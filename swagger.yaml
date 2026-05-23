@@ -1,0 +1,217 @@
+openapi: 3.0.0
+info:
+  title: API Sistema Gastronómico
+  description: 
+  version: 1.0.0
+
+tags:
+  - name: Inicio
+  - name: Menu
+  - name: Reservas
+  - name: Reseñas
+  - name: Admin
+
+paths:
+  /inicio:
+    get:
+      tags:
+        - Inicio
+      summary: Datos del local
+      responses:
+        '200':
+          description: Datos obtenidos correctamente.
+
+  /menu:
+    get:
+      tags:
+        - Menu
+      summary: Listar platos
+      responses:
+        '200':
+          description: Listado de platos.
+
+  /reservas:
+    post:
+      tags:
+        - Reservas
+      summary: Crear reserva
+      responses:
+        '201':
+          description: Reserva creada y QR generado.
+
+  /reservas/{id}:
+    get:
+      tags:
+        - Reservas
+      summary: Detalle reserva
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Información de la reserva.
+
+  /reservas/{id}/cancelar:
+    patch:
+      tags:
+        - Reservas
+      summary: Cancelar reserva (Usuario)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Reserva anulada.
+
+  /reservas/{id}/review:
+    post:
+      tags:
+        - Reseñas
+      summary: Crear reseña vinculada a reserva
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '201':
+          description: Reseña publicada.
+
+  /reviews:
+    get:
+      tags:
+        - Reseñas
+      summary: Listar todas las reseñas
+      responses:
+        '200':
+          description: Lista de reseñas públicas.
+
+  /admin/login:
+    put:
+      tags:
+        - Admin
+      summary: Login administrador
+      responses:
+        '200':
+          description: Autenticación exitosa.
+
+  /admin/reservas:
+    get:
+      tags:
+        - Admin
+      summary: Ver todas las reservas
+      responses:
+        '200':
+          description: Listado total.
+
+  /admin/reservas/{id}:
+    put:
+      tags:
+        - Admin
+      summary: Actualizar estado de reserva
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Estado actualizado.
+
+  /admin/menu:
+    post:
+      tags:
+        - Admin
+      summary: Crear producto
+      responses:
+        '201':
+          description: Producto creado.
+
+  /admin/menu/{id}:
+    put:
+      tags:
+        - Admin
+      summary: Editar producto
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Producto editado.
+    delete:
+      tags:
+        - Admin
+      summary: Eliminar producto
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Producto eliminado.
+
+  /admin/servicios:
+    get:
+      tags:
+        - Admin
+      summary: Listar servicios
+      responses:
+        '200':
+          description: Lista de servicios.
+    post:
+      tags:
+        - Admin
+      summary: Crear servicio
+      responses:
+        '201':
+          description: Servicio creado.
+
+  /admin/servicios/{id}:
+    put:
+      tags:
+        - Admin
+      summary: Editar servicio
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Servicio editado.
+    delete:
+      tags:
+        - Admin
+      summary: Eliminar servicio
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Servicio eliminado.
+
+  /admin/dashboard:
+    get:
+      tags:
+        - Admin
+      summary: Ver estadísticas
+      responses:
+        '200':
+          description: Estadísticas obtenidas.
