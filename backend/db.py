@@ -6,7 +6,7 @@ load_dotenv()
 
 DATABASE_HOST = os.getenv('MYSQL_HOST', 'localhost')
 DATABASE_USERNAME = os.getenv('MYSQL_USERNAME', 'root')
-DATABASE_PASSWORD = os.getenv('MYSQL_PASSWORD', '')
+DATABASE_PASSWORD = os.getenv('MYSQL_PASSWORD', 'root')
 DATABASE_NAME = os.getenv('MYSQL_DATABASE', 'cafeteria')
 DATABASE_PORT = os.getenv('MYSQL_PORT', 3306)
 
