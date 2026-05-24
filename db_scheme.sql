@@ -30,6 +30,15 @@ CREATE TABLE IF NOT EXISTS reservas(
     FOREIGN KEY (id_usuario) REFERENCES usuarios (id_usuario)
 );
 
+CREATE TABLE IF NOT EXISTS resenas(
+	id_resena INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
+    id_reserva INT NOT NULL,
+    estrellas INT NOT NULL,
+    comentario VARCHAR(300) NOT NULL,
+    fecha DATETIME DEFAULT current_timestamp(),
+	FOREIGN KEY (id_reserva) REFERENCES reservas (id_reserva)
+);
+
 
 CREATE TABLE IF NOT EXISTS servicios(
 	id_servicio INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
@@ -49,19 +58,9 @@ CREATE TABLE IF NOT EXISTS menu(
     activo BOOLEAN DEFAULT true
 );
 
-CREATE TABLE IF NOT EXISTS resenas(
-	id_resena INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
-    id_usuario INT NOT NULL,
-    estrellas INT NOT NULL,
-    comentario VARCHAR(300) NOT NULL,
-    fecha DATETIME DEFAULT current_timestamp(),
-    FOREIGN KEY (id_reserva) REFERENCES reservas(id_reserva),
-	FOREIGN KEY (id_usuario) REFERENCES usuarios (id_usuario)
-);
-
 
 CREATE TABLE IF NOT EXISTS administrador(
 	id_admin INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
     usuario VARCHAR(30) NOT NULL UNIQUE,
-    contrasenia VARCHAR(50) NOT NULL
+    contrasenia VARCHAR(255) NOT NULL
 );

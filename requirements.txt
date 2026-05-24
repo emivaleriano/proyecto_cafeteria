@@ -4,3 +4,5 @@ python-dotenv
 qrcode
 pillow
 pre-commit
+PyJWT
+bcrypt
