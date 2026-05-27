@@ -5,12 +5,12 @@ from dotenv import load_dotenv
 load_dotenv(Path(__file__).parent / ".env")
 
 from backend.blueprints.admin_routes import admin_bp # noqa: E402
+from backend.blueprints.inicio_routes import inicio_bp  # noqa: E402
 
 
 app = Flask(__name__)
 
 app.register_blueprint(admin_bp, url_prefix="/admin")
-
 
 @app.route('/')
 def home():
