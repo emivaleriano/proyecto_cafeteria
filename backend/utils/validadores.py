@@ -74,3 +74,15 @@ def validar_fecha(fecha_str):
             crear_error(HTTP_BAD_REQUEST_CODE, MENSAJE_SOLICITUD_INVALIDA, f"La fecha '{fecha_str}' no tiene el formato YYYY-MM-DD")
         ])
     return fecha_str
+
+def validar_estrellas(estrellas):
+    """Valida que estrellas sea un entero entre 1 y 5"""
+    if not isinstance(estrellas, int) or not (1 <= estrellas <= 5):
+        raise ValueError("'estrellas' debe ser un número entero entre 1 y 5")
+    return estrellas
+
+def validar_comentario(comentario):
+    """Valida que el comentario sea un string no vacío"""
+    if not comentario or not isinstance(comentario, str) or not comentario.strip():
+        raise ValueError("'comentario' no puede estar vacío")
+    return comentario.strip()
