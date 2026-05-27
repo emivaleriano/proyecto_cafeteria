@@ -1,4 +1,5 @@
 from backend.db import obtener_conexion
+### Agregar pool de conexiones
 
 def obtener_servicios():
     """Obtiene todos los servicios"""
