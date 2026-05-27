@@ -13,7 +13,6 @@ from backend.blueprints.servicios_routes import servicios_bp # noqa: E402
 app = Flask(__name__)
 registrar_manejadores(app)
 
-
 app.register_blueprint(admin_bp, url_prefix="/admin")
 app.register_blueprint(servicios_bp, url_prefix="/servicios")
 
