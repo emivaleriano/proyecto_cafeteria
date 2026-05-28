@@ -1,11 +1,10 @@
 from flask import Blueprint, request
 
 from backend.services.reservas_service import (
-    data_crear_reserva,
+    crear_nueva_reserva,
     data_obtener_reserva,
     data_cancelar_reserva
 )
-
 from backend.utils.respuestas import (
     crear_respuesta_exito,
     crear_error,
@@ -24,7 +23,7 @@ def crear_reserva_route():
 
     data = request.get_json()
 
-    resultado = data_crear_reserva(data)
+    resultado = crear_nueva_reserva(data)
 
     if "error" in resultado:
 
