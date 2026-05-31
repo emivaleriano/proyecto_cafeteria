@@ -11,6 +11,7 @@ from backend.repositories.inicio_repository import (
     insertar_resena,
 )
 from backend.utils.validadores import validar_estrellas, validar_comentario
+from backend.services.servicios_service import obtener_servicios_activos
 
 def _timedelta_a_str(td):
     '''Convierte un objeto timedelta a una cadena en formato "HH:MM"'''
@@ -32,6 +33,8 @@ inicio_bp = Blueprint("/", __name__)
 def get_inicio():
     try:
         franjas = get_franjas_horarias()
+        servicios = obtener_servicios_activos()
+        nombres_servicios = [s["nombre"] for s in servicios]
 
         horarios = [
             {
@@ -49,12 +52,7 @@ def get_inicio():
             "direccion": "Av. Santa Fe 1234, Palermo, Buenos Aires",
             "telefono":  "+54 11 4987-6543",
             "email":     "hola@labrasa.com.ar",
-            "servicios_disponibles": [
-                "Acceso para personas con discapacidad",
-                "Estacionamiento",
-                "Opciones veganas",
-                "Sin TACC",
-            ],
+            "servicios_disponibles": nombres_servicios,
             "horarios": horarios,
         }
 
