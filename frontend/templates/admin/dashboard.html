@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+
+{% block title %}Admin - Dashboard{% endblock %}
+
+{% block body %}
+<h1>Dashboard</h1>
+
+<div class="base-contenedor">
+    <div class="tarjeta-stats">
+        <ul>
+            <li>
+                <span class="stat-label">Total reservas</span>
+                <span class="stat-valor">{{ stats.total_reservas }}</span>
+            </li>
+            <li>
+                <span class="stat-label">Reservas hoy</span>
+                <span class="stat-valor">{{ stats.reservas_hoy }}</span>
+            </li>
+            <li>
+                <span class="stat-label">Cancelaciones</span>
+                <span class="stat-valor">{{ stats.cancelaciones }}</span>            
+            </li>
+            <li>
+                <span class="stat-label">Reseñas</span>
+                <span class="stat-valor">{{ stats.resenas }}</span>
+            </li>        
+        </ul>
+    </div>
+
+    <h2>Reservas</h2>
+        <table class="tabla-admin">
+            <thead>
+                <tr>
+                    <th>Cliente</th>
+                    <th>Fecha</th>
+                    <th>Personas</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for reserva in reservas %}
+                    <tr>
+                        <td>{{ reserva.nombre }}</td>
+                        <td>{{ reserva.fecha }}</td>
+                        <td>{{ reserva.cantidad }}</td>
+                        <td>{{ reserva.estado }}</td>
+                        <td>
+                            {% if reserva.estado == 'Pendiente' %}
+                                <a class="boton-confirmar" href="{{ url_for('admin.actualizar_reserva', id=reserva.id_reserva) }}?estado=Confirmada">Confirmar</a>
+                                <a class="boton-cancelar" href="{{ url_for('admin.actualizar_reserva', id=reserva.id_reserva) }}?estado=Cancelada">Cancelar</a>
+                            {% elif reserva.estado == 'Confirmada' %}
+                                <a class="boton-cancelar" href="{{ url_for('admin.actualizar_reserva', id=reserva.id_reserva) }}?estado=Cancelada">Cancelar</a>
+                            {% elif reserva.estado == 'Completada' %}
+                                <a class="boton-cancelar" href="{{ url_for('reseña', id=reserva.id) }}">Ver reseña</a>
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    
+    <h2>Menú</h2>
+    <div class="contenedor-menu-admin">
+        <a href="{{ url_for('admin.crear_plato') }}">+ Agregar plato</a>
+        {% for plato in platos %}
+        <div class="menu-admin-tarjeta"> 
+            <h3>{{ plato.nombre }}</h3>
+            <p>{{ plato.descripcion }}</p>
+            <span>{{ plato.precio }}</span>
+            {%  if plato.tags %}
+            <ul>
+                {% for tag in plato.tags %}
+                <li> {{ tag }} </li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+            <a href="{{ url_for('admin.editar_plato', id=plato.id) }}">Editar plato</a>
+            <a href="{{ url_for('admin.eliminar_plato', id=plato.id) }}">Eliminar</a>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<h2>Servicios</h2>
+    <div class="contenedor-servicios-admin">
+    <a href="{{ url_for('admin.crear_servicio') }}">+ Crear servicio</a>
+    {% for servicio in servicios %}
+    <div class="servicio-admin-tarjeta"> 
+        <span>{{ servicio.nombre }}</span>
+        <p>{{ servicio.descripcion }}</p>
+        <a href="{{ url_for('admin.editar_servicio', id=servicio.id_servicio) }}">Editar servicio</a>
+        <a href="{{ url_for('admin.eliminar_servicio', id=servicio.id_servicio) }}">Eliminar servicio</a>
+        <a href="{{ url_for('admin.cambiar_estado_servicio', id=servicio.id_servicio) }}">Cambiar estado</a>
+    </div>
+    {% endfor %}
+    </div>
+</div>
+
+{% endblock %}

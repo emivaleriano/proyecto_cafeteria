@@ -1,0 +1,38 @@
+{% extends "base_usuarios.html" %}
+
+{% block title %} Menú - Sistema de reservas {% endblock %}
+
+{% block body %} 
+    <h1>Menú</h1>
+    <p>Nuestros platos</p>    
+
+    <section class="menu">
+
+        {% for categoria in productos | groupby("categoria") %}
+        
+        <div class="menu__categoria">
+            <h2> {{ categoria.grouper }}</h2>
+            
+            {% for producto in categoria.list %}
+                <div class="producto">
+                    <h3>{{ producto.nombre }}</h3>
+                    <img src="{{ producto.imagen }}" alt="{{ producto.nombre }}">
+                    <p>{{ producto.descripcion }}</p>
+                    <span>{{ producto.precio }}</span> 
+                    {% if producto.tags %}
+                        <div class="producto__tags">
+                            <ul>
+                                {% for tag in producto.tags %}
+                                    <li class="producto__tag">{{ tag }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+
+        </div>
+        {% endfor %}    
+    </section>
+
+{% endblock %}

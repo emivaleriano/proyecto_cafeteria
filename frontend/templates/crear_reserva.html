@@ -1,0 +1,94 @@
+{% extends "base_usuarios.html" %}
+
+{% block title %} Reservar - Sistema de reservas {% endblock %}
+
+{% block body %}
+<h1>Reservar</h1>
+<p>Reservá una mesa para visitarnos</p>
+
+<form class="reservar" method="POST" action="{{ url_for('crear_reserva') }}">
+    
+    <section class="reservar__datos-reserva">
+
+        <h2>Detalles de la reserva</h2>
+
+        <label for="fecha">Fecha</label>
+        <input type="date" id="fecha" name="fecha" required>
+
+        <label for="horario">Horario</label>
+        <select id="horario" name="horario" required>
+            <option disabled selected>Elegí un horario</option>
+            {% for horario in horarios_disponibles %}
+            <option value="{{ horario }}">{{ horario }}hs</option>
+            {% endfor %}
+        </select>
+
+        <label for="cantidad_personas">Cantidad de personas</label>
+        <input type="number">
+
+    </section>
+
+    <section class="reservar__datos-personales">
+
+        <h2>Tus datos</h2>
+        
+        <label for="nombre">Nombre</label>
+        <input type="text" name="nombre" id="nombre">
+        
+        <label for="email">Email</label>
+        <input type="email" name="email" id="email">
+
+        <label for="telefono">Telefono</label>
+        <input type="tel" name="telefono" id="telefono">
+
+    </section>
+
+    <section class="reservar__alergias">
+
+        <h2>Alergias o restricciones alimenticias</h2>
+
+        <div class="reservar__contenedor-alergias">
+
+            {% for alergia in alergias_opciones %}
+            <div>
+            <input type="checkbox" name="alergias[]" value="{{ alergia.id }}">
+            <span>{{ alergia.nombre }}</span>    
+            </div>
+            {% endfor %}
+
+            <label for="otras_restricciones">Otras restricciones</label>
+            <input type="text" name="otras_restricciones" id="otras_restricciones">
+
+        </div>
+
+    </section>
+
+    <section class="reservar__servicios">
+
+        <h2>Servicios adicionales</h2>
+
+        <div class="reservar__contenedor-servicios">
+
+            {% for servicio in servicios_disponibles %}
+            <div>
+                <input type="checkbox" name="servicios[]" id="servicio">
+                <span>{{ servicio.nombre }}</span>
+            </div>
+            {% endfor %}
+            
+        </div>
+
+    </section>
+
+    <section class="reservar__comentarios">
+        
+        <h2>Comentarios</h2>
+        <input type="text" name="comentarios">
+
+    </section>
+    
+    <button class="boton boton--submit" type="submit">Solicitar reserva</button>
+
+</form>
+
+{% endblock %}

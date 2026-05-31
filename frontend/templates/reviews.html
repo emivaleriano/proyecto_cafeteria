@@ -1,0 +1,38 @@
+{% extends "base_usuarios.html" %}
+
+{% block title %}Reseñas - Sistema de reservas{% endblock %}
+
+{% block body %}
+
+
+<section class="reviews">
+
+    <h1>Reseñas</h1>
+    <p>Opiniones de nuestros clientes</p>
+
+    <div class="reviews__contenedor">
+        {% for review in reviews %}
+            <div class="reviews__tarjeta">
+
+                <div class="review__contenedor-estrellas">
+                    {% for i in range(1,6) %}
+                        {% if  i <= review.estrellas %}
+                            <span>★</span>
+                        {% else %}
+                            <span>☆</span>
+                        {% endif  %}
+                    {% endfor  %}
+                </div>
+
+                <p>{{ review.comentario }}</p>
+
+                <time datetime="{{ review.fecha.isoformat() }}">
+                    {{ review.fecha.strftime('%d/%m/%Y') }}
+                </time>
+
+            </div>
+        {% endfor %}
+
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}Admin - Login{% endblock %}
+
+{% block body %}
+<h1>Login</h1>
+
+<form class="login" method="POST" action="{{ url_for('admin.login') }}">
+    
+    <label for="usuario">Usuario</label>
+    <input type="text" id="usuario" name="usuario" required autofocus>
+
+
+    <label for="contra">Contraseña</label>
+    <input type="password" id="contra" name="contra" required>
+
+    <button class="boton boton--submit" type="submit">Ingresar</button>
+
+</form>
+{% endblock %}
