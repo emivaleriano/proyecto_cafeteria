@@ -9,11 +9,11 @@
 </head>
 <body>
     <header>
-        {% block nav %}{{ datos.nombre }}{% endblock %}
+        {% block nav %}{{ (datos | default({})).nombre | default('') }}{% endblock %}
     </header>
     {% block body %}{% endblock %}
     <footer>
-        <p>2026 {{ datos.nombre }}</p>
+        <p>2026 {{ (datos | default({})).nombre | default('') }}</p>
     </footer>
 </body>
 </html>

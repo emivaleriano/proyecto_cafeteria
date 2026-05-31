@@ -26,8 +26,8 @@
 
                 <p>{{ review.comentario }}</p>
 
-                <time datetime="{{ review.fecha.isoformat() }}">
-                    {{ review.fecha.strftime('%d/%m/%Y') }}
+                <time datetime="{{ review.fecha }}">
+                    {{ review.fecha[:10] }}
                 </time>
 
             </div>

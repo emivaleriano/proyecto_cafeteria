@@ -3,17 +3,15 @@
 {% block title %}{{ datos.nombre }}{% endblock %}
 
 {% block body %}
-    
-    <section class="hero">    
+
+    <section class="hero">
         <h1 class="hero__titulo">{{ datos.nombre }}</h1>
         <p class="hero__descripcion">{{ datos.descripcion }}</p>
-        <a class="boton boton--reservar" href="{{ url_for('crear_reserva') }}" >
-            Reservar
-        </a>
-        <a class="boton boton--menu" href="{{ url_for('menu') }}">
+        {#<a class="boton boton--reservar" href="{{ url_for('crear_reserva') }}" > Reservar</a>#}
+        <a class="boton boton--menu" href="{{ url_for('publico.menu') }}">
             Menú
         </a>
-        <a class="boton boton--reviews" href="{{ url_for('reviews') }}">
+        <a class="boton boton--reviews" href="{{ url_for('publico.reviews') }}">
             Reseñas
         </a>
     </section>
@@ -30,7 +28,7 @@
 
                 <dt>Email</dt>
                 <dd>{{ datos.email }}</dd>
-            </dl> 
+            </dl>
         </div>
 
         <div class="servicios">
@@ -43,7 +41,7 @@
 
         <div class="horarios">
             <h2>¡Visitános!</h2>
-            <a class="boton boton--reservar" href="{{ url_for('crear_reserva') }}"></a>
+            {#<a class="boton boton--reservar" href="{{ url_for('crear_reserva') }}"></a>#}
             <table class="horarios__tabla">
                 <tbody>
                     {% for dia in datos.horarios %}
@@ -55,4 +53,4 @@
             </table>
         </div>
     </section>
-{% endblock %} 
+{% endblock %}
