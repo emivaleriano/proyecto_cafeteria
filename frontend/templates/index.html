@@ -48,7 +48,9 @@
                 <tbody>
                     {% for dia in datos.horarios %}
                     <tr>
-
+                        <td>{{ dia.dia }}</td>
+                        <td>{{ dia.hora_apertura }}</td>
+                        <td>{{ dia.hora_cierre }}</td>
                     </tr>
                     {% endfor %}
                 </tbody>
