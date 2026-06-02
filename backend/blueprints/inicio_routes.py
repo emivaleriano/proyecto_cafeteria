@@ -13,6 +13,8 @@ from backend.repositories.inicio_repository import (
 )
 from backend.utils.validadores import validar_estrellas, validar_comentario
 
+inicio_bp = Blueprint("inicio", __name__)
+
 def _timedelta_a_str(td):
     '''Convierte un objeto timedelta a una cadena en formato "HH:MM"'''
     if hasattr(td, "seconds"):
@@ -27,7 +29,7 @@ DIAS = {
 }
 
 '''/inicio: Devuelve la informacion general del local'''
-@inicio_repository.route("/inicio", methods=["GET"])
+@inicio_bp.route("/inicio", methods=["GET"])
 def get_inicio():
     try:
         franjas = get_franjas_horarias()
@@ -72,7 +74,7 @@ def get_inicio():
         ), HTTP_INTERNAL_ERROR_CODE
     
 '''/reviews: Devuelve las reseñas publicadas'''
-@inicio_repository.route("/reviews", methods=["GET"])
+@inicio_bp.route("/reviews", methods=["GET"])
 def get_reviews():
     try:
         resenas = get_resenas_publicas()
@@ -96,7 +98,7 @@ def get_reviews():
         ), HTTP_INTERNAL_ERROR_CODE
     
 '''/reservas/<id_reserva>/review: Permite publicar una reseña para una reserva completada'''
-@inicio_repository.route("/reservas/<int:id_reserva>/review", methods=["POST"])
+@inicio_bp.route("/reservas/<int:id_reserva>/review", methods=["POST"])
 def post_review(id_reserva):
     try:
         body = request.get_json(silent=True)
