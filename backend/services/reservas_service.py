@@ -17,7 +17,7 @@ from backend.utils.validadores import (
 
 from datetime import datetime
 import uuid
-
+import json
 
 def crear_nueva_reserva(data):
 
@@ -70,13 +70,16 @@ def crear_nueva_reserva(data):
         id_usuario = usuario["id_usuario"]
 
     qr = str(uuid.uuid4())
+    alergias_json  = json.dumps(data.get("alergias", []))
+    servicios_json = json.dumps(data.get("servicios", []))
+
 
     id_reserva = crear_reserva(
         id_usuario,
         fecha_hora,
         cantidad_personas,
-        data.get("alergias"),
-        data.get("servicios"),
+        alergias_json,
+        servicios_json,
         data.get("observaciones"),
         "Pendiente",
         qr
@@ -86,6 +89,8 @@ def crear_nueva_reserva(data):
         "id_reserva": id_reserva,
         "qr": qr
     }
+
+
 
 
 def data_obtener_reserva(id_reserva):

@@ -50,10 +50,8 @@ def crear_usuario(nombre, email, telefono):
 
 
 def obtener_franja_por_dia(dia_semana):
-
     conn = obtener_conexion()
     cursor = conn.cursor(dictionary=True)
-
     try:
 
         cursor.execute(
