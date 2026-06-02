@@ -6,8 +6,8 @@
 <h1>Reservar</h1>
 <p>Reservá una mesa para visitarnos</p>
 
-<form class="reservar" method="POST" action="{{ url_for('crear_reserva') }}">
-    
+<form class="reservar" method="POST" action="{{ url_for('publico.crear_reserva') }}">
+
     <section class="reservar__datos-reserva">
 
         <h2>Detalles de la reserva</h2>
@@ -18,23 +18,23 @@
         <label for="horario">Horario</label>
         <select id="horario" name="horario" required>
             <option disabled selected>Elegí un horario</option>
-            {% for horario in horarios_disponibles %}
-            <option value="{{ horario }}">{{ horario }}hs</option>
+            {% for horario in horarios %}
+            <option value="{{ horario.hora_apertura }}">{{ horario.dia }} {{ horario.hora_apertura }}hs</option>
             {% endfor %}
         </select>
 
-        <label for="cantidad_personas">Cantidad de personas</label>
-        <input type="number">
+        <label for="cantidad_personas" >Cantidad de personas</label>
+        <input type="number" name="cantidad_personas">
 
     </section>
 
     <section class="reservar__datos-personales">
 
         <h2>Tus datos</h2>
-        
+
         <label for="nombre">Nombre</label>
         <input type="text" name="nombre" id="nombre">
-        
+
         <label for="email">Email</label>
         <input type="email" name="email" id="email">
 
@@ -52,7 +52,7 @@
             {% for alergia in alergias_opciones %}
             <div>
             <input type="checkbox" name="alergias[]" value="{{ alergia.id }}">
-            <span>{{ alergia.nombre }}</span>    
+            <span>{{ alergia.nombre }}</span>
             </div>
             {% endfor %}
 
@@ -71,22 +71,21 @@
 
             {% for servicio in servicios_disponibles %}
             <div>
-                <input type="checkbox" name="servicios[]" id="servicio">
-                <span>{{ servicio.nombre }}</span>
+                <input type="checkbox" name="servicios[]" value="{{ servicio.id_servicio }}" id="servicio_{{ servicio.id_servicio }}">                <span>{{ servicio.nombre }}</span>
             </div>
             {% endfor %}
-            
+
         </div>
 
     </section>
 
     <section class="reservar__comentarios">
-        
+
         <h2>Comentarios</h2>
         <input type="text" name="comentarios">
 
     </section>
-    
+
     <button class="boton boton--submit" type="submit">Solicitar reserva</button>
 
 </form>

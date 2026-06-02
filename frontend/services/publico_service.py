@@ -5,6 +5,14 @@ from flask import current_app
 def _base_url():
     return current_app.config.get("API_BASE_URL", "http://localhost:5000/api")
 
+ALERGIAS_OPCIONES = [
+    {"id": "gluten",       "nombre": "Gluten"},
+    {"id": "lactosa",      "nombre": "Lactosa"},
+    {"id": "mariscos",     "nombre": "Mariscos"},
+    {"id": "frutos_secos", "nombre": "Frutos secos"},
+    {"id": "huevo",        "nombre": "Huevo"},
+    {"id": "soja",         "nombre": "Soja"},
+]
 
 def get_inicio():
     """
@@ -92,3 +100,86 @@ def post_review(id_reserva, estrellas, comentario):
         return body.get("datos", {}), None
 
     return None, body.get("mensaje", "Error al crear la reseña.")
+
+
+
+def get_datos_reserva():
+    inicio, error = get_inicio()
+    if error:
+        return None, error
+
+    try:
+        res = requests.get(f"{_base_url()}/servicios/activos", timeout=10)
+    except requests.exceptions.ConnectionError:
+        return None, "No se pudo conectar con el servidor."
+    except requests.exceptions.Timeout:
+        return None, "El servidor tardó demasiado en responder."
+
+    body = res.json()
+    if res.status_code != 200 or not body.get("exito"):
+        return None, body.get("mensaje", "Error al obtener los servicios.")
+
+    return {
+        "horarios":              inicio.get("horarios", []),
+        "servicios_disponibles": body.get("datos", []),
+        "alergias_opciones":     ALERGIAS_OPCIONES,
+    }, None
+
+
+def post_reserva(form):
+    fecha      = form.get("fecha", "").strip()
+    horario    = form.get("horario", "").strip()
+    fecha_hora = f"{fecha}T{horario}"
+
+    payload = {
+        "nombre":            form.get("nombre", "").strip(),
+        "email":             form.get("email", "").strip(),
+        "telefono":          form.get("telefono", "").strip(),
+        "cantidad_personas": form.get("cantidad_personas"),
+        "fecha_hora":        fecha_hora,
+        "alergias":          form.getlist("alergias[]"),
+        "servicios":         form.getlist("servicios[]"),
+        "observaciones":     form.get("comentarios", "").strip(),
+    }
+
+    try:
+        res = requests.post(f"{_base_url()}/reservas", json=payload, timeout=10)
+    except requests.exceptions.ConnectionError:
+        return None, "No se pudo conectar con el servidor."
+    except requests.exceptions.Timeout:
+        return None, "El servidor tardó demasiado en responder."
+
+    body = res.json()
+    if res.status_code == 201 and body.get("exito"):
+        return body.get("datos", {}), None
+    return None, body.get("mensaje", "Error al crear la reserva.")
+
+def get_reserva(id_reserva):
+    try:
+        res = requests.get(f"{_base_url()}/reservas/{id_reserva}", timeout=10)
+    except requests.exceptions.ConnectionError:
+        return None, "No se pudo conectar con el servidor."
+    except requests.exceptions.Timeout:
+        return None, "El servidor tardó demasiado en responder."
+
+    body = res.json()
+    if res.status_code == 200 and body.get("exito"):
+        return body.get("datos", {}), None
+    return None, body.get("mensaje", "Error al obtener la reserva.")
+
+
+def post_cancelar_reserva(id_reserva):
+    try:
+        res = requests.patch(
+            f"{_base_url()}/reservas/{id_reserva}/cancelar",
+            timeout=10,
+        )
+    except requests.exceptions.ConnectionError:
+        return None, "No se pudo conectar con el servidor."
+    except requests.exceptions.Timeout:
+        return None, "El servidor tardó demasiado en responder."
+
+    body = res.json()
+    if res.status_code == 200 and body.get("exito"):
+        return body.get("datos", {}), None
+    return None, body.get("mensaje", "Error al cancelar la reserva.")
