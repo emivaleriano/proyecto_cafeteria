@@ -13,6 +13,8 @@ from backend.repositories.inicio_repository import (
 from backend.utils.validadores import validar_estrellas, validar_comentario
 from backend.services.servicios_service import obtener_servicios_activos
 
+inicio_bp = Blueprint("inicio", __name__)
+
 def _timedelta_a_str(td):
     '''Convierte un objeto timedelta a una cadena en formato "HH:MM"'''
     if hasattr(td, "seconds"):
