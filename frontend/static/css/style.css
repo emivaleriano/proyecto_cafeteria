@@ -1,0 +1,115 @@
+/* base.html */
+
+body {
+    margin: 0;
+    border: 0;
+    background-color: whitesmoke;
+    font-family: system-ui;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    text-shadow: 0 0 20px 5px black;
+}
+
+footer {
+    background-color: coral;
+    color: white;
+    text-align: center;
+    margin-top: auto;
+    box-shadow: 0px -5px 20px grey;
+    font-weight: 600;
+}
+
+/* NAV DE USUARIOS - base_usuario.html */
+
+nav {
+    background-color: coral;
+    display: flex;
+    box-shadow: 0px 5px 20px  grey;
+    text-align: center;
+    font-weight: 600;
+    color: white;
+    margin: auto;
+    padding-bottom: 5px;
+    padding-top: 5px;
+}
+
+nav a {
+    color: white;
+    text-decoration: none;
+    padding-right: 5px;
+    padding-left: 5px;
+}
+
+nav a:hover{
+    text-shadow: 0px 0px 10px black;
+}
+
+#nav-usuarios__logo {
+    margin-right: auto;
+}
+
+section.hero {
+    color: white;
+    background-image: url(https://images.unsplash.com/photo-1607681034540-2c46cc71896d?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3Dhttps://lushfabric.com/wp-content/uploads/2019/01/coffee-beans-bean-cafe-cotton-fabric-curtain-upholstery-craft-material-140cm-wide-brown-5c41e2a01.jpg); 
+    height: 100vh;
+}
+
+section.hero h1 {
+    font-size: 72px;
+    -webkit-text-stroke: 2px black;
+    text-shadow: 0px 0px 30px 10px black;
+}
+
+section.hero p {
+    font-size: 48px;
+    -webkit-text-stroke: 2px black;
+    text-shadow: 0px 0px 30px 10px black;
+}
+
+
+
+.boton {
+    display: flex;
+    text-decoration: none;
+    width: 200px;
+    align-items: center;
+    justify-content: center;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    background-color: coral;
+    padding: 10px;
+    color: white;
+    box-shadow: 0px 0px 10px grey
+}
+
+section.informacion {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap 10px;
+}
+
+section.informacion > div {
+    background-color: whitesmoke;
+    border-radius: 15px;
+    box-shadow: 0 0 15px black;
+    padding: 5px;
+    margin: 15px;
+}
+
+div.datos {
+    grid-column: 1 / 3;
+}
+
+table.horarios__tabla {
+    width: 100%;
+    background-color: grey;
+    border-radius: 15px;
+    padding: 15px;
+}
+
+dt {
+    color: grey;
+}
