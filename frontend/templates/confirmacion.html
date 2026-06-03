@@ -5,35 +5,35 @@
 {% block body %}
 
 <section class="confirmacion__contenedor">
-    
+
     <div class="confirmacion__header">
         <h1>Reserva confirmada</h1>
     </div>
 
     <div class="confirmacion__body">
         <h2>¡Te esperamos!</h2>
-        
+
         <img src="{{ reserva.qr }}" alt="QR">
-        
+
         <p>Presentá este codigo en recepción al llegar.</p>
 
         <div class="confirmacion__datos">
             <dl>
                 <dt>Fecha y horario</dt>
-                <dd>{{ reserva.fecha_horario }}</dd>
+                <dd>{{ reserva.fecha_hora}}</dd>
 
                 <dt>Personas</dt>
-                <dd>{{ reserva.personas }}</dd>
+                <dd>{{ reserva.cantidad_personas }}</dd>
 
                 <dt>Direccion</dt>
                 <dd>{{ datos.direccion }}</dd>
             </dl>
         </div>
 
-        <a class="boton boton--cancelar-reserva" href="{{ url_for('cancelar_reserva', id=reserva.id) }}">
-            Cancelar reserva
-        </a>
+        <form method="POST" action="{{ url_for('publico.cancelar_reserva', id_reserva=reserva.id_reserva) }}">
+            <button class="btn_cancelar_reserva" type="submit">Cancelar reserva</button>
+        </form>
     </div>
-    
+
 </section>
 {% endblock %}c

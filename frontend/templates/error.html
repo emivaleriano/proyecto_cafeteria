@@ -1,0 +1,9 @@
+{% extends "base_usuarios.html" %}
+{% block title %}Error{% endblock %}
+{% block body %}
+<section class="error">
+    <h1>Algo salió mal</h1>
+    <p>{{ mensaje }}</p>
+    <a href="{{ url_for('publico.inicio') }}">Volver al inicio</a>
+</section>
+{% endblock %}

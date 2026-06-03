@@ -1,12 +1,12 @@
 {% extends "base.html" %}
 
 {% block nav %}
-    
-    <nav class="nav-usuarios"> 
-        <a href="{{ url_for('inicio') }}">Inicio</a>
-        <a href="{{ url_for('menu') }}">Menú</a>
-        <a href="{{ url_for('reservar') }}">Reservas</a>
-        <a href="{{ url_for('reviews') }}">Reseñas</a>
+
+    <nav class="nav-usuarios">
+        <a href="{{ url_for('publico.inicio') }}">Inicio</a>
+        <a href="{{ url_for('publico.menu') }}">Menú</a>
+        <a href="{{ url_for('publico.crear_reserva') }}">Reservas</a>
+        <a href="{{ url_for('publico.reviews') }}">Reseñas</a>
     </nav>
 
 {% endblock %}
