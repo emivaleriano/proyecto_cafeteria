@@ -3,7 +3,7 @@ from flask import current_app
 
 
 def _base_url():
-    return current_app.config.get("API_BASE_URL", "http://localhost:5000/api")
+    return current_app.config.get("API_BASE_URL", "http://localhost:5000")
 
 ALERGIAS_OPCIONES = [
     {"id": "gluten",       "nombre": "Gluten"},
