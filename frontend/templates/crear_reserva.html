@@ -19,7 +19,7 @@
         <select id="horario" name="horario" required>
             <option disabled selected>Elegí un horario</option>
             {% for horario in horarios %}
-            <option value="{{ horario.hora_apertura }}">{{ horario.dia }} {{ horario.hora_apertura }}hs</option>
+            <option disabled selected value="">Seleccione una fecha</option>
             {% endfor %}
         </select>
 
@@ -89,5 +89,13 @@
     <button class="boton boton--submit" type="submit">Solicitar reserva</button>
 
 </form>
-
+<script>
+    const HORARIOS_DATA = [
+        {% for h in horarios %}
+        { dia: "{{ h.dia }}", hora_apertura: "{{ h.hora_apertura }}", hora_cierre: "{{ h.hora_cierre }}" }{% if not loop.last %},{% endif %}
+        {% endfor %}
+    ];
+</script>
+<script src="{{ url_for('static', filename='division_horarios_reserva.js') }}"></script>
+{#Si marca error en el VS es pq espera todo js dentro de script pero no rompe, despues funciona bien#}
 {% endblock %}
