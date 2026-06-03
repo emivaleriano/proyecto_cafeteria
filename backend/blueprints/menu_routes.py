@@ -1,5 +1,6 @@
 from flask import Blueprint, request
 from backend.services.menu_service import listar_menu, data_nuevo_producto, data_modificacion_producto, data_eliminar_producto
+from backend.utils.admin import requiere_admin
 from backend.utils.respuestas import (
     crear_respuesta_exito,
     crear_error,
@@ -22,6 +23,7 @@ def obtener_menu_route():
     )
 
 @menu_bp.route("/admin/menu", methods=["POST"])
+@requiere_admin
 def nuevo_producto():
     data = request.get_json()
     id_producto = data_nuevo_producto(data)
@@ -33,6 +35,7 @@ def nuevo_producto():
     )
 
 @menu_bp.route("/admin/menu/<int:id>", methods=["PUT"])
+@requiere_admin
 def cambios_producto(id):
 
     data = request.get_json()
@@ -56,6 +59,7 @@ def cambios_producto(id):
     )
 
 @menu_bp.route("/admin/menu/<int:id>", methods=["DELETE"])
+@requiere_admin
 def eliminacion_producto(id):
 
     filas_eliminadas = data_eliminar_producto(id)

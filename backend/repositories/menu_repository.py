@@ -1,4 +1,5 @@
 from backend.db import obtener_conexion
+import json
 
 def obtener_menu_activo():
     conn = obtener_conexion()
@@ -6,12 +7,19 @@ def obtener_menu_activo():
     try:
         cursor.execute(
             "SELECT * FROM menu WHERE activo = true")
-        return cursor.fetchall()
+        productos = cursor.fetchall()
+        for producto in productos:
+            if producto["tags"]:
+                producto["tags"] = json.loads(producto["tags"]) #pasa los tags a una lista en python para que se vea bien el front
+
+        return productos
+
     finally:
         cursor.close()
         conn.close()
 
 def crear_producto(nombre, descripcion, precio, categoria, tags, imagen, activo):
+
     conn = obtener_conexion()
     cursor = conn.cursor(dictionary=True)
 
@@ -25,7 +33,7 @@ def crear_producto(nombre, descripcion, precio, categoria, tags, imagen, activo)
     finally:
         cursor.close()
         conn.close()
-    
+
 def modificar_producto(nombre, descripcion, precio, categoria, tags, imagen, activo, id_producto):
     conn = obtener_conexion()
     cursor = conn.cursor(dictionary=True)
@@ -46,7 +54,7 @@ def eliminar_producto(id_producto):
     cursor = conn.cursor(dictionary=True)
 
     try:
-        cursor.execute("DELETE FROM menu WHERE id = %s",(id_producto))
+        cursor.execute("DELETE FROM menu WHERE id = %s",(id_producto,))
         conn.commit()
         return cursor.rowcount
 
