@@ -1,10 +1,12 @@
 import requests
-from flask import current_app
 
+from dotenv import load_dotenv
+from pathlib import Path
+import os
 
-def _base_url():
-    return current_app.config.get("API_BASE_URL", "http://localhost:5000")
+load_dotenv(Path(__file__).parent / ".env")
 
+API_BASE_URL = os.getenv("API_BASE_URL")
 ALERGIAS_OPCIONES = [
     {"id": "gluten",       "nombre": "Gluten"},
     {"id": "lactosa",      "nombre": "Lactosa"},
@@ -20,7 +22,7 @@ def get_inicio():
     Retorna (datos, None) o (None, mensaje_error).
     """
     try:
-        res = requests.get(f"{_base_url()}/inicio", timeout=10)
+        res = requests.get(f"{API_BASE_URL}/inicio", timeout=10)
     except requests.exceptions.ConnectionError:
         return None, "No se pudo conectar con el servidor."
     except requests.exceptions.Timeout:
@@ -42,7 +44,7 @@ def get_menu():
     Retorna (lista_productos, None) o (None, mensaje_error).
     """
     try:
-        res = requests.get(f"{_base_url()}/menu", timeout=10)
+        res = requests.get(f"{API_BASE_URL}/menu", timeout=10)
     except requests.exceptions.ConnectionError:
         return None, "No se pudo conectar con el servidor."
     except requests.exceptions.Timeout:
@@ -64,7 +66,7 @@ def get_reviews():
     Retorna (lista_reviews, None) o (None, mensaje_error).
     """
     try:
-        res = requests.get(f"{_base_url()}/reviews", timeout=10)
+        res = requests.get(f"{API_BASE_URL}/reviews", timeout=10)
     except requests.exceptions.ConnectionError:
         return None, "No se pudo conectar con el servidor."
     except requests.exceptions.Timeout:
@@ -85,7 +87,7 @@ def post_review(id_reserva, estrellas, comentario):
     """
     try:
         res = requests.post(
-            f"{_base_url()}/reservas/{id_reserva}/review",
+            f"{API_BASE_URL}/reservas/{id_reserva}/review",
             json={"estrellas": estrellas, "comentario": comentario},
             timeout=10,
         )
@@ -109,7 +111,7 @@ def get_datos_reserva():
         return None, error
 
     try:
-        res = requests.get(f"{_base_url()}/servicios/activos", timeout=10)
+        res = requests.get(f"{API_BASE_URL}/servicios/activos", timeout=10)
     except requests.exceptions.ConnectionError:
         return None, "No se pudo conectar con el servidor."
     except requests.exceptions.Timeout:
@@ -143,7 +145,7 @@ def post_reserva(form):
     }
 
     try:
-        res = requests.post(f"{_base_url()}/reservas", json=payload, timeout=10)
+        res = requests.post(f"{API_BASE_URL}/reservas", json=payload, timeout=10)
     except requests.exceptions.ConnectionError:
         return None, "No se pudo conectar con el servidor."
     except requests.exceptions.Timeout:
@@ -156,7 +158,7 @@ def post_reserva(form):
 
 def get_reserva(id_reserva):
     try:
-        res = requests.get(f"{_base_url()}/reservas/{id_reserva}", timeout=10)
+        res = requests.get(f"{API_BASE_URL}/reservas/{id_reserva}", timeout=10)
     except requests.exceptions.ConnectionError:
         return None, "No se pudo conectar con el servidor."
     except requests.exceptions.Timeout:
@@ -171,7 +173,7 @@ def get_reserva(id_reserva):
 def post_cancelar_reserva(id_reserva):
     try:
         res = requests.patch(
-            f"{_base_url()}/reservas/{id_reserva}/cancelar",
+            f"{API_BASE_URL}/reservas/{id_reserva}/cancelar",
             timeout=10,
         )
     except requests.exceptions.ConnectionError:
