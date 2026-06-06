@@ -1,69 +1,27 @@
 from flask import Blueprint, request
 from backend.utils.respuestas import (
     HTTP_OK_CODE, HTTP_INTERNAL_ERROR_CODE,
-    crear_respuesta_exito, crear_error
+    crear_respuesta_exito, crear_error,
 )
-from backend.repositories.inicio_repository import (
-    get_franjas_horarias,
-    get_resenas_publicas,
-    get_reserva_para_resena,
-    get_resena_por_reserva,
-    insertar_resena,
+from backend.services.inicio_service import (
+    obtener_info_local,
+    obtener_resenas,
+    crear_resena,
 )
-from backend.utils.validadores import validar_estrellas, validar_comentario
-from backend.services.servicios_service import obtener_servicios_activos
-
-inicio_bp = Blueprint("inicio", __name__)
-
-def _timedelta_a_str(td):
-    '''Convierte un objeto timedelta a una cadena en formato "HH:MM"'''
-    if hasattr(td, "seconds"):
-        total = int(td.total_seconds())
-        h, m = divmod(total // 60, 60)
-        return f"{h:02d}:{m:02d}"
-    return str(td)[:5]
-
-DIAS = {
-    0: "Lunes", 1: "Martes", 2: "Miércoles", 3: "Jueves",
-    4: "Viernes", 5: "Sábado", 6: "Domingo",
-}
 
 inicio_bp = Blueprint("/", __name__)
 
-'''/inicio: Devuelve la informacion general del local'''
+
+"""/inicio: Devuelve la informacion general del local"""
 @inicio_bp.route("/inicio", methods=["GET"])
 def get_inicio():
     try:
-        franjas = get_franjas_horarias()
-        servicios = obtener_servicios_activos()
-        nombres_servicios = [s["nombre"] for s in servicios]
-
-        horarios = [
-            {
-                "id_franja":        f["id_franja"],
-                "dia":              DIAS.get(f["dia_semana"], f["dia_semana"]),
-                "hora_apertura":    _timedelta_a_str(f["hora_apertura"]),
-                "hora_cierre":      _timedelta_a_str(f["hora_cierre"]),
-                "capacidad_maxima": f["capacidad_maxima"],
-            }
-            for f in franjas
-        ]
-        '''Datos estaticos del local,'''
-        data = {
-            "nombre":    "La Brasa — Cocina de Fuego",
-            "direccion": "Av. Santa Fe 1234, Palermo, Buenos Aires",
-            "telefono":  "+54 11 4987-6543",
-            "email":     "hola@labrasa.com.ar",
-            "servicios_disponibles": nombres_servicios,
-            "horarios": horarios,
-        }
-
+        data = obtener_info_local()
         return crear_respuesta_exito(
             datos=data,
             mensaje="Información del local obtenida correctamente",
             codigo=HTTP_OK_CODE,
         )
-
     except Exception as e:
         return crear_error(
             codigo=HTTP_INTERNAL_ERROR_CODE,
@@ -72,22 +30,17 @@ def get_inicio():
             nivel="error",
         ), HTTP_INTERNAL_ERROR_CODE
 
-'''/reviews: Devuelve las reseñas publicadas'''
+
+"""/reviews: Devuelve las reseñas publicadas"""
 @inicio_bp.route("/reviews", methods=["GET"])
 def get_reviews():
     try:
-        resenas = get_resenas_publicas()
-
-        for r in resenas:
-            if r.get("fecha"):
-                r["fecha"] = r["fecha"].strftime("%Y-%m-%d %H:%M:%S")
-
+        resenas = obtener_resenas()
         return crear_respuesta_exito(
             datos=resenas,
             mensaje="Reseñas obtenidas correctamente",
             codigo=HTTP_OK_CODE,
         )
-
     except Exception as e:
         return crear_error(
             codigo=HTTP_INTERNAL_ERROR_CODE,
@@ -96,7 +49,8 @@ def get_reviews():
             nivel="error",
         ), HTTP_INTERNAL_ERROR_CODE
 
-'''/reservas/<id_reserva>/review: Permite publicar una reseña para una reserva completada'''
+
+"""/reservas/<id_reserva>/review: Permite publicar una reseña para una reserva completada"""
 @inicio_bp.route("/reservas/<int:id_reserva>/review", methods=["POST"])
 def post_review(id_reserva):
     try:
@@ -106,36 +60,15 @@ def post_review(id_reserva):
 
         estrellas  = body.get("estrellas")
         comentario = body.get("comentario")
-        '''Valida formato de los datos'''
+
         try:
-            validar_estrellas(estrellas)
-            validar_comentario(comentario)
+            nuevo_id = crear_resena(id_reserva, estrellas, comentario)
+        except LookupError as le:
+            return crear_error(404, "No encontrada", str(le)), 404
         except ValueError as ve:
-            return crear_error(400, "Datos inválidos", str(ve)), 400
-
-        '''Verifica que la reserva exista'''
-        reserva = get_reserva_para_resena(id_reserva)
-        if not reserva:
-            return crear_error(404, "No encontrada", "La reserva no existe"), 404
-
-        '''Verifica que el estado de la reserva sea completada'''
-        if reserva["estado"] != "Completada":
-            return crear_error(
-                400, "Estado inválido",
-                "Solo se pueden reseñar reservas con estado 'Completada'"
-            ), 400
-
-        '''Verifica que no haya una reseña previa para esta reserva'''
-        if get_resena_por_reserva(id_reserva):
-            return crear_error(
-                409, "Duplicado", "Ya existe una reseña para esta reserva"
-            ), 409
-
-        nuevo_id = insertar_resena(
-            id_reserva=id_reserva,
-            estrellas=estrellas,
-            comentario=comentario.strip(),
-        )
+            msg = str(ve)
+            codigo = 409 if "Ya existe" in msg else 400
+            return crear_error(codigo, "Datos inválidos", msg), codigo
 
         return crear_respuesta_exito(
             datos={"id_resena": nuevo_id},
