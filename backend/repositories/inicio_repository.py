@@ -1,5 +1,6 @@
 from backend.db import obtener_conexion
 
+
 def get_franjas_horarias():
     conexion = obtener_conexion()
     cursor = conexion.cursor(dictionary=True)
@@ -12,6 +13,7 @@ def get_franjas_horarias():
     cursor.close()
     conexion.close()
     return resultado
+
 
 def get_resenas_publicas():
     """Devuelve una lista de reseñas publicadas a nombre del usuario"""
@@ -34,6 +36,7 @@ def get_resenas_publicas():
     conexion.close()
     return resultado
 
+
 def get_reserva_para_resena(id_reserva):
     """Devuelve el estado de una reserva para validar si puede escribir una reseña"""
     conexion = obtener_conexion()
@@ -48,6 +51,7 @@ def get_reserva_para_resena(id_reserva):
     conexion.close()
     return resultado
 
+
 def get_resena_por_reserva(id_reserva):
     """Verifica si ya existe una reseña para una reserva dada"""
     conexion = obtener_conexion()
@@ -61,6 +65,7 @@ def get_resena_por_reserva(id_reserva):
     cursor.close()
     conexion.close()
     return resultado
+
 
 def insertar_resena(id_reserva, estrellas, comentario):
     conexion = obtener_conexion()

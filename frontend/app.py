@@ -11,7 +11,7 @@ app = Flask(__name__)
 
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "clave-local-desarrollo")
 app.config["PERMANENT_SESSION_LIFETIME"] = timedelta(hours=8)
-app.config["API_BASE_URL"] = os.environ.get("API_BASE_URL")
+app.config["_base_url"] = os.environ.get("_base_url")
 app.register_blueprint(admin_front_bp)
 app.register_blueprint(publico_bp)
 
