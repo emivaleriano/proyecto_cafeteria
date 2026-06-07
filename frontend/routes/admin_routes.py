@@ -29,7 +29,6 @@ def login():
 
 @admin_front_bp.route("/dashboard")
 def dashboard():
-
     if not session.get("admin_token"):
         return redirect(url_for("admin.login"))
     return render_template("admin/dashboard.html", datos={})
