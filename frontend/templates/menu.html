@@ -3,35 +3,60 @@
 {% block title %} Menú - Sistema de reservas {% endblock %}
 
 {% block body %} 
-    <h1>Menú</h1>
-    <p>Nuestros platos</p>    
-
+    <section class="encabezado-pagina">
+        <h1>Menú</h1>
+        <hr>
+        <p>Nuestros platos</p>
+    </section>      
+    
     <section class="menu">
 
         {% for categoria in productos | groupby("categoria") %}
         
         <div class="menu__categoria">
-            <h2> {{ categoria.grouper }}</h2>
-            
-            {% for producto in categoria.list %}
-                <div class="producto">
-                    <h3>{{ producto.nombre }}</h3>
-                    <img src="{{ producto.imagen }}" alt="{{ producto.nombre }}">
-                    <p>{{ producto.descripcion }}</p>
-                    <span>{{ producto.precio }}</span> 
-                    {% if producto.tags %}
-                        <div class="producto__tags">
-                            <ul>
-                                {% for tag in producto.tags %}
-                                    <li class="producto__tag">{{ tag }}</li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-                    {% endif %}
-                </div>
-            {% endfor %}
 
-        </div>
+    <h2>{{ categoria.grouper }}</h2>
+
+    <div class="menu__productos">
+
+        {% for producto in categoria.list %}
+
+        <article class="producto">
+
+            <img src="{{ producto.imagen }}"
+                 alt="{{ producto.nombre }}">
+
+            <div class="producto__contenido">
+
+                <h3>{{ producto.nombre }}</h3>
+
+                <p>{{ producto.descripcion }}</p>
+
+                <span class="producto__precio">
+                    ${{ producto.precio }}
+                </span>
+
+                {% if producto.tags %}
+                <div class="producto__tags">
+                    <ul>
+                        {% for tag in producto.tags %}
+                        <li class="producto__tag">
+                            {{ tag }}
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endif %}
+
+            </div>
+
+        </article>
+
+        {% endfor %}
+
+    </div>
+
+</div>
         {% endfor %}    
     </section>
 

@@ -5,13 +5,15 @@
 {% block body %}
 
     <section class="hero">
-        <h1 class="hero__titulo">{{ datos.nombre }}</h1>
+        <h1>{{ datos.nombre }}</h1>
         <p class="hero__descripcion">{{ datos.descripcion }}</p>
-        <a class="boton boton--reservar" href="{{ url_for('publico.crear_reserva') }}" > Reservar</a>
         <a class="boton boton--menu" href="{{ url_for('publico.menu') }}">
             Menú
         </a>
-        <a class="boton boton--reviews" href="{{ url_for('publico.reviews') }}">
+        <a class="boton boton--reservar" href="{{ url_for('publico.crear_reserva') }}">
+            Reservar
+        </a>
+                <a class="boton boton--reviews" href="{{ url_for('publico.reviews') }}">
             Reseñas
         </a>
     </section>
@@ -20,18 +22,28 @@
 
         <div class="datos">
             <dl>
-                <dt>Dirección</dt>
-                <dd>{{ datos.direccion }}</dd>
+                <div id="datos__direccion">
+                    <dt>Dirección</dt>
+                    <dd>{{ datos.direccion }}</dd>
+                </div>
 
-                <dt>Teléfono</dt>
-                <dd>{{ datos.telefono }}</dd>
-
-                <dt>Email</dt>
-                <dd>{{ datos.email }}</dd>
+                <hr>                
+                
+                <div id="datos__telefono">
+                    <dt>Teléfono</dt>
+                    <dd>{{ datos.telefono }}</dd>
+                </div>
+                
+                <div id="datos__email">
+                    <dt>Email</dt>
+                    <dd>{{ datos.email }}</dd>
+                </div>
+                
             </dl>
         </div>
 
         <div class="servicios">
+            <h2>Servicios disponibles</h2>
                 <ul>
                     {% for servicio in datos.servicios_disponibles %}
                     <li>{{ servicio }}</li>
@@ -40,8 +52,12 @@
             </div>
 
         <div class="horarios">
-            <h2>¡Visitános!</h2>
-            <a class="boton boton--reservar" href="{{ url_for('publico.crear_reserva') }}">Reservar</a>
+            
+            <div class="horarios__header">
+                <h2>¡Visitános!</h2>
+                <a class="boton boton--reservar" href="{{ url_for('publico.crear_reserva') }}">Reservar</a>
+            </div>
+
             <table class="horarios__tabla">
                 <tbody>
                     {% for dia in datos.horarios %}
