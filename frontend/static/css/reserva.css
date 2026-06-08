@@ -1,0 +1,203 @@
+/* ══════════════════════════════════════════════
+   RESERVA.CSS
+   Conectar en: crear_reserva.html · confirmacion.html
+   ══════════════════════════════════════════════ */
+
+main {
+  padding: 60px 5%;
+}
+
+main > h1 {
+  font-family: var(--font-display);
+  font-size: 2.6rem;
+  font-style: italic;
+  color: var(--cafe);
+  margin-bottom: 4px;
+}
+
+main > p {
+  color: var(--texto-suave);
+  font-weight: 300;
+  margin-bottom: 40px;
+}
+
+/* ── Layout del formulario ── */
+.reservar {
+  max-width: 700px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+/* ── Panel compartido — reemplaza la lista larga de selectores ── */
+.reservar__panel {
+  background: var(--blanco-caldo);
+  border-radius: 10px;
+  padding: 30px 32px;
+  box-shadow: 0 3px 14px var(--sombra);
+}
+
+.reservar__panel h2 {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-style: italic;
+  color: var(--cafe);
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--crema-oscura);
+}
+
+/* ── Campos de formulario ── */
+label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--texto-suave);
+  margin-top: 14px;
+  margin-bottom: 5px;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="date"],
+input[type="number"],
+select,
+textarea {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1.5px solid var(--crema-oscura);
+  border-radius: 6px;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: var(--texto);
+  background: var(--crema);
+  transition: border-color 0.25s, box-shadow 0.25s;
+  appearance: none;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--cafe-suave);
+  box-shadow: 0 0 0 3px rgba(196, 149, 106, 0.2);
+  background: var(--blanco-caldo);
+}
+
+textarea { resize: vertical; min-height: 90px; }
+
+/* ── Grids de checkboxes ── */
+.reservar__contenedor-alergias,
+.reservar__contenedor-servicios {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.reservar__contenedor-alergias > div,
+.reservar__contenedor-servicios > div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1.5px solid var(--crema-oscura);
+  border-radius: 6px;
+  background: var(--crema);
+  font-size: 0.9rem;
+  color: var(--texto-suave);
+  cursor: pointer;
+  transition: border-color 0.25s, background 0.25s;
+}
+
+.reservar__contenedor-alergias > div:has(input:checked),
+.reservar__contenedor-servicios > div:has(input:checked) {
+  border-color: var(--cafe);
+  background: #fff8f2;
+  color: var(--cafe);
+}
+
+input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  flex-shrink: 0;
+  accent-color: var(--cafe);
+  cursor: pointer;
+}
+
+/* ══════════════════════════════════════════════
+   CONFIRMACIÓN
+   ══════════════════════════════════════════════ */
+.confirmacion__contenedor {
+  max-width: 560px;
+  margin: 0 auto;
+}
+
+.confirmacion__header h1 {
+  font-family: var(--font-display);
+  font-size: 2.6rem;
+  font-style: italic;
+  color: var(--cafe);
+  margin-bottom: 28px;
+}
+
+.confirmacion__body {
+  background: var(--blanco-caldo);
+  border-radius: 10px;
+  padding: 36px 32px;
+  box-shadow: 0 3px 14px var(--sombra);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  text-align: center;
+}
+
+.confirmacion__body h2 {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-style: italic;
+  color: var(--cafe-claro);
+}
+
+.confirmacion__body img {
+  width: 180px;
+  height: 180px;
+  object-fit: contain;
+}
+
+.confirmacion__datos dl { text-align: left; width: 100%; }
+
+.confirmacion__datos dt {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--cafe-suave);
+  margin-top: 14px;
+}
+.confirmacion__datos dt:first-child { margin-top: 0; }
+.confirmacion__datos dd { font-size: 0.95rem; }
+
+.btn_cancelar_reserva {
+  background: transparent;
+  color: var(--cafe-suave);
+  border: 1.5px solid var(--cafe-suave);
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 10px 22px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.25s, color 0.25s;
+}
+.btn_cancelar_reserva:hover {
+  background: var(--cafe-suave);
+  color: var(--blanco-caldo);
+}

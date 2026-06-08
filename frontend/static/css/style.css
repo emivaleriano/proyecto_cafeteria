@@ -51,7 +51,7 @@ nav a:hover{
 
 section.hero {
     color: white;
-    background-image: url(https://images.unsplash.com/photo-1607681034540-2c46cc71896d?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3Dhttps://lushfabric.com/wp-content/uploads/2019/01/coffee-beans-bean-cafe-cotton-fabric-curtain-upholstery-craft-material-140cm-wide-brown-5c41e2a01.jpg); 
+    background-image: url(https://images.unsplash.com/photo-1607681034540-2c46cc71896d?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3Dhttps://lushfabric.com/wp-content/uploads/2019/01/coffee-beans-bean-cafe-cotton-fabric-curtain-upholstery-craft-material-140cm-wide-brown-5c41e2a01.jpg);
     height: 100vh;
 }
 
@@ -88,7 +88,7 @@ section.hero p {
 section.informacion {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap 10px;
+    gap:10px;
 }
 
 section.informacion > div {
