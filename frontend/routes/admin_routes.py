@@ -10,8 +10,7 @@ from frontend.services.admin_service import (
     service_eliminar_servicio,
     service_eliminar_plato,
     service_obtener_reserva,
-    service_obtener_dashboard
-
+    obtener_dashboard
     )
 
 
@@ -49,14 +48,27 @@ def logout():
     session.clear()
     return redirect(url_for("admin.login"))
 
-@admin_front_bp.route("/dashboard", methods=["GET"])
-def dashboard():
-    sesion = requiere_sesion()
-    if sesion:
-        return sesion
-    reservas, platos, servicios = service_obtener_dashboard(session["admin_token"])
-    return render_template("admin/dashboard.html", reservas=reservas, platos=platos, servicios=servicios)
 
+@admin_front_bp.route("/dashboard")
+def dashboard():
+    if not session.get("admin_token"):
+        return redirect(url_for("admin.login"))
+
+    token = session.get("admin_token")
+    datos, error = obtener_dashboard(token)
+
+    print("ERROR:", error)
+    print("DATOS:", datos)
+
+    if error:
+        datos = {"stats": {}, "reservas": [], "platos": [], "servicios": []}
+
+    return render_template("admin/dashboard.html",
+        stats = datos.get("stats", {}),
+        reservas = datos.get("reservas", []),
+        platos = datos.get("platos", []),
+        servicios = datos.get("servicios", [])
+    )
 
 # ------- Platos
 
