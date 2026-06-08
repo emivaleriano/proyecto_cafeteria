@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session
-from frontend.services.admin_service import login_admin
+from frontend.services.admin_service import login_admin, obtener_dashboard
 
 admin_front_bp = Blueprint("admin", __name__, template_folder="../templates")
 
@@ -32,7 +32,19 @@ def dashboard():
 
     if not session.get("admin_token"):
         return redirect(url_for("admin.login"))
-    return render_template("admin/dashboard.html", datos={})
+
+    token = session.get("admin_token")
+    datos, error = obtener_dashboard(token)
+
+    if error:
+        datos = {"stats": {}, "reservas": [], "platos": [], "servicios": []}
+
+    return render_template("admin/dashboard.html",
+        stats = datos.get("stats", {}),
+        reservas = datos.get("reservas", []),
+        platos = datos.get("platos", []),
+        servicios = datos.get("servicios", [])
+    )
 
 
 @admin_front_bp.route("/logout")
