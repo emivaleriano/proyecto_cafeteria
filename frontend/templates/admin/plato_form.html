@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}
+  {% if plato %}Editar plato{% else %}Nuevo plato{% endif %} - Admin
+{% endblock %}
+
+{% block body %}
+<h1>{% if plato %}Editar plato{% else %}Nuevo plato{% endif %}</h1>
+<p>{% if plato %}Modificá los datos del plato.{% else %}Completá los datos para agregar un plato al menú.{% endif %}</p>
+
+<div class="reservar">
+  <div class="reservar__panel">
+    <h2>Datos del plato</h2>
+
+    <form method="POST" action="
+      {%- if plato -%}
+        {{ url_for('admin.editar_plato', id=plato.id) }}
+      {%- else -%}
+        {{ url_for('admin.crear_plato') }}
+      {%- endif -%}
+    ">
+
+      <label for="nombre">Nombre</label>
+      <input type="text" id="nombre" name="nombre"
+             value="{{ plato.nombre if plato else '' }}" required>
+
+      <label for="descripcion">Descripción</label>
+      <textarea id="descripcion" name="descripcion">{{ plato.descripcion if plato else '' }}</textarea>
+
+      <label for="precio">Precio</label>
+      <input type="text" id="precio" name="precio"
+             value="{{ plato.precio if plato else '' }}" required>
+
+      <label for="categoria">Categoría</label>
+      <input type="text" id="categoria" name="categoria"
+             value="{{ plato.categoria if plato else '' }}">
+
+      <label for="imagen">URL de imagen</label>
+      <input type="text" id="imagen" name="imagen"
+             value="{{ plato.imagen if plato else '' }}">
+
+      <label for="tags">Tags (separados por coma)</label>
+      <input type="text" id="tags" name="tags"
+             value="{{ plato.tags | join(', ') if plato and plato.tags else '' }}"
+             placeholder="vegano, sin gluten, destacado">
+
+      <button type="submit" class="boton boton--submit">
+        {% if plato %}Guardar cambios{% else %}Crear plato{% endif %}
+      </button>
+    </form>
+  </div>
+
+  <a href="{{ url_for('admin.dashboard') }}" class="boton boton--reviews">
+    ← Volver al dashboard
+  </a>
+</div>
+{% endblock %}
