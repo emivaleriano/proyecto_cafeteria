@@ -1,16 +1,17 @@
+import json
 from backend.repositories.menu_repository import obtener_menu_activo, crear_producto, modificar_producto, eliminar_producto
 
 def listar_menu():
     return obtener_menu_activo()
 
 def data_nuevo_producto(data):
-
+    tags_json = json.dumps(data.get("tags", []))
     return crear_producto(
         data["nombre"],
         data["descripcion"],
         data["precio"],
         data["categoria"],
-        data.get("tags"),
+        tags_json,
         data["imagen"]
     )
 

@@ -18,7 +18,7 @@ def obtener_menu_activo():
         cursor.close()
         conn.close()
 
-def crear_producto(nombre, descripcion, precio, categoria, tags, imagen, activo):
+def crear_producto(nombre, descripcion, precio, categoria, tags, imagen, activo=True):
 
     conn = obtener_conexion()
     cursor = conn.cursor(dictionary=True)
