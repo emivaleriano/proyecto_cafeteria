@@ -42,17 +42,26 @@
                 {% for reserva in reservas %}
                     <tr>
                         <td>{{ reserva.nombre }}</td>
-                        <td>{{ reserva.fecha }}</td>
-                        <td>{{ reserva.cantidad }}</td>
+                        <td>{{ reserva.fecha_hora }}</td>
+                        <td>{{ reserva.cantidad_personas }}</td>
                         <td>{{ reserva.estado }}</td>
                         <td>
                             {% if reserva.estado == 'Pendiente' %}
-                                <a class="boton-confirmar" href="{{ url_for('admin.actualizar_reserva', id=reserva.id_reserva) }}?estado=Confirmada">Confirmar</a>
-                                <a class="boton-cancelar" href="{{ url_for('admin.actualizar_reserva', id=reserva.id_reserva) }}?estado=Cancelada">Cancelar</a>
+                            <form method="POST" action="{{ url_for('admin.actualizar_estado_reserva', id=reserva.id_reserva) }}" style="display:inline">
+                            <input type="hidden" name="estado" value="Confirmada">
+                                <button type="submit" class="boton-confirmar">Confirmar</button>
+                            </form>
+                            <form method="POST" action="{{ url_for('admin.actualizar_estado_reserva', id=reserva.id_reserva) }}" style="display:inline">
+                            <input type="hidden" name="estado" value="Cancelada">
+                                <button type="submit" class="boton-cancelar">Cancelar</button>
+                            </form>
                             {% elif reserva.estado == 'Confirmada' %}
-                                <a class="boton-cancelar" href="{{ url_for('admin.actualizar_reserva', id=reserva.id_reserva) }}?estado=Cancelada">Cancelar</a>
+                            <form method="POST" action="{{ url_for('admin.actualizar_estado_reserva', id=reserva.id_reserva) }}" style="display:inline">
+                            <input type="hidden" name="estado" value="Cancelada">
+                                <button type="submit" class="boton-cancelar">Cancelar</button>
+                            </form>
                             {% elif reserva.estado == 'Completada' %}
-                                <a class="boton-cancelar" href="{{ url_for('reseña', id=reserva.id) }}">Ver reseña</a>
+                            <a href="{{ url_for('admin.reserva_detalle', id=reserva.id_reserva) }}">Ver reserva</a>
                             {% endif %}
                         </td>
                     </tr>
@@ -62,7 +71,7 @@
 
     <h2>Menú</h2>
     <div class="contenedor-menu-admin">
-       {# <a href="{{ url_for('admin.crear_plato') }}">+ Agregar plato</a>#}
+       <a href="{{ url_for('admin.crear_plato') }}">+ Agregar plato</a>
         {% for plato in platos %}
         <div class="menu-admin-tarjeta">
             <h3>{{ plato.nombre }}</h3>
@@ -75,26 +84,50 @@
                 {% endfor %}
             </ul>
             {% endif %}
-            {#<a href="{{ url_for('admin.editar_plato', id=plato.id) }}">Editar plato</a>#}
-            {#<a href="{{ url_for('admin.eliminar_plato', id=plato.id) }}">Eliminar</a>#}
-        </div>
+            <a href="{{ url_for('admin.editar_plato', id=plato.id) }}">Editar plato</a>
+            <form method="POST" action="{{ url_for('admin.eliminar_plato', id=plato.id) }}" style="display:inline">
+                <button type="submit" class="boton-cancelar">Eliminar</button>
+            </form>
+         </div>
         {% endfor %}
     </div>
 </div>
 
 <h2>Servicios</h2>
     <div class="contenedor-servicios-admin">
-    {#<a href="{{ url_for('admin.crear_servicio') }}">+ Crear servicio</a>#}
+    <a href="{{ url_for('admin.crear_servicio') }}">+ Crear servicio</a>
     {% for servicio in servicios %}
     <div class="servicio-admin-tarjeta">
         <span>{{ servicio.nombre }}</span>
         <p>{{ servicio.descripcion }}</p>
         <a href="{{ url_for('admin.editar_servicio', id=servicio.id_servicio) }}">Editar servicio</a>
-        <a href="{{ url_for('admin.eliminar_servicio', id=servicio.id_servicio) }}">Eliminar servicio</a>
-        <a href="{{ url_for('admin.cambiar_estado_servicio', id=servicio.id_servicio) }}">Cambiar estado</a>
+        <form method="POST" action="{{ url_for('admin.eliminar_servicio', id=servicio.id_servicio) }}" style="display:inline">
+            <button type="submit">Eliminar servicio</button>
+        </form>
+        <form method="POST" action="{{ url_for('admin.cambiar_estado_servicio', id=servicio.id_servicio) }}" style="display:inline">
+            <button type="submit">Cambiar estado</button>
+        </form>
     </div>
     {% endfor %}
     </div>
-</div>
+
 
 {% endblock %}
+
+
+
+
+
+{#
+GET /admin/platos/nuevo → renderiza plato_form.html
+POST /admin/platos/nuevo → procesa y redirige
+GET /admin/platos/<id>/editar → renderiza plato_form.html con el plato
+POST /admin/platos/<id>/editar → procesa y redirige
+GET /admin/servicios/nuevo → renderiza servicio_form.html
+POST /admin/servicios/nuevo → procesa y redirige
+GET /admin/servicios/<id>/editar → igual
+POST /admin/servicios/<id>/editar → igual
+GET /admin/reservas/<id> → renderiza reserva_detalle.html
+
+
+    #}

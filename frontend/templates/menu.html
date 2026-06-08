@@ -2,23 +2,27 @@
 
 {% block title %} Menú - Sistema de reservas {% endblock %}
 
-{% block body %} 
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/menu.css') }}">
+{% endblock %}
+
+{% block body %}
     <h1>Menú</h1>
-    <p>Nuestros platos</p>    
+    <p>Nuestros platos</p>
 
     <section class="menu">
 
         {% for categoria in productos | groupby("categoria") %}
-        
+
         <div class="menu__categoria">
             <h2> {{ categoria.grouper }}</h2>
-            
+            <div class="productos-grid">
             {% for producto in categoria.list %}
                 <div class="producto">
                     <h3>{{ producto.nombre }}</h3>
                     <img src="{{ producto.imagen }}" alt="{{ producto.nombre }}">
                     <p>{{ producto.descripcion }}</p>
-                    <span>{{ producto.precio }}</span> 
+                    <span>{{ producto.precio }}</span>
                     {% if producto.tags %}
                         <div class="producto__tags">
                             <ul>
@@ -30,9 +34,10 @@
                     {% endif %}
                 </div>
             {% endfor %}
-
+            </div>
         </div>
-        {% endfor %}    
+        {% endfor %}
+
     </section>
 
 {% endblock %}
