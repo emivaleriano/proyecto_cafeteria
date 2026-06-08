@@ -3,10 +3,13 @@
 {% block title %}Reseñas - {{ datos.nombre }}{% endblock %}
 
 {% block body %}
+<section class="encabezado-pagina">
+    <h1>Reseñas</h1>
+    <hr>
+    <p>Dejanos tu opinión sobre tu experiencia en nuestro local</p>
+</section>
 
-<h1>Crear reseña</h1>
-
-<form class="review" method="POST" action="{{ url_for('post_review') }}">
+<form class="review" method="POST" action="{{ url_for('publico.reviews') }}">
     <label for="review__id">Número de reserva</label>
     <input type="review__id" id="review__id" name="id_reserva" >
 

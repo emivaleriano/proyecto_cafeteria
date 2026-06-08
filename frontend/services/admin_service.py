@@ -1,11 +1,12 @@
 import requests
-from flask import current_app
 
+from dotenv import load_dotenv
+from pathlib import Path
+import os
 
-def _base_url():
-    return current_app.config.get("API_BASE_URL", "http://localhost:5000")
+load_dotenv(Path(__file__).parent / ".env")
 
-
+API_BASE_URL = os.getenv("API_BASE_URL")
 def login_admin(usuario, contrasenia):
     """
     Retorna (datos, None) si el login es exitoso.
@@ -13,7 +14,7 @@ def login_admin(usuario, contrasenia):
     """
     try:
         res = requests.post(
-            f"{_base_url()}/admin/login",
+            f"{API_BASE_URL}/admin/login",
             json={"usuario": usuario, "contrasenia": contrasenia},
             timeout=10,
         )
@@ -38,7 +39,7 @@ def obtener_dashboard(token):
 
     try:
         res = requests.get(
-            f"{_base_url()}/admin/dashboard",
+            f"{API_BASE_URL}/admin/dashboard",
             headers=headers,
             timeout=10,
         )
