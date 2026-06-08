@@ -1,0 +1,22 @@
+<div class="producto__contenido">
+
+    <h3>{{ producto.nombre }}</h3>
+
+    <p>{{ producto.descripcion }}</p>
+
+    <span class="producto__precio">
+        ${{ producto.precio }}
+    </span>
+
+    {% if producto.tags %}
+    <div class="producto__tags">
+        <ul>
+            {% for tag in producto.tags %}
+            <li class="producto__tag">
+                {{ tag }}
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
+</div>

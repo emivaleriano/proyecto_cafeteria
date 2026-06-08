@@ -69,65 +69,74 @@
             </tbody>
         </table>
 
-    <h2>Menú</h2>
-    <div class="contenedor-menu-admin">
-       <a href="{{ url_for('admin.crear_plato') }}">+ Agregar plato</a>
-        {% for plato in platos %}
-        <div class="menu-admin-tarjeta">
-            <h3>{{ plato.nombre }}</h3>
-            <p>{{ plato.descripcion }}</p>
-            <span>{{ plato.precio }}</span>
-            {%  if plato.tags %}
-            <ul>
-                {% for tag in plato.tags %}
-                <li> {{ tag }} </li>
-                {% endfor %}
-            </ul>
-            {% endif %}
-            <a href="{{ url_for('admin.editar_plato', id=plato.id) }}">Editar plato</a>
-            <form method="POST" action="{{ url_for('admin.eliminar_plato', id=plato.id) }}" style="display:inline">
-                <button type="submit" class="boton-cancelar">Eliminar</button>
-            </form>
-         </div>
-        {% endfor %}
-    </div>
-</div>
 
-<h2>Servicios</h2>
-    <div class="contenedor-servicios-admin">
-    <a href="{{ url_for('admin.crear_servicio') }}">+ Crear servicio</a>
-    {% for servicio in servicios %}
-    <div class="servicio-admin-tarjeta">
-        <span>{{ servicio.nombre }}</span>
-        <p>{{ servicio.descripcion }}</p>
-        <a href="{{ url_for('admin.editar_servicio', id=servicio.id_servicio) }}">Editar servicio</a>
-        <form method="POST" action="{{ url_for('admin.eliminar_servicio', id=servicio.id_servicio) }}" style="display:inline">
-            <button type="submit">Eliminar servicio</button>
-        </form>
-        <form method="POST" action="{{ url_for('admin.cambiar_estado_servicio', id=servicio.id_servicio) }}" style="display:inline">
-            <button type="submit">Cambiar estado</button>
-        </form>
+
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem;">
+    <h2>Menú</h2>
+    <a class="boton" href="{{ url_for('admin.crear_plato') }}">+ Crear plato</a>
+</div>
+<table class="tabla-admin">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Categoría</th>
+            <th>Precio</th>
+            <th>Activo</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for plato in platos %}
+        <tr>
+            <td>{{ plato.nombre }}</td>
+            <td>{{ plato.categoria }}</td>
+            <td>${{ plato.precio }}</td>
+            <td>{{ 'Sí' if plato.activo else 'No' }}</td>
+            <td>
+                    <a class="boton" href="{{ url_for('admin.editar_plato', id=plato.id) }}">Editar</a>
+                    <form method="POST" action="{{ url_for('admin.eliminar_plato', id=plato.id) }}" style="display:inline">
+                        <button type="submit" class="boton-cancelar">Eliminar</button>
+                    </form>
+                    {#<a class="boton" href="{{ url_for('admin.cambiar_estado_plato', id=plato.id) }}">{{ 'Desactivar' if plato.activo else 'Activar' }}</a>#}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+    <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem;">
+        <h2>Servicios</h2>
+        <a class="boton" href="{{ url_for('admin.crear_servicio') }}">+ Crear servicio</a>
     </div>
-    {% endfor %}
-    </div>
+    <table class="tabla-admin">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Descripción</th>
+                <th>Activo</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for servicio in servicios %}
+            <tr>
+                <td>{{ servicio.nombre }}</td>
+                <td>{{ servicio.descripcion }}</td>
+                <td>{{ 'Sí' if servicio.activo else 'No' }}</td>
+                <td>
+                        <a class="boton" href="{{ url_for('admin.editar_servicio', id=servicio.id_servicio) }}">Editar</a>
+                        <form method="POST" action="{{ url_for('admin.eliminar_servicio', id=servicio.id_servicio) }}" style="display:inline">
+                            <button class="boton-cancelar" type="submit">Eliminar</button>
+                        </form>
+                        <form method="PATCH" action="{{ url_for('admin.cambiar_estado_servicio', id=servicio.id_servicio) }}" style="display:inline">
+                            <button class="boton" type="submit">{{ 'Desactivar' if servicio.activo else 'Activar' }}</button>
+                        </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 
 
 {% endblock %}
-
-
-
-
-
-{#
-GET /admin/platos/nuevo → renderiza plato_form.html
-POST /admin/platos/nuevo → procesa y redirige
-GET /admin/platos/<id>/editar → renderiza plato_form.html con el plato
-POST /admin/platos/<id>/editar → procesa y redirige
-GET /admin/servicios/nuevo → renderiza servicio_form.html
-POST /admin/servicios/nuevo → procesa y redirige
-GET /admin/servicios/<id>/editar → igual
-POST /admin/servicios/<id>/editar → igual
-GET /admin/reservas/<id> → renderiza reserva_detalle.html
-
-
-    #}

@@ -2,17 +2,17 @@
 
 {% block title %}Reseñas - Sistema de reservas{% endblock %}
 
-{% block extra_css %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/reviews.css') }}">
-{% endblock %}
-
 {% block body %}
 
 
 <section class="reviews">
 
-    <h1>Reseñas</h1>
-    <p>Opiniones de nuestros clientes</p>
+    <section class="encabezado-pagina">
+        <h1>Reseñas</h1>
+        <hr>
+        <p>Opiniones de nuestros clientes</p>
+    </section>
+    <section class="reviews">
 
     <div class="reviews__contenedor">
         {% for review in reviews %}

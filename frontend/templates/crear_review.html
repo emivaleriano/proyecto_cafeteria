@@ -4,7 +4,12 @@
 
 {% block body %}
 
-<h1>Crear reseña</h1>
+<section class="encabezado-pagina">
+    <h1>Reseñas</h1>
+    <hr>
+    <p>Dejanos tu opinión sobre tu experiencia en nuestro local</p>
+</section>
+
 
 <form class="review" method="POST" action="{{ url_for('publico.reviews') }}">
     <label for="review__id">Número de reserva</label>
