@@ -1,5 +1,9 @@
 from flask import Blueprint, request, jsonify
 from backend.services.admin_service import autenticar_admin
+from backend.services.dashboard_service import obtener_stats, obtener_reservas
+from backend.repositories.menu_repository import obtener_menu
+from backend.repositories.servicios_repository import obtener_servicios
+from backend.utils.admin import requiere_admin
 from backend.utils.respuestas import (
     crear_error,
     crear_respuesta_exito,
@@ -8,7 +12,6 @@ from backend.utils.respuestas import (
     HTTP_INTERNAL_ERROR_CODE,
 )
 
-from backend.utils.admin import requiere_admin
 
 
 admin_bp = Blueprint("admin", __name__)
@@ -52,4 +55,22 @@ def me():
         datos={"id_admin": request.admin_actual["sub"]},
         mensaje="Token valido",
     )
+    return jsonify(respuesta), codigo
+
+
+@admin_bp.route("/dashboard", methods=['GET'])
+@requiere_admin
+def dashboard_data():
+    stats = obtener_stats()
+    reservas = obtener_reservas()
+    platos = obtener_menu()
+    servicios = obtener_servicios()
+
+    datos = {
+        "stats": stats,
+        "reservas": reservas,
+        "platos": platos,
+        "servicios": servicios
+    }
+    respuesta, codigo = crear_respuesta_exito(datos=datos, mensaje="Dashboard obtenido")
     return jsonify(respuesta), codigo

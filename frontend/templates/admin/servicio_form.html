@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}
+  {% if servicio %}Editar servicio{% else %}Nuevo servicio{% endif %} - Admin
+{% endblock %}
+
+{% block body %}
+<h1>{% if servicio %}Editar servicio{% else %}Nuevo servicio{% endif %}</h1>
+<p>{% if servicio %}Modificá los datos del servicio.{% else %}Completá los datos para crear un nuevo servicio.{% endif %}</p>
+
+<div class="reservar">
+  <div class="reservar__panel">
+    <h2>Datos del servicio</h2>
+
+    <form method="POST" action="
+      {%- if servicio -%}
+        {{ url_for('admin.editar_servicio', id=servicio.id_servicio) }}
+      {%- else -%}
+        {{ url_for('admin.crear_servicio') }}
+      {%- endif -%}
+    ">
+
+      <label for="nombre">Nombre</label>
+      <input type="text" id="nombre" name="nombre"
+             value="{{ servicio.nombre if servicio else '' }}" required>
+
+      <label for="descripcion">Descripción</label>
+      <textarea id="descripcion" name="descripcion">{{ servicio.descripcion if servicio else '' }}</textarea>
+
+      {% if servicio %}
+      <div class="reservar__contenedor-servicios" style="margin-top: 14px;">
+        <div>
+          <input type="checkbox" id="activo" name="activo"
+                 {% if servicio.activo %}checked{% endif %}>
+          <label for="activo" style="margin: 0; text-transform: none; font-size: 0.9rem;">
+            Servicio activo
+          </label>
+        </div>
+      </div>
+      {% endif %}
+
+      <button type="submit" class="boton boton--submit">
+        {% if servicio %}Guardar cambios{% else %}Crear servicio{% endif %}
+      </button>
+    </form>
+  </div>
+
+  <a href="{{ url_for('admin.dashboard') }}" class="boton boton--reviews">
+    ← Volver al dashboard
+  </a>
+</div>
+{% endblock %}

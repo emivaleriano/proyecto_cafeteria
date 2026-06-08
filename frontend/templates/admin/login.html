@@ -3,7 +3,11 @@
 {% block title %}Admin - Login{% endblock %}
 
 {% block body %}
-<h1>Login</h1>
+<section class="encabezado-pagina">
+    <h1>Admin Login</h1>
+    <p>Ingresá tus credenciales para acceder al panel de administración</p>
+</section>
+
 
 <form class="login" method="POST" action="{{ url_for('admin.login') }}">
 

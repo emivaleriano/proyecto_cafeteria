@@ -18,7 +18,25 @@ def obtener_menu_activo():
         cursor.close()
         conn.close()
 
-def crear_producto(nombre, descripcion, precio, categoria, tags, imagen, activo):
+def obtener_menu():
+    """
+    Muestra todos los platos (activos e inactivos).
+    """
+    conn = obtener_conexion()
+    cursor = conn.cursor(dictionary=True)
+    try:
+        cursor.execute("SELECT * FROM menu")
+        productos = cursor.fetchall()
+        for producto in productos:
+            if producto["tags"]:
+                producto["tags"] = json.loads(producto["tags"])
+        return productos
+    finally:
+        cursor.close()
+        conn.close()
+
+
+def crear_producto(nombre, descripcion, precio, categoria, tags, imagen, activo=True):
 
     conn = obtener_conexion()
     cursor = conn.cursor(dictionary=True)

@@ -5,7 +5,9 @@ from backend.repositories.reservas_repository import (
     obtener_franja_por_dia,
     obtener_personas_reservadas,
     obtener_reserva,
-    cancelar_reserva
+    cancelar_reserva,
+    obtener_todas_reservas,
+    actualizar_estado_reserva
 )
 
 from backend.utils.validadores import (
@@ -105,3 +107,13 @@ def data_cancelar_reserva(id_reserva):
     id_reserva = validar_id(id_reserva)
 
     return cancelar_reserva(id_reserva)
+
+def data_obtener_todas_reservas():
+    return obtener_todas_reservas()
+
+def data_actualizar_estado_reserva(id_reserva, estado):
+    id_reserva = validar_id(id_reserva)
+    ESTADOS_VALIDOS = {"Pendiente", "Confirmada", "Cancelada", "Completada"}
+    if estado not in ESTADOS_VALIDOS:
+        return {"error": f"Estado inválido. Debe ser uno de: {', '.join(ESTADOS_VALIDOS)}"}
+    return actualizar_estado_reserva(id_reserva, estado)
