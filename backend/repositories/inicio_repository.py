@@ -79,3 +79,16 @@ def insertar_resena(id_reserva, estrellas, comentario):
     cursor.close()
     conexion.close()
     return nuevo_id
+
+def get_info_local():
+    conexion = obtener_conexion()
+    cursor = conexion.cursor(dictionary=True)
+    cursor.execute("""
+        SELECT nombre, direccion, telefono, email
+        FROM info_local
+        LIMIT 1
+    """)
+    resultado = cursor.fetchone()
+    cursor.close()
+    conexion.close()
+    return resultado
