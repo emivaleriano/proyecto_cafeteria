@@ -1,6 +1,7 @@
 from backend.repositories.inicio_repository import get_franjas_horarias, get_resenas_publicas, get_reserva_para_resena, get_resena_por_reserva, insertar_resena
 from backend.services.servicios_service import obtener_servicios_activos
 from backend.utils.validadores import validar_estrellas, validar_comentario
+from backend.db import obtener_conexion
 
 DIAS = {
     0: "Lunes", 1: "Martes", 2: "Miércoles", 3: "Jueves",
@@ -23,6 +24,8 @@ def obtener_info_local():
     servicios = obtener_servicios_activos()
     nombres_servicios = [s["nombre"] for s in servicios]
 
+    info = get_info_local()
+
     horarios = [
         {
             "id_franja":        f["id_franja"],
@@ -35,12 +38,12 @@ def obtener_info_local():
     ]
 
     return {
-        "nombre":    "La Brasa — Cocina de Fuego",
-        "direccion": "Av. Santa Fe 1234, Palermo, Buenos Aires",
-        "telefono":  "+54 11 4987-6543",
-        "email":     "hola@labrasa.com.ar",
+         "nombre":                info["nombre"],
+        "direccion":             info["direccion"],
+        "telefono":              info["telefono"],
+        "email":                 info["email"],
         "servicios_disponibles": nombres_servicios,
-        "horarios": horarios,
+        "horarios":              horarios,
     }
 
 
@@ -77,3 +80,16 @@ def crear_resena(id_reserva, estrellas, comentario):
         estrellas=estrellas,
         comentario=comentario.strip(),
     )
+
+def get_info_local():
+    conexion = obtener_conexion()
+    cursor = conexion.cursor(dictionary=True)
+    cursor.execute("""
+        SELECT nombre, direccion, telefono, email
+        FROM info_local
+        LIMIT 1
+    """)
+    resultado = cursor.fetchone()
+    cursor.close()
+    conexion.close()
+    return resultado
