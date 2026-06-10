@@ -60,6 +60,25 @@ def login_admin(usuario, contrasenia):
 
     return None, body.get("mensaje", "Error al iniciar sesión.")
 
+def service_cambiar_contrasenia(contra_actual, nueva_contra, confirmar_contra, token):
+    if nueva_contra != confirmar_contra:
+        return None, "Las contraseñas no coinciden."
+
+    if len(nueva_contra) < 8:
+        return None, "La contraseña debe tener al menos 8 caracteres."
+
+    res = _request(
+        "PATCH",
+        f"{API_BASE_URL}/admin/contrasenia",
+        token=token,
+        json={"contra_actual": contra_actual, "nueva_contra": nueva_contra}
+    )
+
+    if res is None:
+        return None, "No se pudo conectar con el servidor."
+
+    return _handle(res, 200, "Error al cambiar la contraseña.")
+
 
 def obtener_dashboard(token): #stats
     """
