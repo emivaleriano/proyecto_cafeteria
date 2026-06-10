@@ -59,6 +59,8 @@ def get_servicio(id):
     servicio = obtener_servicio(id)
     respuesta, codigo = crear_respuesta_exito(datos=servicio)
     return jsonify(respuesta), codigo
+
+
 # decidir si requiere admin o si muestro solo los activos
 
 @servicios_bp.route("/<int:id>", methods=["DELETE"])

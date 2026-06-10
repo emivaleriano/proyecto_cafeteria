@@ -22,7 +22,8 @@ def _handle(res, codigo_exito, mensaje_default):
     return None, body.get("mensaje", mensaje_default)
 
 def _request(method, url, token=None, json=None):
-    """ConnectionError y Timeout."""
+    """ConnectionError y Timeout.
+    Unifica el connection y timeout para evitar la repeticion en cada funcion"""
     try:
         return requests.request(
             method,

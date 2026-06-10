@@ -10,16 +10,19 @@ from backend.repositories.servicios_repository import (
 )
 
 
-
 def obtener_servicios():
     """ Devuelve todos los servicios existentes"""
     return repo_obtener_servicios()
 
 def obtener_servicio(id):
+
     servicio = obtener_servicio_bd(id)
     if not servicio:
         raise LookupError("No existe un servicio con ese ID")
+
     return servicio
+
+
 
 def obtener_servicios_activos():
     """ Devuelve todos los servicios activos"""
@@ -49,7 +52,7 @@ def modificar_servicio(id, nombre, descripcion, activo):
     if not nombre or not descripcion or activo is None:
         raise ValueError("Faltan datos obligatorios: nombre, descripcion, activo")
     servicio = obtener_servicio_por_nombre(nombre)
-    if servicio:
+    if servicio["id_servicio"] != id:
         raise KeyError("Ya existe servicio con ese nombre")
     servicio = obtener_servicio_bd(id)
     if not servicio:

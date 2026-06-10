@@ -20,7 +20,6 @@ def obtener_conexion():
             'port': DATABASE_PORT
         }
         conexion = mysql.connector.connect(**config)
-        print("¡Conexión exitosa a MySQL!")
         return conexion
 
     except mysql.connector.Error as err:
