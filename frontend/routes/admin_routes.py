@@ -10,7 +10,10 @@ from frontend.services.admin_service import (
     service_eliminar_servicio,
     service_eliminar_plato,
     service_obtener_reserva,
-    obtener_dashboard
+    obtener_dashboard,
+    service_cambiar_contrasenia,
+    service_obtener_plato,
+    service_obtener_servicio
     )
 
 
@@ -49,6 +52,29 @@ def logout():
     return redirect(url_for("admin.login"))
 
 
+@admin_front_bp.route("/nueva_clave", methods=["GET", "POST"])
+def cambiar_contrasenia():
+    sesion = requiere_sesion()
+    if sesion:
+        return sesion
+
+    if request.method == "POST":
+        contra_actual    = request.form.get("contra_actual")
+        nueva_contra     = request.form.get("nueva_contra")
+        confirmar_contra = request.form.get("confirmar_contra")
+
+        datos, error = service_cambiar_contrasenia(
+            contra_actual, nueva_contra, confirmar_contra,
+            session["admin_token"]
+        )
+
+        if error:
+            return render_template("admin/cambiar_contrasenia.html", error=error) #si hay un error renderiza la misma con el error
+
+        return redirect(url_for("admin.dashboard")) # si sale bien vuelve al dash
+
+    return render_template("admin/cambiar_contrasenia.html")# get
+
 @admin_front_bp.route("/dashboard")
 def dashboard():
     if not session.get("admin_token"):
@@ -56,9 +82,6 @@ def dashboard():
 
     token = session.get("admin_token")
     datos, error = obtener_dashboard(token)
-
-    print("ERROR:", error)
-    print("DATOS:", datos)
 
     if error:
         datos = {"stats": {}, "reservas": [], "platos": [], "servicios": []}
@@ -99,7 +122,10 @@ def editar_plato(id):
         return sesion
 
     if request.method == "GET":
-        return render_template("admin/plato_form.html")
+        plato, error = service_obtener_plato(id, session["admin_token"])
+        if error:
+            return render_template("error.html", mensaje=error), 503
+        return render_template("admin/plato_form.html", plato=plato) # pasa el plato para mostrar los datos en el modo edicion
     datos = {
         "nombre":      request.form.get("nombre"),
         "descripcion": request.form.get("descripcion"),
@@ -108,6 +134,7 @@ def editar_plato(id):
         "imagen":      request.form.get("imagen"),
         "tags":        [t.strip() for t in request.form.get("tags", "").split(",") if t.strip()],
     }
+    print(datos)
     service_editar_plato(id, datos, session["admin_token"])
     return redirect(url_for("admin.dashboard"))
 
@@ -146,7 +173,11 @@ def editar_servicio(id):
         return sesion
 
     if request.method == "GET":
-        return render_template("admin/servicio_form.html")
+        servicio, error = service_obtener_servicio(id, session["admin_token"])
+        if error:
+            return render_template("error.html", mensaje=error), 503
+        return render_template("admin/servicio_form.html", servicio=servicio) # pasa el servicio para mostrar los datos en el modo edicion
+
     datos = {
         "nombre":      request.form.get("nombre"),
         "descripcion": request.form.get("descripcion"),
@@ -183,7 +214,6 @@ def reserva_detalle(id):
         return sesion
 
     reserva, error = service_obtener_reserva(id, session["admin_token"])
-    print("RESERVA:", reserva)
     return render_template("admin/reserva_detalle.html", reserva=reserva)
 
 @admin_front_bp.route("/reservas/<int:id>/actualizar", methods=["POST"])

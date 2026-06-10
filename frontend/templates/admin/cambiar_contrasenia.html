@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Admin - Cambiar Contraseña{% endblock %}
+
+{% block nav %}
+<nav id="nav-admin">
+    <span></span>
+    <a href="{{ url_for('admin.logout') }}">Logout</a>
+</nav>
+{% endblock %}
+
+{% block body %}
+<section class="encabezado-pagina">
+    <h1>Cambiar Contraseña</h1>
+</section>
+
+{% if error %}
+    <div class="alert alert-error">{{ error }}</div>
+{% endif %}
+
+<form class="login" method="POST" action="{{ url_for('admin.cambiar_contrasenia') }}">
+    <label for="contra_actual">Contraseña actual</label>
+    <input type="password" id="contra_actual" name="contra_actual" required>
+
+    <label for="nueva_contra">Nueva contraseña</label>
+    <input type="password" id="nueva_contra" name="nueva_contra" required>
+
+    <label for="confirmar_contra">Confirmar nueva contraseña</label>
+    <input type="password" id="confirmar_contra" name="confirmar_contra" required>
+
+    <button class="boton boton--submit" type="submit">Guardar</button>
+    <a href="{{ url_for('admin.dashboard') }}">Cancelar</a>
+</form>
+{% endblock %}

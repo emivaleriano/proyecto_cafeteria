@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from backend.services.admin_service import autenticar_admin
+from backend.services.admin_service import autenticar_admin, cambiar_contrasenia
 from backend.services.dashboard_service import obtener_stats, obtener_reservas
 from backend.repositories.menu_repository import obtener_menu
 from backend.repositories.servicios_repository import obtener_servicios
@@ -10,6 +10,7 @@ from backend.utils.respuestas import (
     HTTP_BAD_REQUEST_CODE,
     HTTP_UNAUTHORIZED_CODE,
     HTTP_INTERNAL_ERROR_CODE,
+    HTTP_OK_CODE
 )
 
 
@@ -55,6 +56,26 @@ def me():
         datos={"id_admin": request.admin_actual["sub"]},
         mensaje="Token valido",
     )
+    return jsonify(respuesta), codigo
+
+
+@admin_bp.route("/contrasenia", methods=["PATCH"])
+@requiere_admin
+def patch_contrasenia():
+    data = request.get_json(silent=True) or {}
+
+    contra_actual = data.get("contra_actual")
+    nueva_contra  = data.get("nueva_contra")
+
+    if not contra_actual or not nueva_contra:
+        respuesta, codigo = crear_error("Faltan datos.", HTTP_BAD_REQUEST_CODE)
+        return jsonify(respuesta), codigo
+
+    id_admin = request.admin_actual["sub"]
+
+    cambiar_contrasenia(id_admin, contra_actual, nueva_contra)
+
+    respuesta, codigo = crear_respuesta_exito(mensaje="Contraseña actualizada.", codigo=HTTP_OK_CODE)
     return jsonify(respuesta), codigo
 
 
