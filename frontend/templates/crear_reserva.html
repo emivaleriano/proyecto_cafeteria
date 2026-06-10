@@ -20,8 +20,11 @@
         <input type="date" id="fecha" name="fecha" required>
 
         <label for="horario">Horario</label>
-        <select id="horario" name="horario" required disabled>
-            <option disabled selected value="">Elegí fecha primero</option>
+        <select id="horario" name="horario" required>
+            <option disabled selected>Elegí un horario</option>
+            {% for horario in horarios %}
+            <option disabled selected value="">Seleccione una fecha</option>
+            {% endfor %}
         </select>
 
         <label for="cantidad_personas" >Cantidad de personas</label>
