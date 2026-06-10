@@ -64,3 +64,14 @@ CREATE TABLE IF NOT EXISTS administrador(
     usuario VARCHAR(30) NOT NULL UNIQUE,
     contrasenia VARCHAR(255) NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS info_local(
+    id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
+    nombre VARCHAR(100) NOT NULL,   
+    direccion VARCHAR(200) NOT NULL,
+    telefono VARCHAR(50) NOT NULL,
+    email VARCHAR(100) NOT NULL,
+);
+
+INSERT INTO info_local (nombre, direccion, telefono, email) VALUES
+('Cafetería El Rincón', ' Av Santa Fe 1234 , CABA', '+54 11 4987-6543', 'info@elricon.com');
