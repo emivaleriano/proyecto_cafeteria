@@ -92,3 +92,13 @@ def get_info_local():
     cursor.close()
     conexion.close()
     return resultado
+
+def update_info_local(nombre, direccion, telefono, email):
+    conexion = obtener_conexion()
+    cursor = conexion.cursor(dictionary=True)
+    cursor.execute("""
+                   update info_local set nombre=%s, direccion=%s, telefono=%s,email=%s where id = 1""",
+                   (nombre, direccion, telefono, email))
+    conexion.commit()
+    cursor.close()
+    conexion.close()

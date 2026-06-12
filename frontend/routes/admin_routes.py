@@ -13,7 +13,9 @@ from frontend.services.admin_service import (
     obtener_dashboard,
     service_cambiar_contrasenia,
     service_obtener_plato,
-    service_obtener_servicio
+    service_obtener_servicio,
+    cambiar_info_local,
+    obtener_info_local
     )
 
 
@@ -75,6 +77,28 @@ def cambiar_contrasenia():
 
     return render_template("admin/cambiar_contrasenia.html")# get
 
+@admin_front_bp.route("/inicio/config", methods=["GET", "POST"])
+def config_local():
+    sesion = requiere_sesion()
+    if sesion:
+        return sesion
+    if request.method =="GET":
+        datos, error = obtener_info_local()
+        if error:
+            return render_template(url_for("admin.configuracion.html", error=error))
+        return render_template("admin/configuracion.html", datos=datos)
+    datos= {
+        "nombre" : request.form.get("nombre"),
+        "direccion" : request.form.get("direccion"),
+        "telefono" : request.form.get("telefono"),
+        "email" : request.form.get("email"),
+    }
+    datos, error = cambiar_info_local(datos, session["admin_token"])
+
+    return redirect(url_for("admin.dashboard"))
+
+
+
 @admin_front_bp.route("/dashboard")
 def dashboard():
     if not session.get("admin_token"):
@@ -134,7 +158,6 @@ def editar_plato(id):
         "imagen":      request.form.get("imagen"),
         "tags":        [t.strip() for t in request.form.get("tags", "").split(",") if t.strip()],
     }
-    print(datos)
     service_editar_plato(id, datos, session["admin_token"])
     return redirect(url_for("admin.dashboard"))
 

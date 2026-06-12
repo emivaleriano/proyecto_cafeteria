@@ -81,6 +81,19 @@ def service_cambiar_contrasenia(contra_actual, nueva_contra, confirmar_contra, t
     return _handle(res, 200, "Error al cambiar la contraseña.")
 
 
+def cambiar_info_local(datos, token):
+    res = _request("PUT", f"{API_BASE_URL}/admin/inicio/config", token=token, json=datos)
+    if res is None:
+        return None, "No se pudo conectar con el servidor."
+    return _handle(res, 200, "Error al editar la info del local.")
+
+def obtener_info_local():
+    res = _request("GET", f"{API_BASE_URL}/inicio")
+    if res is None:
+        return None, "No se pudo conectar con el servidor."
+    return _handle(res, 200, "Error al obtener la configuracion.")
+
+
 def obtener_dashboard(token): #stats
     """
     Retorna (datos, None) si la request es exitosa.

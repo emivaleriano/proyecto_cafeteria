@@ -1,4 +1,4 @@
-from backend.repositories.inicio_repository import get_franjas_horarias, get_resenas_publicas, get_reserva_para_resena, get_resena_por_reserva, insertar_resena
+from backend.repositories.inicio_repository import get_franjas_horarias, get_resenas_publicas, get_reserva_para_resena, get_resena_por_reserva, insertar_resena, update_info_local
 from backend.services.servicios_service import obtener_servicios_activos
 from backend.utils.validadores import validar_estrellas, validar_comentario
 from backend.db import obtener_conexion
@@ -93,3 +93,8 @@ def get_info_local():
     cursor.close()
     conexion.close()
     return resultado
+
+def actualizar_info_local(nombre, direccion, telefono, email):
+    if not nombre or not direccion or not telefono or not email:
+        raise ValueError("Faltan datos obligatorios: nombre, direccion, telefono, email")
+    update_info_local(nombre, direccion, telefono, email)

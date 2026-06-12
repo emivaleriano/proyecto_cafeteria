@@ -1,4 +1,5 @@
-from flask import Blueprint, request
+from flask import Blueprint, request, jsonify
+from backend.utils.admin import requiere_admin
 from backend.utils.respuestas import (
     HTTP_OK_CODE, HTTP_INTERNAL_ERROR_CODE,
     crear_respuesta_exito, crear_error,
@@ -7,6 +8,7 @@ from backend.services.inicio_service import (
     obtener_info_local,
     obtener_resenas,
     crear_resena,
+    actualizar_info_local
 )
 
 inicio_bp = Blueprint("/", __name__)
@@ -83,3 +85,16 @@ def post_review(id_reserva):
             mensaje=str(e),
             nivel="error",
         ), HTTP_INTERNAL_ERROR_CODE
+
+@inicio_bp.route("/admin/inicio/config", methods=["PUT"])
+@requiere_admin
+def put_info_local():
+    data = request.get_json(silent=True) or {}
+    nombre = data.get("nombre")
+    direccion = data.get("direccion")
+    telefono = data.get("telefono")
+    email = data.get("email")
+
+    actualizar_info_local(nombre, direccion, telefono, email)
+    respuesta, codigo = crear_respuesta_exito(mensaje="Información del local modificada", codigo=HTTP_OK_CODE)
+    return jsonify(respuesta), codigo

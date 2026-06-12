@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Admin - Actualizar Configuracion{% endblock %}
+
+{% block nav %}
+<nav id="nav-admin">
+    <span></span>
+    <a href="{{ url_for('admin.logout') }}">Logout</a>
+</nav>
+{% endblock %}
+
+{% block body %}
+<section class="encabezado-pagina">
+    <h1>Editar Configuración</h1>
+</section>
+
+{% if error %}
+    <div class="alert alert-error">{{ error }}</div>
+{% endif %}
+
+<form class="login" method="POST" action="{{ url_for('admin.config_local') }}">
+    <label for="nombre">nombre</label>
+    <input  id="nombre" name="nombre" value="{{ datos.nombre if datos else '' }}" required>
+
+    <label for="direccion">Direccion</label>
+    <input  id="direccion" name="direccion" value="{{ datos.direccion if datos else '' }}" required>
+
+    <label for="telefono">Telefono</label>
+    <input  id="telefono" name="telefono" value="{{ datos.telefono if datos else '' }}" required>
+
+    <label for="email">Email</label>
+    <input  id="email|" name="email" value="{{ datos.email if datos else '' }}" required>
+
+    <button class="boton boton--submit" type="submit">Guardar</button>
+    <a href="{{ url_for('admin.dashboard') }}">Cancelar</a>
+</form>
+{% endblock %}

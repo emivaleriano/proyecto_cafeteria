@@ -33,9 +33,7 @@ def crear_nueva_reserva(data):
     )
 
     fecha_hora = data.get("fecha_hora")
-
     fecha_obj = datetime.fromisoformat(fecha_hora)
-
     dia_semana = fecha_obj.weekday()
 
     franja = obtener_franja_por_dia(dia_semana)
@@ -46,7 +44,7 @@ def crear_nueva_reserva(data):
         }
 
     personas_reservadas = obtener_personas_reservadas(
-        fecha_obj.date()
+        fecha_obj
     )
 
     if (
