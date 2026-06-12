@@ -8,7 +8,6 @@ DIAS = {
 def formatear_reserva(reserva):
     if reserva:
         reserva["servicios"] = json.loads(reserva["servicios"] or "[]")
-        reserva["alergias"]  = json.loads(reserva["alergias"]  or "[]")
         if reserva["fecha_hora"]:
             fecha = reserva["fecha_hora"]
             reserva["fecha_hora"] = f"{DIAS[fecha.strftime('%A')]} {fecha.strftime('%d/%m/%Y %H:%M')}"
@@ -113,7 +112,6 @@ def crear_reserva(
     id_usuario,
     fecha_hora,
     cantidad_personas,
-    alergias,
     servicios,
     observaciones,
     estado,
@@ -132,19 +130,17 @@ def crear_reserva(
                 id_usuario,
                 fecha_hora,
                 cantidad_personas,
-                alergias,
                 servicios,
                 observaciones,
                 estado,
                 qr
             )
-            VALUES (%s,%s,%s,%s,%s,%s,%s,%s)
+            VALUES (%s,%s,%s,%s,%s,%s,%s)
             """,
             (
                 id_usuario,
                 fecha_hora,
                 cantidad_personas,
-                alergias,
                 servicios,
                 observaciones,
                 estado,

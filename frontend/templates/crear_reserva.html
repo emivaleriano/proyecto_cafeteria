@@ -47,26 +47,6 @@
 
     </section>
 
-    <section class="reservar__alergias">
-
-        <h2>Alergias o restricciones alimenticias</h2>
-
-        <div class="reservar__contenedor-alergias">
-
-            {% for alergia in alergias_opciones %}
-            <div>
-            <input type="checkbox" name="alergias[]" value="{{ alergia.id }}">
-            <span>{{ alergia.nombre }}</span>
-            </div>
-            {% endfor %}
-
-            <label for="otras_restricciones">Otras restricciones</label>
-            <input type="text" name="otras_restricciones" id="otras_restricciones">
-
-        </div>
-
-    </section>
-
     <section class="reservar__servicios">
 
         <h2>Servicios adicionales</h2>

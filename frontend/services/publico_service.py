@@ -7,14 +7,6 @@ import os
 load_dotenv(Path(__file__).parent / ".env")
 
 API_BASE_URL = os.getenv("API_BASE_URL")
-ALERGIAS_OPCIONES = [
-    {"id": "gluten",       "nombre": "Gluten"},
-    {"id": "lactosa",      "nombre": "Lactosa"},
-    {"id": "mariscos",     "nombre": "Mariscos"},
-    {"id": "frutos_secos", "nombre": "Frutos secos"},
-    {"id": "huevo",        "nombre": "Huevo"},
-    {"id": "soja",         "nombre": "Soja"},
-]
 
 def get_inicio():
     """
@@ -124,7 +116,6 @@ def get_datos_reserva():
     return {
         "horarios":              inicio.get("horarios", []),
         "servicios_disponibles": body.get("datos", []),
-        "alergias_opciones":     ALERGIAS_OPCIONES,
     }, None
 
 
@@ -139,7 +130,6 @@ def post_reserva(form):
         "telefono":          form.get("telefono", "").strip(),
         "cantidad_personas": form.get("cantidad_personas"),
         "fecha_hora":        fecha_hora,
-        "alergias":          form.getlist("alergias[]"),
         "servicios":         form.getlist("servicios[]"),
         "observaciones":     form.get("comentarios", "").strip(),
     }
