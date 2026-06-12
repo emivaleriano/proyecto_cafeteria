@@ -5,7 +5,7 @@ def get_franjas_horarias():
     conexion = obtener_conexion()
     cursor = conexion.cursor(dictionary=True)
     cursor.execute("""
-        SELECT id_franja, dia_semana, hora_apertura, hora_cierre, capacidad_maxima
+        SELECT id_franja, dia_semana, hora_apertura, hora_cierre
         FROM franjas_horarias
         ORDER BY dia_semana ASC
     """)
@@ -93,12 +93,25 @@ def get_info_local():
     conexion.close()
     return resultado
 
-def update_info_local(nombre, direccion, telefono, email):
+def get_capacidad_maxima():
     conexion = obtener_conexion()
     cursor = conexion.cursor(dictionary=True)
     cursor.execute("""
-                   update info_local set nombre=%s, direccion=%s, telefono=%s,email=%s where id = 1""",
-                   (nombre, direccion, telefono, email))
+        SELECT capacidad_maxima
+        FROM info_local
+        LIMIT 1
+    """)
+    resultado = cursor.fetchone()
+    cursor.close()
+    conexion.close()
+    return resultado
+
+def update_info_local(nombre, direccion, telefono, email, capacidad):
+    conexion = obtener_conexion()
+    cursor = conexion.cursor(dictionary=True)
+    cursor.execute("""
+                   update info_local set nombre=%s, direccion=%s, telefono=%s,email=%s, capacidad_maxima=%s where id = 1""",
+                   (nombre, direccion, telefono, email, capacidad))
     conexion.commit()
     cursor.close()
     conexion.close()

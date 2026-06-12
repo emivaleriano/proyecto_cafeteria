@@ -32,7 +32,6 @@ def obtener_info_local():
             "dia":              DIAS.get(f["dia_semana"], f["dia_semana"]),
             "hora_apertura":    _timedelta_a_str(f["hora_apertura"]),
             "hora_cierre":      _timedelta_a_str(f["hora_cierre"]),
-            "capacidad_maxima": f["capacidad_maxima"],
         }
         for f in franjas
     ]
@@ -42,6 +41,7 @@ def obtener_info_local():
         "direccion":             info["direccion"],
         "telefono":              info["telefono"],
         "email":                 info["email"],
+        "capacidad":             info["capacidad_maxima"],
         "servicios_disponibles": nombres_servicios,
         "horarios":              horarios,
     }
@@ -85,7 +85,7 @@ def get_info_local():
     conexion = obtener_conexion()
     cursor = conexion.cursor(dictionary=True)
     cursor.execute("""
-        SELECT nombre, direccion, telefono, email
+        SELECT nombre, direccion, telefono, email, capacidad_maxima
         FROM info_local
         LIMIT 1
     """)
@@ -94,7 +94,7 @@ def get_info_local():
     conexion.close()
     return resultado
 
-def actualizar_info_local(nombre, direccion, telefono, email):
-    if not nombre or not direccion or not telefono or not email:
-        raise ValueError("Faltan datos obligatorios: nombre, direccion, telefono, email")
-    update_info_local(nombre, direccion, telefono, email)
+def actualizar_info_local(nombre, direccion, telefono, email, capacidad):
+    if not nombre or not direccion or not telefono or not email or not capacidad:
+        raise ValueError("Faltan datos obligatorios: nombre, direccion, telefono, email, capacidad")
+    update_info_local(nombre, direccion, telefono, email, capacidad)

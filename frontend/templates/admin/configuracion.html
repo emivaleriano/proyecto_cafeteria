@@ -30,6 +30,9 @@
     <label for="email">Email</label>
     <input  id="email|" name="email" value="{{ datos.email if datos else '' }}" required>
 
+    <label for="capacidad">Capacidad máxima</label>
+    <input  id="capacidad" name="capacidad" value="{{ datos.capacidad if datos else '' }}" required>
+
     <button class="boton boton--submit" type="submit">Guardar</button>
     <a href="{{ url_for('admin.dashboard') }}">Cancelar</a>
 </form>

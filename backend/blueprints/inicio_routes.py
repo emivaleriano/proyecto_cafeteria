@@ -94,7 +94,8 @@ def put_info_local():
     direccion = data.get("direccion")
     telefono = data.get("telefono")
     email = data.get("email")
+    capacidad = data.get("capacidad")
 
-    actualizar_info_local(nombre, direccion, telefono, email)
+    actualizar_info_local(nombre, direccion, telefono, email, capacidad)
     respuesta, codigo = crear_respuesta_exito(mensaje="Información del local modificada", codigo=HTTP_OK_CODE)
     return jsonify(respuesta), codigo

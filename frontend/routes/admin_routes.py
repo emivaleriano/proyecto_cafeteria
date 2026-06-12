@@ -92,6 +92,7 @@ def config_local():
         "direccion" : request.form.get("direccion"),
         "telefono" : request.form.get("telefono"),
         "email" : request.form.get("email"),
+        "capacidad" : request.form.get("capacidad"),
     }
     datos, error = cambiar_info_local(datos, session["admin_token"])
 
