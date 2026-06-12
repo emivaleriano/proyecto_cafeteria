@@ -22,7 +22,6 @@ CREATE TABLE IF NOT EXISTS reservas(
     fecha_hora DATETIME NOT NULL,
     fecha_creacion DATETIME DEFAULT current_timestamp(),
     cantidad_personas INT NOT NULL DEFAULT 1,
-    alergias JSON,
     servicios JSON,
     observaciones VARCHAR(100),
     estado enum("Pendiente", "Confirmada", "Cancelada", "Completada"),

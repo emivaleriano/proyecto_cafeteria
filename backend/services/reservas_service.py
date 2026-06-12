@@ -72,7 +72,6 @@ def crear_nueva_reserva(data):
         id_usuario = usuario["id_usuario"]
 
     qr = str(uuid.uuid4())
-    alergias_json  = json.dumps(data.get("alergias", []))
     servicios_json = json.dumps(data.get("servicios", []))
 
 
@@ -80,7 +79,6 @@ def crear_nueva_reserva(data):
         id_usuario,
         fecha_hora,
         cantidad_personas,
-        alergias_json,
         servicios_json,
         data.get("observaciones"),
         "Pendiente",

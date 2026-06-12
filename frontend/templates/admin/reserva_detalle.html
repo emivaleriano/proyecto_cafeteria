@@ -30,17 +30,6 @@
     </dl>
   </div>
 
-  {% if reserva.alergias %}
-  <div class="reservar__panel">
-    <h2>Alergias</h2>
-    <div class="reservar__contenedor-alergias">
-      {% for alergia in reserva.alergias %}
-      <div><span>{{ alergia }}</span></div>
-      {% endfor %}
-    </div>
-  </div>
-  {% endif %}
-
   {% if reserva.servicios %}
   <div class="reservar__panel">
     <h2>Servicios solicitados</h2>
