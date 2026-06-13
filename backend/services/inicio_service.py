@@ -1,4 +1,11 @@
-from backend.repositories.inicio_repository import get_franjas_horarias, get_resenas_publicas, get_reserva_para_resena, get_resena_por_reserva, insertar_resena, update_info_local
+from backend.repositories.inicio_repository import (
+    get_franjas_horarias, get_resenas_publicas,
+    get_reserva_para_resena,
+    get_resena_por_reserva,
+    insertar_resena,
+    update_info_local,
+    reemplazar_franjas_horarias
+)
 from backend.services.servicios_service import obtener_servicios_activos
 from backend.utils.validadores import validar_estrellas, validar_comentario
 from backend.db import obtener_conexion
@@ -45,6 +52,21 @@ def obtener_info_local():
         "servicios_disponibles": nombres_servicios,
         "horarios":              horarios,
     }
+
+def obtener_franjas():
+    franjas = get_franjas_horarias()
+    for f in franjas:
+        f["hora_apertura"] = _timedelta_a_str(f["hora_apertura"])
+        f["hora_cierre"] = _timedelta_a_str(f["hora_cierre"])
+    return franjas
+
+def actualizar_franjas_horarias(franjas):
+    if not isinstance(franjas, list):
+        raise ValueError("Formato inválido de franjas horarias")
+    for f in franjas:
+        if "dia_semana" not in f or "hora_apertura" not in f or "hora_cierre" not in f:
+            raise ValueError("Cada franja debe tener dia_semana, hora_apertura y hora_cierre")
+    reemplazar_franjas_horarias(franjas)
 
 
 def obtener_resenas():

@@ -7,13 +7,32 @@ def get_franjas_horarias():
     cursor.execute("""
         SELECT id_franja, dia_semana, hora_apertura, hora_cierre
         FROM franjas_horarias
-        ORDER BY dia_semana ASC
+        ORDER BY dia_semana, hora_apertura ASC
     """)
     resultado = cursor.fetchall()
     cursor.close()
     conexion.close()
     return resultado
 
+
+def reemplazar_franjas_horarias(franjas):
+    """Borra las franjas existentes y las reemplaza por nuevas (en caso de que se agregue otra franja dentro de un dia)"""
+    conexion = obtener_conexion()
+    cursor = conexion.cursor(dictionary=True)
+    try:
+        cursor.execute("DELETE FROM franjas_horarias")
+        for f in franjas:
+            cursor.execute(
+                "INSERT INTO franjas_horarias (dia_semana, hora_apertura, hora_cierre) values (%s, %s, %s)",
+                (f["dia_semana"], f["hora_apertura"], f["hora_cierre"])
+            )
+            conexion.commit()
+    except Exception as e:
+        conexion.rollback()
+        raise e
+    finally:
+        cursor.close()
+        conexion.close()
 
 def get_resenas_publicas():
     """Devuelve una lista de reseñas publicadas a nombre del usuario"""

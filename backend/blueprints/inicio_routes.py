@@ -8,7 +8,9 @@ from backend.services.inicio_service import (
     obtener_info_local,
     obtener_resenas,
     crear_resena,
-    actualizar_info_local
+    actualizar_info_local,
+    obtener_franjas,
+    actualizar_franjas_horarias
 )
 
 inicio_bp = Blueprint("/", __name__)
@@ -98,4 +100,27 @@ def put_info_local():
 
     actualizar_info_local(nombre, direccion, telefono, email, capacidad)
     respuesta, codigo = crear_respuesta_exito(mensaje="Información del local modificada", codigo=HTTP_OK_CODE)
+    return jsonify(respuesta), codigo
+
+@inicio_bp.route("/inicio/franjas", methods=["GET"])
+def get_franjas_horarias():
+    try:
+        franjas = obtener_franjas()
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 500
+
+    respuesta, codigo = crear_respuesta_exito(datos=franjas, mensaje="Franjas horarias obtenidas", codigo=HTTP_OK_CODE)
+    return jsonify(respuesta), codigo
+
+@inicio_bp.route("/admin/inicio/franjas", methods=["PUT"])
+@requiere_admin
+def put_franjas_horarias():
+    data = request.get_json(silent=True) or {}
+    franjas = data.get("franjas", [])
+
+    actualizar_franjas_horarias(franjas)
+
+    respuesta, codigo = crear_respuesta_exito(mensaje="Franjas horarias actualizadas", codigo=HTTP_OK_CODE)
     return jsonify(respuesta), codigo

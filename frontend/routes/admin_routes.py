@@ -15,9 +15,12 @@ from frontend.services.admin_service import (
     service_obtener_plato,
     service_obtener_servicio,
     cambiar_info_local,
-    obtener_info_local
+    obtener_info_local,
+    obtener_franjas_horarias,
+    cambiar_franjas_horarias
     )
 
+import json
 
 admin_front_bp = Blueprint("admin", __name__, template_folder="../templates")
 
@@ -99,6 +102,25 @@ def config_local():
     return redirect(url_for("admin.dashboard"))
 
 
+@admin_front_bp.route("/inicio/franjas", methods=["GET", "POST"])
+def franjas_horarias():
+    sesion = requiere_sesion()
+    if sesion:
+        return sesion
+
+    if request.method == "GET":
+        franjas, error = obtener_franjas_horarias()
+        if error:
+            return render_template("admin/franjas_horarias.html", error=error, franjas=[])
+        return render_template("admin/franjas_horarias.html", franjas=franjas)
+
+    franjas = json.loads(request.form.get("franjas_json", "[]"))
+    datos, error = cambiar_franjas_horarias(franjas, session["admin_token"])
+
+    if error:
+        return render_template("admin/franjas_horarias.html", error=error, franjas=franjas)
+
+    return redirect(url_for("admin.dashboard"))
 
 @admin_front_bp.route("/dashboard")
 def dashboard():

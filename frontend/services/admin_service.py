@@ -94,6 +94,19 @@ def obtener_info_local():
     return _handle(res, 200, "Error al obtener la configuracion.")
 
 
+def obtener_franjas_horarias():
+    res = _request("GET", f"{API_BASE_URL}/inicio/franjas")
+    if res is None:
+        return None, "No se pudo conectar con el servidor."
+    return _handle(res, 200, "Error al obtener las franjas horarias.")
+
+
+def cambiar_franjas_horarias(franjas, token):
+    res = _request("PUT", f"{API_BASE_URL}/admin/inicio/franjas", token=token, json={"franjas": franjas})
+    if res is None:
+        return None, "No se pudo conectar con el servidor."
+    return _handle(res, 200, "Error al editar las franjas horarias.")
+
 def obtener_dashboard(token): #stats
     """
     Retorna (datos, None) si la request es exitosa.
