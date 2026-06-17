@@ -7,6 +7,11 @@
 <h1>{% if plato %}Editar plato{% else %}Nuevo plato{% endif %}</h1>
 <p>{% if plato %}Modificá los datos del plato.{% else %}Completá los datos para agregar un plato al menú.{% endif %}</p>
 
+
+{% if error %}
+    <div class="alert alert-error">{{ error }}</div>
+{% endif %}
+
 <div class="reservar">
   <div class="reservar__panel">
     <h2>Datos del plato</h2>

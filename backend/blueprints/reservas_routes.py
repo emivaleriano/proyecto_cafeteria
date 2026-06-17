@@ -101,8 +101,7 @@ def obtener_reservas_route():
         codigo=HTTP_OK_CODE
     )
 
-@reservas_bp.route("/reservas/<int:id>/estado", methods=["POST"])
-@requiere_admin
+@reservas_bp.route("/reservas/<int:id>/estado", methods=["PATCH"])
 def actualizar_estado_route(id):
     data = request.get_json()
     estado = data.get("estado")
@@ -119,17 +118,17 @@ def actualizar_estado_route(id):
         codigo=HTTP_OK_CODE
     )
 
-@reservas_bp.route("/reservas/check-in/<string:token>", methods=["PATCH"])
-def check_in_route(token):
+@reservas_bp.route("/reservas/check-in/<string:token>", methods=["GET"])
+def obtener_check_in_route(token):
     resultado = data_check_in(token)
     if "error" in resultado:
         return crear_error(
             codigo=HTTP_BAD_REQUEST_CODE,
-            descripcion="No se pudo completar el check-in",
+            descripcion="No se pudo obtener la reserva",
             mensaje=resultado["error"]
         ), HTTP_BAD_REQUEST_CODE
     return crear_respuesta_exito(
-        datos={},
-        mensaje="Check-in realizado correctamente",
+        datos=resultado,
+        mensaje="Reserva obtenida correctamente",
         codigo=HTTP_OK_CODE
     )

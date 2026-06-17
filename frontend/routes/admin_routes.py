@@ -269,5 +269,5 @@ def actualizar_estado_reserva(id):
         return sesion
 
     estado = request.form.get("estado")
-    service_actualizar_reserva(id, estado, session["admin_token"])
+    service_actualizar_reserva(id, estado)
     return redirect(url_for("admin.dashboard"))

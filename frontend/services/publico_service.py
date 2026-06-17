@@ -176,9 +176,9 @@ def post_cancelar_reserva(id_reserva):
         return body.get("datos", {}), None
     return None, body.get("mensaje", "Error al cancelar la reserva.")
 
-def patch_check_in(token):
+def get_check_in(token):
     try:
-        res = requests.patch(f"{API_BASE_URL}/reservas/check-in/{token}", timeout=10)
+        res = requests.get(f"{API_BASE_URL}/reservas/check-in/{token}", timeout=10)
     except requests.exceptions.ConnectionError:
         return None, "No se pudo conectar con el servidor."
     except requests.exceptions.Timeout:
@@ -186,4 +186,4 @@ def patch_check_in(token):
     body = res.json()
     if res.status_code == 200 and body.get("exito"):
         return body.get("datos", {}), None
-    return None, body.get("mensaje", "Error al realizar el check-in.")
+    return None, body.get("mensaje", "Error al realizar obtener la reserva.")

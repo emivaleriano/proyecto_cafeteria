@@ -11,8 +11,9 @@ from frontend.services.publico_service import (
     post_reserva,
     get_reserva,
     post_cancelar_reserva,
-    patch_check_in
+    get_check_in
 )
+from frontend.services.admin_service import service_actualizar_reserva
 from frontend.utils.tokens import verificar_token_resena
 import os
 publico_bp = Blueprint("publico", __name__)
@@ -128,12 +129,25 @@ def cancelar_reserva(id_reserva):
         return render_template("error.html", mensaje=error), 503
     return render_template("reserva_cancelada.html")
 
+
 @publico_bp.route("/check-in/<string:token>", methods=["GET"])
 def check_in(token):
-    _, error = patch_check_in(token)
+    reserva, error = get_check_in(token)
     if error:
         return render_template("error.html", mensaje=error), 503
-    return render_template("check_in.html")
+    return render_template("check_in.html", reserva=reserva)
+
+
+@publico_bp.route("/check-in/<string:token>", methods=["POST"])
+def confirmar_check_in(token):
+    reserva, error = get_check_in(token)
+    if error:
+        return render_template("error.html", mensaje=error), 503
+    _, error = service_actualizar_reserva(reserva["id_reserva"], "Completada")
+    if error:
+        return render_template("error.html", mensaje=error), 503
+    return render_template("check_in.html", reserva=reserva, completada=True)
+
 """
 Para generar el mail:
 from utils.tokens import generar_token_resena

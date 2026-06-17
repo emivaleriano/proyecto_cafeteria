@@ -9,6 +9,10 @@
 </section>
 
 
+{% if error %}
+    <div class="alert alert-error">{{ error }}</div>
+{% endif %}
+
 <form class="login" method="POST" action="{{ url_for('admin.login') }}">
 
     <label for="usuario">Usuario</label>

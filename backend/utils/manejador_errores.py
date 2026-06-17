@@ -20,6 +20,7 @@ def registrar_manejadores(app):
 
     @app.errorhandler(Exception)
     def handle_generic_error(e):
+        app.logger.exception(e)  # imprime el traceback completo en consola
         return jsonify({"error": "Error interno del servidor", "detalle": str(e)}), 500
 
 
