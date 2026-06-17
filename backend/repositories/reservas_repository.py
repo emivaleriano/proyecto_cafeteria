@@ -255,3 +255,18 @@ def actualizar_estado_reserva(id_reserva, estado):
     finally:
         cursor.close()
         conn.close()
+
+def obtener_reserva_por_token(token):
+    conn = obtener_conexion()
+    cursor = conn.cursor(dictionary=True)
+    try:
+        cursor.execute("""
+            SELECT r.*, u.nombre, u.email, u.telefono
+            FROM reservas r
+            JOIN usuarios u ON r.id_usuario = u.id_usuario
+            WHERE r.qr = %s
+        """, (token,))
+        return cursor.fetchone()
+    finally:
+        cursor.close()
+        conn.close()
