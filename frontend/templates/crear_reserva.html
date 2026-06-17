@@ -10,6 +10,11 @@
     <p>Reservá una mesa para visitarnos</p>
 </section>
 
+
+{% if error %}
+    <div class="alert alert-error">{{ error }}</div>
+{% endif %}
+
 <form class="reservar" method="POST" action="{{ url_for('publico.crear_reserva') }}">
 
     <section class="reservar__datos-reserva">
@@ -37,7 +42,7 @@
         <h2>Tus datos</h2>
 
         <label for="nombre">Nombre</label>
-        <input type="text" name="nombre" id="nombre">
+        <input type="text" name="nombre" id="nombre" required>
 
         <label for="email">Email</label>
         <input type="email" name="email" id="email" required>

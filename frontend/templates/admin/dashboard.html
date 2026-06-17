@@ -9,6 +9,11 @@
 </nav>
 {% endblock %}
 
+
+{% if error %}
+    <div class="alert alert-error">{{ error }}</div>
+{% endif %}
+
 {% block body %}
 <h1>Dashboard</h1>
 <div>
@@ -40,6 +45,7 @@
         <table class="tabla-admin">
             <thead>
                 <tr>
+                    <th>ID</th>
                     <th>Cliente</th>
                     <th>Fecha</th>
                     <th>Personas</th>
@@ -50,6 +56,7 @@
             <tbody>
                 {% for reserva in reservas %}
                     <tr>
+                        <td>#{{reserva.id_reserva}}</td>
                         <td>{{ reserva.nombre }}</td>
                         <td>{{ reserva.fecha_hora }}</td>
                         <td>{{ reserva.cantidad_personas }}</td>
