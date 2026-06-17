@@ -1,0 +1,13 @@
+{% extends "base_usuarios.html" %}
+{% block title %}Check-in realizado{% endblock %}
+{% block body %}
+<section class="confirmacion__contenedor">
+<div class="confirmacion__header">
+<h1>Check-in realizado</h1>
+</div>
+<div class="confirmacion__body">
+<p>Tu reserva fue registrada exitosamente.</p>
+<a href="{{ url_for('publico.inicio') }}">Volver al inicio</a>
+</div>
+</section>
+{% endblock %}

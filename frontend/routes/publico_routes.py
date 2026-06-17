@@ -1,5 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for
-import qrcode, io, base64
+import qrcode
+import io
+import base64
 from frontend.services.publico_service import (
     get_inicio,
     get_menu,
@@ -9,9 +11,10 @@ from frontend.services.publico_service import (
     post_reserva,
     get_reserva,
     post_cancelar_reserva,
+    patch_check_in
 )
 from frontend.utils.tokens import verificar_token_resena
-
+import os
 publico_bp = Blueprint("publico", __name__)
 
 
@@ -96,7 +99,10 @@ def confirmacion_reserva(id_reserva):
         return render_template("error.html", mensaje=error), 503
 
     # Genera la imagen QR en base64 para mostrar en la página
-    img = qrcode.make(reserva["qr"])
+    base_url = os.getenv("FRONTEND_BASE_URL")
+    url_qr = f"{base_url}/check-in/{reserva['qr']}"
+
+    img = qrcode.make(url_qr)
     buffer = io.BytesIO()
     img.save(buffer, format="PNG")
     buffer.seek(0)
@@ -122,6 +128,12 @@ def cancelar_reserva(id_reserva):
         return render_template("error.html", mensaje=error), 503
     return render_template("reserva_cancelada.html")
 
+@publico_bp.route("/check-in/<string:token>", methods=["GET"])
+def check_in(token):
+    _, error = patch_check_in(token)
+    if error:
+        return render_template("error.html", mensaje=error), 503
+    return render_template("check_in.html")
 """
 Para generar el mail:
 from utils.tokens import generar_token_resena
@@ -131,4 +143,3 @@ link  = url_for("publico.crear_review", token=token, _external=True) # el extern
 # usas link en el cuerpo del mail
 # usar siempre id_reserva, no id solo
 """
-    
