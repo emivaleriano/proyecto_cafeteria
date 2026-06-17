@@ -5,7 +5,8 @@ from backend.services.reservas_service import (
     data_obtener_reserva,
     data_cancelar_reserva,
     data_actualizar_estado_reserva,
-    data_obtener_todas_reservas
+    data_obtener_todas_reservas,
+    data_check_in
 )
 
 from backend.utils.respuestas import (
@@ -115,5 +116,20 @@ def actualizar_estado_route(id):
     return crear_respuesta_exito(
         datos={"id_reserva": id},
         mensaje="Reserva actualizada correctamente",
+        codigo=HTTP_OK_CODE
+    )
+
+@reservas_bp.route("/reservas/check-in/<string:token>", methods=["PATCH"])
+def check_in_route(token):
+    resultado = data_check_in(token)
+    if "error" in resultado:
+        return crear_error(
+            codigo=HTTP_BAD_REQUEST_CODE,
+            descripcion="No se pudo completar el check-in",
+            mensaje=resultado["error"]
+        ), HTTP_BAD_REQUEST_CODE
+    return crear_respuesta_exito(
+        datos={},
+        mensaje="Check-in realizado correctamente",
         codigo=HTTP_OK_CODE
     )

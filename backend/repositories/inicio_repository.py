@@ -123,7 +123,7 @@ def get_capacidad_maxima():
     resultado = cursor.fetchone()
     cursor.close()
     conexion.close()
-    return resultado
+    return resultado["capacidad_maxima"]
 
 def update_info_local(nombre, direccion, telefono, email, capacidad):
     conexion = obtener_conexion()
