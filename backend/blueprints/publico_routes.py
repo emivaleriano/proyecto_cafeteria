@@ -1,5 +1,4 @@
 from flask import Blueprint, render_template, request, redirect, url_for
-import qrcode, io, base64
 from frontend.services.publico_service import (
     get_inicio,
     get_menu,
@@ -10,7 +9,6 @@ from frontend.services.publico_service import (
     get_reserva,
     post_cancelar_reserva,
 )
-from frontend.utils.tokens import verificar_token_resena
 
 publico_bp = Blueprint("publico", __name__)
 
@@ -40,26 +38,19 @@ def reviews():
     return render_template("reviews.html", reviews=lista)
 
 
-@publico_bp.route("/reviews/<token>", methods=["GET", "POST"])
-def crear_review(token):
-    id_reserva, error = verificar_token_resena(token)
-    if error:
-        return render_template("error.html", mensaje=error), 403
-
+@publico_bp.route("/reviews/crear", methods=["GET", "POST"])
+def crear_review():
     if request.method == "GET":
-        return render_template("crear_review.html", datos={}, error=None, token=token)
+        return render_template("crear_review.html", datos={}, error=None)
 
+    id_reserva = request.form.get("id_reserva", "").strip()
     estrellas  = request.form.get("estrellas")
     comentario = request.form.get("comentario", "").strip()
 
-    if not estrellas:
-        return render_template("crear_review.html", datos={}, error="Seleccioná una valoración.", token=token)
-
-
-    datos, error = post_review(id_reserva, int(estrellas), comentario)
+    datos, error = post_review(id_reserva, estrellas, comentario)
 
     if error:
-        return render_template("crear_review.html", datos={}, error=error, token=token)
+        return render_template("crear_review.html", datos={}, error=error)
 
     return redirect(url_for("publico.reviews"))
 
@@ -95,15 +86,7 @@ def confirmacion_reserva(id_reserva):
     if error:
         return render_template("error.html", mensaje=error), 503
 
-    # Genera la imagen QR en base64 para mostrar en la página
-    img = qrcode.make(reserva["qr"])
-    buffer = io.BytesIO()
-    img.save(buffer, format="PNG")
-    buffer.seek(0)
-    qr_b64 = base64.b64encode(buffer.read()).decode("utf-8")
-    qr_data_url = f"data:image/png;base64,{qr_b64}"
-
-    return render_template("confirmacion.html", reserva=reserva, datos=datos, qr_img=qr_data_url)
+    return render_template("confirmacion.html", reserva=reserva, datos=datos)
 
 
 @publico_bp.route("/reservar/<int:id_reserva>/cancelar", methods=["GET"])
@@ -120,15 +103,4 @@ def cancelar_reserva(id_reserva):
     _, error = post_cancelar_reserva(id_reserva)
     if error:
         return render_template("error.html", mensaje=error), 503
-    return render_template("reserva_cancelada.html")
-
-"""
-Para generar el mail:
-from utils.tokens import generar_token_resena
-
-token = generar_token_resena(id_reserva)
-link  = url_for("publico.crear_review", token=token, _external=True) # el external true es para que genere la URL completa
-# usas link en el cuerpo del mail
-# usar siempre id_reserva, no id solo
-"""
-    
+    return redirect(url_for("publico.inicio"))

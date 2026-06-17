@@ -1,0 +1,46 @@
+{% extends "base_usuarios.html" %}
+
+{% block title %}Cancelar reserva{% endblock %}
+
+{% block body %}
+<section class="confirmacion__contenedor">
+
+    <div class="confirmacion__header">
+        <h1>Cancelar reserva</h1>
+    </div>
+
+    <div class="confirmacion__body">
+
+        {% if error %}
+            <p style="color: red;">{{ error }}</p>
+        {% else %}
+            <h2>¿Confirmás la cancelación?</h2>
+
+            <div class="confirmacion__datos">
+                <dl>
+                    <dt>Reserva n.º</dt>
+                    <dd>#{{ reserva.id_reserva }}</dd>
+
+                    <dt>Fecha y horario</dt>
+                    <dd>{{ reserva.fecha_hora }}</dd>
+
+                    <dt>Personas</dt>
+                    <dd>{{ reserva.cantidad_personas }}</dd>
+                </dl>
+            </div>
+
+            <p>Esta acción no se puede deshacer.</p>
+
+            <form method="POST" action="{{ url_for('publico.cancelar_reserva', id_reserva=reserva.id_reserva) }}">
+                <button class="btn_cancelar_reserva" type="submit">Sí, cancelar reserva</button>
+            </form>
+
+            <a href="{{ url_for('publico.inicio') }}" style="display:block; margin-top:12px;">
+                Volver al inicio
+            </a>
+        {% endif %}
+
+    </div>
+
+</section>
+{% endblock %}
