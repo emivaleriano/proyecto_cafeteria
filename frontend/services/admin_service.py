@@ -163,8 +163,6 @@ def service_crear_plato(datos, token):
     res = _request("POST", f"{API_BASE_URL}/admin/menu", token=token, json=datos)
     if res is None:
         return None, "No se pudo conectar con el servidor."
-    print("STATUS:", res.status_code)
-    print("BODY:", res.json())
     return _handle(res, 201, "Error al crear el plato.")
 
 def service_editar_plato(id, datos, token):
@@ -225,10 +223,8 @@ def service_obtener_reserva(id, token):
         return None, "No se pudo conectar con el servidor."
     return _handle(res, 200, "Error al obtener la reserva.")
 
-
-def service_actualizar_reserva(id, estado, token):
-    res = _request("POST", f"{API_BASE_URL}/reservas/{id}/estado",
-                   token=token, json={"estado": estado})
+def service_actualizar_reserva(id, estado):
+    res = requests.patch(f"{API_BASE_URL}/reservas/{id}/estado",json={"estado": estado}, timeout=10)
     if res is None:
         return None, "No se pudo conectar con el servidor."
     return _handle(res, 200, "Error al actualizar la reserva.")
