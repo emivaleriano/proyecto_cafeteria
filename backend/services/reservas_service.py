@@ -11,13 +11,14 @@ from backend.repositories.reservas_repository import (
     obtener_reserva_por_token
 )
 from backend.repositories.inicio_repository import get_capacidad_maxima
+from backend.repositories.servicios_repository import obtener_servicios
 from backend.utils.validadores import (
     validar_id,
     validar_texto,
     validar_email,
     validar_entero_positivo
 )
-
+from backend.utils.formatos import formatear_reserva
 from datetime import datetime
 import uuid
 import json
@@ -41,7 +42,6 @@ def crear_nueva_reserva(data):
 
         franja = obtener_franja_por_dia(dia_semana)
         capacidad_maxima = get_capacidad_maxima()
-        print("CAPACIDAD: ", capacidad_maxima)
 
         if not franja:
             return {
@@ -116,8 +116,16 @@ def crear_nueva_reserva(data):
 def data_obtener_reserva(id_reserva):
 
     id_reserva = validar_id(id_reserva)
+    reserva = obtener_reserva(id_reserva)
 
-    return obtener_reserva(id_reserva)
+    todos = obtener_servicios() #obtiene todos los servicios para no hacer una consulta
+    reserva["servicios"] = [
+        s["nombre"] for s in todos
+        if str(s["id_servicio"]) in [str(id) for id in reserva["servicios"]] #si el id coincide con los servicios de la reserva
+    ]
+
+    print(reserva)
+    return reserva
 
 
 def data_cancelar_reserva(id_reserva):
@@ -137,22 +145,23 @@ def data_actualizar_estado_reserva(id_reserva, estado):
     return actualizar_estado_reserva(id_reserva, estado)
 
 def data_check_in(token):
-    try:
-        reserva = obtener_reserva_por_token(token)
-        if not reserva:
-            return {"error": "Reserva no encontrada"}
-        if reserva["estado"] == "Cancelada":
-            return {"error": "La reserva fue cancelada"}
-        if reserva["estado"] == "Completada":
-            return {"error": "La reserva ya fue completada"}
+    reserva = obtener_reserva_por_token(token)
+    if not reserva:
+        return {"error": "Reserva no encontrada"}
+    if reserva["estado"] == "Cancelada":
+        return {"error": "La reserva fue cancelada"}
+    if reserva["estado"] == "Completada":
+        return {"error": "La reserva ya fue completada"}
 
-        hoy = datetime.now().date()
-        fecha_reserva = reserva["fecha_hora"].date()
-        if fecha_reserva != hoy:
-            return {"error": "El QR solo es válido el día de la reserva"}
+    hoy = datetime.now().date()
+    fecha_reserva = reserva["fecha_hora"].date()
+    if fecha_reserva != hoy:
+        return {"error": "El QR solo es válido el día de la reserva"}
 
-        return actualizar_estado_reserva(reserva["id_reserva"], "Completada")
-    except Exception:
-        import traceback
-        print("ERROR en enviar_confirmacion_reserva:")
-        traceback.print_exc()
+    todos = obtener_servicios() #obtiene todos los servicios para no hacer una consulta
+    ids = json.loads(reserva["servicios"] or "[]")
+    reserva["servicios"] = [
+        s["nombre"] for s in todos
+        if str(s["id_servicio"]) in [str(id) for id in ids]
+    ]
+    return formatear_reserva(reserva)
