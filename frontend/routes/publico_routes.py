@@ -10,6 +10,7 @@ from frontend.services.publico_service import (
     get_reserva,
     post_cancelar_reserva,
 )
+from frontend.utils.tokens import verificar_token_resena
 
 publico_bp = Blueprint("publico", __name__)
 
@@ -39,19 +40,26 @@ def reviews():
     return render_template("reviews.html", reviews=lista)
 
 
-@publico_bp.route("/reviews/crear", methods=["GET", "POST"])
-def crear_review():
-    if request.method == "GET":
-        return render_template("crear_review.html", datos={}, error=None)
+@publico_bp.route("/reviews/<token>", methods=["GET", "POST"])
+def crear_review(token):
+    id_reserva, error = verificar_token_resena(token)
+    if error:
+        return render_template("error.html", mensaje=error), 403
 
-    id_reserva = request.form.get("id_reserva", "").strip()
+    if request.method == "GET":
+        return render_template("crear_review.html", datos={}, error=None, token=token)
+
     estrellas  = request.form.get("estrellas")
     comentario = request.form.get("comentario", "").strip()
 
-    datos, error = post_review(id_reserva, estrellas, comentario)
+    if not estrellas:
+        return render_template("crear_review.html", datos={}, error="Seleccioná una valoración.", token=token)
+
+
+    datos, error = post_review(id_reserva, int(estrellas), comentario)
 
     if error:
-        return render_template("crear_review.html", datos={}, error=error)
+        return render_template("crear_review.html", datos={}, error=error, token=token)
 
     return redirect(url_for("publico.reviews"))
 
@@ -113,3 +121,14 @@ def cancelar_reserva(id_reserva):
     if error:
         return render_template("error.html", mensaje=error), 503
     return render_template("reserva_cancelada.html")
+
+"""
+Para generar el mail:
+from utils.tokens import generar_token_resena
+
+token = generar_token_resena(id_reserva)
+link  = url_for("publico.crear_review", token=token, _external=True) # el external true es para que genere la URL completa
+# usas link en el cuerpo del mail
+# usar siempre id_reserva, no id solo
+"""
+    

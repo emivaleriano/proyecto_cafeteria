@@ -86,21 +86,18 @@ def obtener_personas_reservadas(fecha):
 
     conn = obtener_conexion()
     cursor = conn.cursor(dictionary=True)
-
     try:
-
         cursor.execute(
             """
             SELECT COALESCE(SUM(cantidad_personas), 0) AS total
             FROM reservas
-            WHERE DATE(fecha_hora) = %s
+            WHERE fecha_hora = %s
             AND estado <> 'Cancelada'
             """,
             (fecha,)
         )
 
         resultado = cursor.fetchone()
-
         return resultado["total"]
 
     finally:

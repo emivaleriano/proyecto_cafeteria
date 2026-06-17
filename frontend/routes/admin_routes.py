@@ -13,9 +13,14 @@ from frontend.services.admin_service import (
     obtener_dashboard,
     service_cambiar_contrasenia,
     service_obtener_plato,
-    service_obtener_servicio
+    service_obtener_servicio,
+    cambiar_info_local,
+    obtener_info_local,
+    obtener_franjas_horarias,
+    cambiar_franjas_horarias
     )
 
+import json
 
 admin_front_bp = Blueprint("admin", __name__, template_folder="../templates")
 
@@ -74,6 +79,48 @@ def cambiar_contrasenia():
         return redirect(url_for("admin.dashboard")) # si sale bien vuelve al dash
 
     return render_template("admin/cambiar_contrasenia.html")# get
+
+@admin_front_bp.route("/inicio/config", methods=["GET", "POST"])
+def config_local():
+    sesion = requiere_sesion()
+    if sesion:
+        return sesion
+    if request.method =="GET":
+        datos, error = obtener_info_local()
+        if error:
+            return render_template(url_for("admin.configuracion.html", error=error))
+        return render_template("admin/configuracion.html", datos=datos)
+    datos= {
+        "nombre" : request.form.get("nombre"),
+        "direccion" : request.form.get("direccion"),
+        "telefono" : request.form.get("telefono"),
+        "email" : request.form.get("email"),
+        "capacidad" : request.form.get("capacidad"),
+    }
+    datos, error = cambiar_info_local(datos, session["admin_token"])
+
+    return redirect(url_for("admin.dashboard"))
+
+
+@admin_front_bp.route("/inicio/franjas", methods=["GET", "POST"])
+def franjas_horarias():
+    sesion = requiere_sesion()
+    if sesion:
+        return sesion
+
+    if request.method == "GET":
+        franjas, error = obtener_franjas_horarias()
+        if error:
+            return render_template("admin/franjas_horarias.html", error=error, franjas=[])
+        return render_template("admin/franjas_horarias.html", franjas=franjas)
+
+    franjas = json.loads(request.form.get("franjas_json", "[]"))
+    datos, error = cambiar_franjas_horarias(franjas, session["admin_token"])
+
+    if error:
+        return render_template("admin/franjas_horarias.html", error=error, franjas=franjas)
+
+    return redirect(url_for("admin.dashboard"))
 
 @admin_front_bp.route("/dashboard")
 def dashboard():
@@ -134,7 +181,6 @@ def editar_plato(id):
         "imagen":      request.form.get("imagen"),
         "tags":        [t.strip() for t in request.form.get("tags", "").split(",") if t.strip()],
     }
-    print(datos)
     service_editar_plato(id, datos, session["admin_token"])
     return redirect(url_for("admin.dashboard"))
 

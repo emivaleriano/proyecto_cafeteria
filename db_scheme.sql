@@ -5,8 +5,7 @@ CREATE TABLE IF NOT EXISTS franjas_horarias(
 	id_franja INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
     dia_semana INT NOT NULL,
     hora_apertura TIME DEFAULT '09:00:00',
-    hora_cierre TIME DEFAULT '20:00:00',
-    capacidad_maxima INT NOT NULL
+    hora_cierre TIME DEFAULT '20:00:00'
 );
 
 CREATE TABLE IF NOT EXISTS usuarios(
@@ -69,7 +68,8 @@ CREATE TABLE IF NOT EXISTS info_local(
     nombre VARCHAR(100) NOT NULL,
     direccion VARCHAR(200) NOT NULL,
     telefono VARCHAR(50) NOT NULL,
-    email VARCHAR(100) NOT NULL
+    email VARCHAR(100) NOT NULL,
+    capacidad_maxima INT NOT NULL
 );
 
 INSERT INTO info_local (nombre, direccion, telefono, email) VALUES

@@ -23,10 +23,10 @@ reservas_bp = Blueprint("reservas", __name__)
 
 @reservas_bp.route("/reservas", methods=["POST"])
 def crear_reserva_route():
-
     data = request.get_json()
 
     resultado = crear_nueva_reserva(data)
+    print(resultado)
 
     if "error" in resultado:
 
@@ -43,6 +43,7 @@ def crear_reserva_route():
         mensaje="Reserva creada correctamente",
         codigo=HTTP_CREATED_CODE
     )
+
 
 
 @reservas_bp.route("/reservas/<int:id>", methods=["GET"])

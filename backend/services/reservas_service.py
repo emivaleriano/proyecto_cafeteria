@@ -9,7 +9,7 @@ from backend.repositories.reservas_repository import (
     obtener_todas_reservas,
     actualizar_estado_reserva
 )
-
+from backend.repositories.inicio_repository import get_capacidad_maxima
 from backend.utils.validadores import (
     validar_id,
     validar_texto,
@@ -35,12 +35,12 @@ def crear_nueva_reserva(data):
     )
 
     fecha_hora = data.get("fecha_hora")
-
     fecha_obj = datetime.fromisoformat(fecha_hora)
-
     dia_semana = fecha_obj.weekday()
 
     franja = obtener_franja_por_dia(dia_semana)
+    capacidad_maxima = get_capacidad_maxima()
+    print("CAPACIDAD: ", capacidad_maxima)
 
     if not franja:
         return {
@@ -48,12 +48,12 @@ def crear_nueva_reserva(data):
         }
 
     personas_reservadas = obtener_personas_reservadas(
-        fecha_obj.date()
+        fecha_obj
     )
 
     if (
         personas_reservadas + cantidad_personas
-        > franja["capacidad_maxima"]
+        > capacidad_maxima
     ):
         return {
             "error": "No hay disponibilidad para esa fecha"
