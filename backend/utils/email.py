@@ -2,7 +2,7 @@ import os
 import smtplib
 import qrcode
 import io
-import base64
+import traceback
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
@@ -18,9 +18,6 @@ FRONTEND_BASE_URL = os.getenv("FRONTEND_BASE_URL", "http://localhost:5001")
 
 
 def generar_imagen_qr(texto_qr):
-    """
-    Genera un QR en memoria y lo devuelve como bytes PNG.
-    """
     img = qrcode.make(texto_qr)
     buffer = io.BytesIO()
     img.save(buffer, format="PNG")
@@ -29,37 +26,32 @@ def generar_imagen_qr(texto_qr):
 
 
 def enviar_confirmacion_reserva(email_destino, nombre, reserva):
-    """
-    Envía el email de confirmación con el QR adjunto y el botón de cancelar.
-
-    Args:
-        email_destino (str): Email del usuario.
-        nombre (str): Nombre del usuario.
-        reserva (dict): Datos de la reserva (id_reserva, fecha_hora, cantidad_personas, qr).
-    """
     if not SMTP_USER or not SMTP_PASSWORD:
-        # Si no hay credenciales configuradas, no falla — solo avisa
         print("[EMAIL] Variables SMTP_USER / SMTP_PASSWORD no configuradas. Email no enviado.")
         return
 
     id_reserva = reserva["id_reserva"]
     fecha_hora = reserva.get("fecha_hora", "")
-    cantidad = reserva.get("cantidad_personas", "")
-    codigo_qr = reserva["qr"]
+    cantidad   = reserva.get("cantidad_personas", "")
+    codigo_qr  = reserva["qr"]
 
     url_cancelar = f"{FRONTEND_BASE_URL}/reservar/{id_reserva}/cancelar"
 
-    # Genera la imagen QR
     imagen_qr_bytes = generar_imagen_qr(codigo_qr)
-    imagen_qr_b64 = base64.b64encode(imagen_qr_bytes).decode("utf-8")
 
-    # Arma el mensaje MIME
+    # Estructura correcta para imagen inline:
+    # multipart/related
+    #   └── multipart/alternative
+    #         └── text/html   (referencia cid:qr_image)
+    #   └── image/png         (Content-ID: <qr_image>)
     msg = MIMEMultipart("related")
     msg["Subject"] = f"Confirmación de reserva #{id_reserva} - Cafetería"
-    msg["From"] = SMTP_USER
-    msg["To"] = email_destino
+    msg["From"]    = SMTP_USER
+    msg["To"]      = email_destino
 
-    # Cuerpo HTML con el QR embebido (cid:qr_image)
+    alternative = MIMEMultipart("alternative")
+    msg.attach(alternative)
+
     html = f"""
     <html>
       <body style="font-family: Arial, sans-serif; color: #333; max-width: 600px; margin: auto;">
@@ -88,10 +80,7 @@ def enviar_confirmacion_reserva(email_destino, nombre, reserva):
         </div>
 
         <hr style="border: none; border-top: 1px solid #eee;">
-
-        <p style="margin-top: 24px;">
-          ¿No podés asistir? Podés cancelar tu reserva haciendo clic en el botón de abajo.
-        </p>
+        <p style="margin-top: 24px;">¿No podés asistir? Cancelá tu reserva desde el botón de abajo.</p>
 
         <div style="text-align: center; margin: 16px 0;">
           <a href="{url_cancelar}"
@@ -110,23 +99,23 @@ def enviar_confirmacion_reserva(email_destino, nombre, reserva):
     </html>
     """
 
-    parte_html = MIMEText(html, "html")
-    msg.attach(parte_html)
+    alternative.attach(MIMEText(html, "html"))
 
-    # Adjunta el QR como imagen inline
+    # Imagen adjunta inline — va en "related", no en "alternative"
     imagen_mime = MIMEImage(imagen_qr_bytes, _subtype="png")
     imagen_mime.add_header("Content-ID", "<qr_image>")
     imagen_mime.add_header("Content-Disposition", "inline", filename="qr_reserva.png")
     msg.attach(imagen_mime)
 
-    # Envía el mail
     try:
+        print(f"[EMAIL] Conectando a {SMTP_HOST}:{SMTP_PORT} como {SMTP_USER}...")
         with smtplib.SMTP(SMTP_HOST, SMTP_PORT) as servidor:
             servidor.ehlo()
             servidor.starttls()
             servidor.login(SMTP_USER, SMTP_PASSWORD)
             servidor.sendmail(SMTP_USER, email_destino, msg.as_string())
-        print(f"[EMAIL] Confirmación enviada a {email_destino}")
-    except smtplib.SMTPException as e:
-        # No queremos que un fallo de email rompa la reserva
-        print(f"[EMAIL] Error al enviar email: {e}")
+        print(f"[EMAIL] Email enviado exitosamente a {email_destino}")
+    except Exception as e:
+        # Loguea el error completo para poder diagnosticar
+        print(f"[EMAIL] ERROR al enviar email a {email_destino}:")
+        traceback.print_exc()
