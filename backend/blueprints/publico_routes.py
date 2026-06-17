@@ -1,5 +1,4 @@
 from flask import Blueprint, render_template, request, redirect, url_for
-import qrcode, io, base64
 from frontend.services.publico_service import (
     get_inicio,
     get_menu,
@@ -87,15 +86,7 @@ def confirmacion_reserva(id_reserva):
     if error:
         return render_template("error.html", mensaje=error), 503
 
-    # Genera la imagen QR en base64 para mostrar en la página
-    img = qrcode.make(reserva["qr"])
-    buffer = io.BytesIO()
-    img.save(buffer, format="PNG")
-    buffer.seek(0)
-    qr_b64 = base64.b64encode(buffer.read()).decode("utf-8")
-    qr_data_url = f"data:image/png;base64,{qr_b64}"
-
-    return render_template("confirmacion.html", reserva=reserva, datos=datos, qr_img=qr_data_url)
+    return render_template("confirmacion.html", reserva=reserva, datos=datos)
 
 
 @publico_bp.route("/reservar/<int:id_reserva>/cancelar", methods=["GET"])
@@ -112,4 +103,4 @@ def cancelar_reserva(id_reserva):
     _, error = post_cancelar_reserva(id_reserva)
     if error:
         return render_template("error.html", mensaje=error), 503
-    return render_template("reserva_cancelada.html")
+    return redirect(url_for("publico.inicio"))

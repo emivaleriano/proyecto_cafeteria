@@ -1,0 +1,19 @@
+{% extends "base_usuarios.html" %}
+
+{% block title %}Reserva cancelada{% endblock %}
+
+{% block body %}
+<section class="confirmacion__contenedor">
+
+    <div class="confirmacion__header">
+        <h1>Reserva cancelada</h1>
+    </div>
+
+    <div class="confirmacion__body">
+        <p>Tu reserva fue cancelada exitosamente.</p>
+        <p>Si querés hacer una nueva reserva, podés hacerlo desde el inicio.</p>
+        <a href="{{ url_for('publico.inicio') }}">Volver al inicio</a>
+    </div>
+
+</section>
+{% endblock %}
