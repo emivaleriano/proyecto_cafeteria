@@ -41,15 +41,34 @@
         </ul>
     </div>
 
-    <h2>Reservas</h2>
+    <h2 id="tabla-reservas">Reservas</h2>
         <table class="tabla-admin">
             <thead>
                 <tr>
                     <th>ID</th>
                     <th>Cliente</th>
-                    <th>Fecha</th>
+                    <th>
+                        <a href="{{ url_for('admin.dashboard', pagina=1, orden='desc' if orden == 'asc' else 'asc', estado=estados) }}#tabla-reservas">
+                        Fecha {{ '↑' if orden == 'asc' else '↓' }}
+                        </a>
+                    </th>
                     <th>Personas</th>
-                    <th>Estado</th>
+                    <th style="position: relative;">
+                        Estado
+                        <button onclick="toggleFiltroEstado()" class="boton" style="font-size: 12px; padding: 2px 8px;">▾</button>
+                        <div id="filtro-estado" style="display:none; position:absolute; background:white; border: 1px solid #ccc; padding: 8px; z-index: 10; top: 100%; left: 0; white-space: nowrap;">
+                            <form method="GET" action="{{ url_for('admin.dashboard') }}#tabla-reservas">
+                                <input type="hidden" name="orden" value="{{ orden }}">
+                                <input type="hidden" name="pagina" value="1">
+                                {% for e in ['Pendiente', 'Confirmada', 'Completada', 'Cancelada'] %}
+                                <label style="display:block;">
+                                    <input type="checkbox" name="estado" value="{{ e }}" {{ 'checked' if e in estados }}> {{ e }}
+                                </label>
+                                {% endfor %}
+                                <button type="submit" class="boton" style="margin-top: 6px;">Aplicar</button>
+                            </form>
+                        </div>
+                    </th>
                     <th>Acciones</th>
                 </tr>
             </thead>
@@ -83,6 +102,14 @@
                     </tr>
                 {% endfor %}
             </tbody>
+            <div style="display: flex; gap: 8px; margin-top: 1rem;">
+                {% for i in range(1, total_paginas + 1) %}
+                    <a class="boton {{ 'disabled' if i == pagina }}"
+                    href="{{ url_for('admin.dashboard', pagina=i, orden=orden, estado=estados) }}#tabla-reservas">
+                        {{ i }}
+                    </a>
+                {% endfor %}
+            </div>
         </table>
 
 
@@ -158,4 +185,17 @@
     </div>
 
 
+<script>
+function toggleFiltroEstado() {
+    const div = document.getElementById('filtro-estado');
+    div.style.display = div.style.display === 'none' ? 'block' : 'none'; // si esta oculto lo muestra, sino lo oculta
+}
+
+document.addEventListener('click', function(e) {
+    const filtro = document.getElementById('filtro-estado'); // botones de filtro
+    if (!filtro.contains(e.target) && !e.target.closest('button[onclick]')) { // e.target es donde se hizo click
+        filtro.style.display = 'none'; // si se clickeo dentro de los filtros no se cierra el dropdown
+    }
+});
+</script>
 {% endblock %}
