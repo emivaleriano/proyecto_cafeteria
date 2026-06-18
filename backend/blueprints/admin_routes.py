@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify
 from backend.services.admin_service import autenticar_admin, cambiar_contrasenia
-from backend.services.dashboard_service import obtener_stats, obtener_reservas
+from backend.services.reservas_service import obtener_todas_reservas
+from backend.services.dashboard_service import obtener_stats
 from backend.repositories.menu_repository import obtener_menu
 from backend.repositories.servicios_repository import obtener_servicios
 from backend.utils.admin import requiere_admin
@@ -82,8 +83,12 @@ def patch_contrasenia():
 @admin_bp.route("/dashboard", methods=['GET'])
 @requiere_admin
 def dashboard_data():
+    pagina = int(request.args.get("pagina", 1))
+    orden = request.args.get("orden", "asc")
+    estados = request.args.getlist("estado")
+
     stats = obtener_stats()
-    reservas = obtener_reservas()
+    reservas = obtener_todas_reservas(pagina=pagina, orden=orden, estados=estados)
     platos = obtener_menu()
     servicios = obtener_servicios()
 

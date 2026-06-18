@@ -3,7 +3,6 @@ from backend.repositories.dashboard_repository import (
     contar_reservas_hoy,
     contar_cancelaciones,
     contar_total_resenas,
-    obtener_todas_reservas,
 )
 
 def obtener_stats():
@@ -21,9 +20,3 @@ def obtener_stats():
         "cancelaciones": cancelaciones,
         "resenas": total_resenas,
     }
-
-def obtener_reservas():
-    """
-    Devuele la lista de reservas para el dashboard.
-    """
-    return obtener_todas_reservas()
