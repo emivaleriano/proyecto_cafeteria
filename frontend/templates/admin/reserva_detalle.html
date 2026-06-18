@@ -2,77 +2,70 @@
 {% block title %}Reserva #{{ reserva.id_reserva }} - Admin{% endblock %}
 
 {% block body %}
-<h1>Detalle de reserva</h1>
-<p>Información completa de la reserva.</p>
+<section class="encabezado-pagina">
+    <h1>Detalle de reserva</h1>
+    <p>Información completa de la reserva #{{ reserva.id_reserva }}</p>
+    <hr>
+</section>
 
-<div class="reservar">
+<div class="base-contenedor" style="max-width: 760px;">
 
-  <div class="reservar__panel">
-    <h2>Datos de la reserva</h2>
-    <dl>
-      <dt>ID</dt>
-      <dd>{{ reserva.id_reserva }}</dd>
-
-      <dt>Cliente</dt>
-      <dd>{{ reserva.nombre }}</dd>
-
-      <dt>Email</dt>
-      <dd>{{ reserva.email }}</dd>
-
-      <dt>Teléfono</dt>
-      <dd>{{ reserva.telefono if reserva.telefono else '—' }}</dd>
-
-      <dt>Fecha y horario</dt>
-      <dd>{{ reserva.fecha_hora }}</dd>
-
-      <dt>Personas</dt>
-      <dd>{{ reserva.cantidad_personas }}</dd>
-
-      <dt>Estado</dt>
-      <dd>{{ reserva.estado }}</dd>
-    </dl>
-  </div>
-
-  {% if reserva.servicios %}
-  <div class="reservar__panel">
-    <h2>Servicios solicitados</h2>
-    <div class="reservar__contenedor-servicios">
-      {% for servicio in reserva.servicios %}
-      <div><span>{{ servicio }}</span></div>
-      {% endfor %}
+    <div class="tarjeta-detalle">
+        <div class="tarjeta-detalle__header"><h2>Datos de la reserva</h2></div>
+        <div class="tarjeta-detalle__body">
+            <dl class="detalle-grilla">
+                <div><dt>ID</dt><dd>#{{ reserva.id_reserva }}</dd></div>
+                <div><dt>Estado</dt><dd><span class="estado-badge estado-badge--{{ reserva.estado | lower }}">{{ reserva.estado }}</span></dd></div>
+                <div><dt>Cliente</dt><dd>{{ reserva.nombre }}</dd></div>
+                <div><dt>Email</dt><dd>{{ reserva.email }}</dd></div>
+                <div><dt>Teléfono</dt><dd>{{ reserva.telefono if reserva.telefono else '—' }}</dd></div>
+                <div><dt>Fecha y horario</dt><dd>{{ reserva.fecha_hora }}</dd></div>
+                <div><dt>Personas</dt><dd>{{ reserva.cantidad_personas }}</dd></div>
+            </dl>
+        </div>
     </div>
-  </div>
-  {% endif %}
 
-  {% if reserva.comentarios %}
-  <div class="reservar__panel">
-    <h2>Comentarios</h2>
-    <p>{{ reserva.comentarios }}</p>
-  </div>
-  {% endif %}
+    {% if reserva.servicios %}
+    <div class="tarjeta-detalle">
+        <div class="tarjeta-detalle__header"><h2>Servicios solicitados</h2></div>
+        <div class="tarjeta-detalle__body">
+            <div class="detalle-chips">
+                {% for servicio in reserva.servicios %}
+                <span class="detalle-chip">{{ servicio }}</span>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
 
-  {% if reserva.estado == 'Pendiente' %}
-  <div class="reservar__panel" style="display: flex; gap: 12px;">
-    <form method="POST" action="{{ url_for('admin.actualizar_estado_reserva', id=reserva.id_reserva) }}">
-      <input type="hidden" name="estado" value="Confirmada">
-      <button type="submit" class="boton boton--reservar">Confirmar reserva</button>
-    </form>
-    <form method="POST" action="{{ url_for('admin.actualizar_estado_reserva', id=reserva.id_reserva) }}">
-      <input type="hidden" name="estado" value="Cancelada">
-      <button type="submit" class="boton boton--reviews">Cancelar reserva</button>
-    </form>
-  </div>
-  {% elif reserva.estado == 'Confirmada' %}
-  <div class="reservar__panel">
-    <form method="POST" action="{{ url_for('admin.actualizar_estado_reserva', id=reserva.id_reserva) }}">
-      <input type="hidden" name="estado" value="Cancelada">
-      <button type="submit" class="boton boton--reviews">Cancelar reserva</button>
-    </form>
-  </div>
-  {% endif %}
+    {% if reserva.observaciones %}
+    <div class="tarjeta-detalle">
+        <div class="tarjeta-detalle__header"><h2>Observaciones</h2></div>
+        <div class="tarjeta-detalle__body">
+            <p class="detalle-comentario">{{ reserva.observaciones }}</p>
+        </div>
+    </div>
+    {% endif %}
 
-  <a href="{{ url_for('admin.dashboard') }}" class="boton boton--reviews">
-    ← Volver al dashboard
-  </a>
+    {% if reserva.estado in ['Pendiente', 'Confirmada'] %}
+    <div class="tarjeta-detalle">
+        <div class="tarjeta-detalle__header"><h2>Acciones</h2></div>
+        <div class="tarjeta-detalle__body" style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+            {% if reserva.estado == 'Pendiente' %}
+            <form method="POST" action="{{ url_for('admin.actualizar_estado_reserva', id=reserva.id_reserva) }}">
+                <input type="hidden" name="estado" value="Confirmada">
+                <button type="submit" class="boton-confirmar">Confirmar reserva</button>
+            </form>
+            {% endif %}
+            <form method="POST" action="{{ url_for('admin.actualizar_estado_reserva', id=reserva.id_reserva) }}">
+                <input type="hidden" name="estado" value="Cancelada">
+                <button type="submit" class="boton-cancelar">Cancelar reserva</button>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+
+    <a href="{{ url_for('admin.dashboard') }}" class="boton" style="justify-self: start;">← Volver al dashboard</a>
+
 </div>
 {% endblock %}

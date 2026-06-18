@@ -5,20 +5,21 @@
 {% block nav %}
 <nav id="nav-admin">
     <span></span>
+    <a href="{{ url_for('admin.config_local') }}" class="boton">Configuración Local</a>
     <a href="{{ url_for('admin.logout') }}">Logout</a>
 </nav>
 {% endblock %}
 
-
 {% if error %}
-    <div class="alert alert-error">{{ error }}</div>
+    <div class="error">⚠ {{ error }}</div>
 {% endif %}
 
 {% block body %}
-<h1>Dashboard</h1>
-<div>
-    <a class="boton" href="{{url_for('admin.config_local')}}">Configuracion Local</a>
-</div>
+<section class="encabezado-pagina">
+    <h1>Dashboard</h1>
+    <hr>
+</section>
+
 <div class="base-contenedor">
     <div class="tarjeta-stats">
         <ul>
@@ -102,14 +103,20 @@
                     </tr>
                 {% endfor %}
             </tbody>
-            <div style="display: flex; gap: 8px; margin-top: 1rem;">
-                {% for i in range(1, total_paginas + 1) %}
-                    <a class="boton {{ 'disabled' if i == pagina }}"
-                    href="{{ url_for('admin.dashboard', pagina=i, orden=orden, estado=estados) }}#tabla-reservas">
-                        {{ i }}
-                    </a>
-                {% endfor %}
-            </div>
+            <tfoot>
+                <tr>
+                    <td colspan="6">
+                        <div class="paginacion">
+                            {% for i in range(1, total_paginas + 1) %}
+                                <a class="{{ 'paginacion__btn paginacion__btn--activo' if i == pagina else 'paginacion__btn' }}"
+                                href="{{ url_for('admin.dashboard', pagina=i, orden=orden, estado=estados) }}#tabla-reservas">
+                                    {{ i }}
+                                </a>
+                            {% endfor %}
+                        </div>
+                    </td>
+                </tr>
+            </tfoot>
         </table>
 
 

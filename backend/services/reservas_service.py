@@ -57,7 +57,7 @@ def crear_nueva_reserva(data):
             > capacidad_maxima
         ):
             return {
-                "error": "No hay disponibilidad para esa fecha"
+                "error": "No hay disponibilidad para esa cantidad de personas "
             }
 
         usuario = obtener_usuario_por_email(email)

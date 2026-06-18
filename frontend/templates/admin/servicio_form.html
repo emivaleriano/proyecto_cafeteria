@@ -4,12 +4,14 @@
 {% endblock %}
 
 {% block body %}
-<h1>{% if servicio %}Editar servicio{% else %}Nuevo servicio{% endif %}</h1>
-<p>{% if servicio %}Modificá los datos del servicio.{% else %}Completá los datos para crear un nuevo servicio.{% endif %}</p>
-
+<section class="encabezado-pagina">
+    <h1>{% if servicio %}Editar servicio{% else %}Nuevo servicio{% endif %}</h1>
+    <p>{% if servicio %}Modificá los datos del servicio.{% else %}Completá los datos para crear un nuevo servicio.{% endif %}</p>
+    <hr>
+</section>
 
 {% if error %}
-    <div class="alert alert-error">{{ error }}</div>
+    <div class="error">⚠ {{ error }}</div>
 {% endif %}
 
 <div class="reservar">
