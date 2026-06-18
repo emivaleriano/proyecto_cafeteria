@@ -94,9 +94,13 @@ def cancelar_reserva_route(id):
 @reservas_bp.route("/reservas", methods=["GET"])
 @requiere_admin
 def obtener_reservas_route():
-    reservas = data_obtener_todas_reservas()
+    pagina = int(request.args.get("pagina", 1))
+    max = int(request.args.get("max", 10))
+    estados = request.args.getlist("estado")
+    orden = request.args.get("orden", "asc")
+    resultado = data_obtener_todas_reservas(pagina, max, estados, orden)
     return crear_respuesta_exito(
-        datos=reservas,
+        datos=resultado,
         mensaje="Reservas obtenidas correctamente",
         codigo=HTTP_OK_CODE
     )

@@ -134,8 +134,10 @@ def data_cancelar_reserva(id_reserva):
 
     return cancelar_reserva(id_reserva)
 
-def data_obtener_todas_reservas():
-    return obtener_todas_reservas()
+
+
+def data_obtener_todas_reservas(pagina, max, estados, orden):
+    return obtener_todas_reservas(pagina, max, estados, orden)
 
 def data_actualizar_estado_reserva(id_reserva, estado):
     id_reserva = validar_id(id_reserva)
