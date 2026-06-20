@@ -63,7 +63,7 @@ def obtener_franja_por_dia(dia_semana):
             (dia_semana,)
         )
 
-        return cursor.fetchone()
+        return cursor.fetchall()
 
     finally:
         cursor.close()

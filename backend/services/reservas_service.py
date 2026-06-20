@@ -105,10 +105,11 @@ def crear_nueva_reserva(data):
             "id_reserva": id_reserva,
             "qr": qr
         }
-    except Exception:
+    except Exception as e:
         import traceback
-        print("ERROR en enviar_confirmacion_reserva:")
+        print("ERROR en crear_nueva_reserva:")
         traceback.print_exc()
+        return {"error": str(e)}
 
 
 
