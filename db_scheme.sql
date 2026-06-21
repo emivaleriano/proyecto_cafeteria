@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS reservas(
     servicios JSON,
     observaciones VARCHAR(100),
     estado enum("Pendiente", "Confirmada", "Cancelada", "Completada"),
-    qr VARCHAR(100) NOT NULL,
+    qr VARCHAR(100) NOT NULL UNIQUE,
     FOREIGN KEY (id_usuario) REFERENCES usuarios (id_usuario)
 );
 

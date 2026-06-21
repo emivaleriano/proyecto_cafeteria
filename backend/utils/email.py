@@ -37,13 +37,10 @@ def enviar_confirmacion_reserva(email_destino, nombre, reserva):
 
     url_cancelar = f"{FRONTEND_BASE_URL}/reservar/{id_reserva}/cancelar"
 
-    imagen_qr_bytes = generar_imagen_qr(codigo_qr)
+    url_qr = f"{FRONTEND_BASE_URL}/check-in/{codigo_qr}"
+    imagen_qr_bytes = generar_imagen_qr(url_qr)
 
-    # Estructura correcta para imagen inline:
-    # multipart/related
-    #   └── multipart/alternative
-    #         └── text/html   (referencia cid:qr_image)
-    #   └── image/png         (Content-ID: <qr_image>)
+
     msg = MIMEMultipart("related")
     msg["Subject"] = f"Confirmación de reserva #{id_reserva} - Cafetería"
     msg["From"]    = SMTP_USER
@@ -115,7 +112,7 @@ def enviar_confirmacion_reserva(email_destino, nombre, reserva):
             servidor.login(SMTP_USER, SMTP_PASSWORD)
             servidor.sendmail(SMTP_USER, email_destino, msg.as_string())
         print(f"[EMAIL] Email enviado exitosamente a {email_destino}")
-    except Exception as e:
+    except Exception:
         # Loguea el error completo para poder diagnosticar
         print(f"[EMAIL] ERROR al enviar email a {email_destino}:")
         traceback.print_exc()

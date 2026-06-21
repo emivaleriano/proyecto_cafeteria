@@ -38,7 +38,7 @@ def crear_nueva_reserva(data):
 
         fecha_hora = data.get("fecha_hora")
         fecha_obj = datetime.fromisoformat(fecha_hora)
-        dia_semana = fecha_obj.weekday()
+        dia_semana = fecha_obj.isoweekday() % 7 # Domingo = 0, Lunes = 1
 
         franja = obtener_franja_por_dia(dia_semana)
         capacidad_maxima = get_capacidad_maxima()
