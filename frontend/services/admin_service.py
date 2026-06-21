@@ -62,6 +62,28 @@ def login_admin(usuario, contrasenia):
 
     return None, body.get("mensaje", "Error al iniciar sesión.")
 
+
+def validar_token(token):
+    """
+    Consulta al back si el token sigue siendo válido.
+    """
+    try:
+        res = requests.get(
+            f"{API_BASE_URL}/admin/me",
+            headers={"Authorization": f"Bearer {token}"},
+            timeout=5,
+        )
+    except requests.exceptions.ConnectionError:
+        return None, "No se pudo conectar con el servidor."
+    except requests.exceptions.Timeout:
+        return None, "El servidor tardó demasiado en responder."
+
+    body = res.json()
+    if res.status_code == 200 and body.get("exito"):
+        return body.get("datos", {}), None
+    return None, body.get("mensaje", "Token inválido o expirado.")
+
+
 def service_cambiar_contrasenia(contra_actual, nueva_contra, confirmar_contra, token):
     if nueva_contra != confirmar_contra:
         return None, "Las contraseñas no coinciden."
