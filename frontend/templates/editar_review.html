@@ -1,0 +1,124 @@
+{% extends "base_usuarios.html" %}
+
+{% block title %}Modificar reseña - {% endblock %}
+
+
+{% block body %}
+
+<section class="encabezado-pagina">
+    <h1>Modificar reseña</h1>
+    <hr>
+    <p>Editá tu opinión sobre tu experiencia en nuestro local</p>
+</section>
+
+
+<form class="review" method="POST" action="{{ url_for('publico.modificar_review', id=resena.id_resena) }}">
+
+
+    <div class="review__campo">
+
+        <label for="review__id">
+            Número de reserva
+        </label>
+
+        <input 
+            type="text" 
+            id="review__id" 
+            name="id_reserva"
+            value="{{ resena.id_reserva }}"
+            readonly
+        >
+
+    </div>
+
+
+
+    <div class="review__campo">
+
+        <label for="review__estrellas">
+            Valoración
+        </label>
+
+
+        <select id="review__estrellas" name="estrellas">
+
+
+            <option value="1" 
+            {% if resena.estrellas == 1 %}selected{% endif %}>
+                ★
+            </option>
+
+
+            <option value="2"
+            {% if resena.estrellas == 2 %}selected{% endif %}>
+                ★★
+            </option>
+
+
+            <option value="3"
+            {% if resena.estrellas == 3 %}selected{% endif %}>
+                ★★★
+            </option>
+
+
+            <option value="4"
+            {% if resena.estrellas == 4 %}selected{% endif %}>
+                ★★★★
+            </option>
+
+
+            <option value="5"
+            {% if resena.estrellas == 5 %}selected{% endif %}>
+                ★★★★★
+            </option>
+
+
+        </select>
+
+    </div>
+
+
+
+    <div class="review__campo">
+
+        <label for="review__comentario">
+            Comentarios
+        </label>
+
+
+        <textarea 
+            id="review__comentario"
+            name="comentario"
+        >{{ resena.comentario }}</textarea>
+
+
+    </div>
+
+
+
+    <button class="boton boton--submit" type="submit">
+    Guardar cambios
+    </button>
+
+
+</form>
+
+
+
+<form 
+    class="review__eliminar"
+    method="POST"
+    action="{{ url_for('publico.eliminar_review', id=resena.id_resena) }}"
+>
+
+
+    <button class="boton-cancelar" type="submit">
+    Eliminar reseña
+    </button>
+
+
+</form>
+
+
+
+{% endblock %}
