@@ -14,6 +14,7 @@ from frontend.services.publico_service import (
     get_review,
     patch_review,
     delete_review,
+    get_check_in
 )
 from frontend.services.admin_service import service_actualizar_reserva
 from frontend.utils.tokens import verificar_token_resena

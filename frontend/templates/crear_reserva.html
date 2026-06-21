@@ -12,7 +12,7 @@
 
 
 {% if error %}
-    <div class="alert alert-error">{{ error }}</div>
+    <div class="error">⚠ {{ error }}</div>
 {% endif %}
 
 <form class="reservar" method="POST" action="{{ url_for('publico.crear_reserva') }}">
@@ -28,7 +28,7 @@
         <select id="horario" name="horario" required>
             <option disabled selected>Elegí un horario</option>
             {% for horario in horarios %}
-            <option value="{{ horario }}">{{ horario }}</option>
+            <option disabled selected value="">Seleccione una fecha</option>
             {% endfor %}
         </select>
 

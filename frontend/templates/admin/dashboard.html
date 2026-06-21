@@ -4,28 +4,22 @@
 
 {% block nav %}
 <nav id="nav-admin">
-<<<<<<< HEAD
-    <span>{{ datos.nombre }}</span>
-=======
     <span></span>
->>>>>>> main
+    <a href="{{ url_for('admin.config_local') }}" class="boton">Configuración Local</a>
     <a href="{{ url_for('admin.logout') }}">Logout</a>
 </nav>
 {% endblock %}
 
-<<<<<<< HEAD
-=======
-
 {% if error %}
-    <div class="alert alert-error">{{ error }}</div>
+    <div class="error">⚠ {{ error }}</div>
 {% endif %}
 
->>>>>>> main
 {% block body %}
-<h1>Dashboard</h1>
-<div>
-    <a class="boton" href="{{url_for('admin.config_local')}}">Configuracion Local</a>
-</div>
+<section class="encabezado-pagina">
+    <h1>Dashboard</h1>
+    <hr>
+</section>
+
 <div class="base-contenedor">
     <div class="tarjeta-stats">
         <ul>
@@ -48,15 +42,34 @@
         </ul>
     </div>
 
-    <h2>Reservas</h2>
+    <h2 id="tabla-reservas">Reservas</h2>
         <table class="tabla-admin">
             <thead>
                 <tr>
                     <th>ID</th>
                     <th>Cliente</th>
-                    <th>Fecha</th>
+                    <th>
+                        <a href="{{ url_for('admin.dashboard', pagina=1, orden='desc' if orden == 'asc' else 'asc', estado=estados) }}#tabla-reservas">
+                        Fecha {{ '↑' if orden == 'asc' else '↓' }}
+                        </a>
+                    </th>
                     <th>Personas</th>
-                    <th>Estado</th>
+                    <th style="position: relative;">
+                        Estado
+                        <button onclick="toggleFiltroEstado()" class="boton" style="font-size: 12px; padding: 2px 8px;">▾</button>
+                        <div id="filtro-estado" style="display:none; position:absolute; background:white; border: 1px solid #ccc; padding: 8px; z-index: 10; top: 100%; left: 0; white-space: nowrap;">
+                            <form method="GET" action="{{ url_for('admin.dashboard') }}#tabla-reservas">
+                                <input type="hidden" name="orden" value="{{ orden }}">
+                                <input type="hidden" name="pagina" value="1">
+                                {% for e in ['Pendiente', 'Confirmada', 'Completada', 'Cancelada'] %}
+                                <label style="display:block;">
+                                    <input type="checkbox" name="estado" value="{{ e }}" {{ 'checked' if e in estados }}> {{ e }}
+                                </label>
+                                {% endfor %}
+                                <button type="submit" class="boton" style="margin-top: 6px;">Aplicar</button>
+                            </form>
+                        </div>
+                    </th>
                     <th>Acciones</th>
                 </tr>
             </thead>
@@ -90,76 +103,27 @@
                     </tr>
                 {% endfor %}
             </tbody>
+            <tfoot>
+                <tr>
+                    <td colspan="6">
+                        <div class="paginacion">
+                            {% for i in range(1, total_paginas + 1) %}
+                                <a class="{{ 'paginacion__btn paginacion__btn--activo' if i == pagina else 'paginacion__btn' }}"
+                                href="{{ url_for('admin.dashboard', pagina=i, orden=orden, estado=estados) }}#tabla-reservas">
+                                    {{ i }}
+                                </a>
+                            {% endfor %}
+                        </div>
+                    </td>
+                </tr>
+            </tfoot>
         </table>
 
-<<<<<<< HEAD
-    <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem;">
-        <h2>Menú</h2>
-        <a class="boton" href="{{ url_for('admin.crear_plato') }}">+ Crear plato</a>
-    </div>
-    <table class="tabla-admin">
-        <thead>
-            <tr>
-                <th>Nombre</th>
-                <th>Categoría</th>
-                <th>Precio</th>
-                <th>Activo</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for plato in platos %}
-            <tr>
-                <td>{{ plato.nombre }}</td>
-                <td>{{ plato.categoria }}</td>
-                <td>${{ plato.precio }}</td>
-                <td>{{ 'Sí' if plato.activo else 'No' }}</td>
-                <td>
-                                    <a class="boton" href="{{ url_for('admin.editar_plato', id=plato.id) }}">Editar</a>
-                        <a class="boton-cancelar" href="{{ url_for('admin.eliminar_plato', id=plato.id) }}">Eliminar</a>
-                        <a class="boton" href="{{ url_for('admin.cambiar_estado_plato', id=plato.id) }}">{{ 'Desactivar' if plato.activo else 'Activar' }}</a>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-
-    <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem;">
-        <h2>Servicios</h2>
-        <a class="boton" href="{{ url_for('admin.crear_servicio') }}">+ Crear servicio</a>
-    </div>
-    <table class="tabla-admin">
-        <thead>
-            <tr>
-                <th>Nombre</th>
-                <th>Descripción</th>
-                <th>Activo</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for servicio in servicios %}
-            <tr>
-                <td>{{ servicio.nombre }}</td>
-                <td>{{ servicio.descripcion }}</td>
-                <td>{{ 'Sí' if servicio.activo else 'No' }}</td>
-                <td>
-                                    <a class="boton" href="{{ url_for('admin.editar_servicio', id=servicio.id_servicio) }}">Editar</a>
-                        <a class="boton-cancelar" href="{{ url_for('admin.eliminar_servicio', id=servicio.id_servicio) }}">Eliminar</a>
-                        <a class="boton" href="{{ url_for('admin.cambiar_estado_servicio', id=servicio.id_servicio) }}">{{ 'Desactivar' if servicio.activo else 'Activar' }}</a>
-                </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    </div>
-=======
 
 
 <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem;">
     <h2>Menú</h2>
     <a class="boton" href="{{ url_for('admin.crear_plato') }}">+ Crear plato</a>
->>>>>>> main
 </div>
 <table class="tabla-admin">
     <thead>
@@ -228,4 +192,17 @@
     </div>
 
 
+<script>
+function toggleFiltroEstado() {
+    const div = document.getElementById('filtro-estado');
+    div.style.display = div.style.display === 'none' ? 'block' : 'none'; // si esta oculto lo muestra, sino lo oculta
+}
+
+document.addEventListener('click', function(e) {
+    const filtro = document.getElementById('filtro-estado'); // botones de filtro
+    if (!filtro.contains(e.target) && !e.target.closest('button[onclick]')) { // e.target es donde se hizo click
+        filtro.style.display = 'none'; // si se clickeo dentro de los filtros no se cierra el dropdown
+    }
+});
+</script>
 {% endblock %}

@@ -197,7 +197,7 @@ def post_reserva(form):
         "cantidad_personas": form.get("cantidad_personas"),
         "fecha_hora":        fecha_hora,
         "servicios":         form.getlist("servicios[]"),
-        "observaciones":     form.get("comentarios", "").strip(),
+        "observaciones":     form.get("observaciones", "").strip(),
     }
 
     try:

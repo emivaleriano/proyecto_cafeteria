@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, session
+from flask import Blueprint, render_template, request, redirect, url_for, session, jsonify
 from frontend.services.admin_service import (
     login_admin,
     service_actualizar_reserva,
@@ -17,7 +17,8 @@ from frontend.services.admin_service import (
     cambiar_info_local,
     obtener_info_local,
     obtener_franjas_horarias,
-    cambiar_franjas_horarias
+    cambiar_franjas_horarias,
+    service_obtener_reservas
     )
 
 import json
@@ -128,18 +129,44 @@ def dashboard():
         return redirect(url_for("admin.login"))
 
     token = session.get("admin_token")
-    datos, error = obtener_dashboard(token)
+
+    pagina = int(request.args.get("pagina", 1))
+    orden = request.args.get("orden", "asc")
+    estados = request.args.getlist("estado")
+
+    datos, error = obtener_dashboard(token, pagina, orden, estados)
+    reservas_data = datos.get("reservas", {})
 
     if error:
         datos = {"stats": {}, "reservas": [], "platos": [], "servicios": []}
 
     return render_template("admin/dashboard.html",
         stats = datos.get("stats", {}),
-        reservas = datos.get("reservas", []),
+        reservas=reservas_data.get("reservas", []),
+        total_paginas=reservas_data.get("total_paginas", 1),
         platos = datos.get("platos", []),
-        servicios = datos.get("servicios", [])
+        servicios = datos.get("servicios", []),
+        pagina=pagina,
+        orden=orden,
+        estados=estados
     )
 
+@admin_front_bp.route("/dashboard/reservas")
+def dashboard_reservas():
+    sesion = requiere_sesion()
+    if sesion:
+        return sesion
+    token = session.get("admin_token")
+
+    pagina = int(request.args.get("pagina", 1))
+    orden = request.args.get("orden", "asc")
+    estados = request.args.getlist("estado")
+
+    reservas, error = service_obtener_reservas(token, pagina, orden, estados)
+    if error:
+        return render_template("admin/dashboard.html", error=error), 500
+        # return jsonify({"error": error}), 500
+    return jsonify(reservas)
 # ------- Platos
 
 @admin_front_bp.route("/platos/nuevo", methods=["GET", "POST"])
