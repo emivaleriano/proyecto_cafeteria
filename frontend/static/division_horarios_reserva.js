@@ -58,3 +58,13 @@ document.getElementById("fecha").addEventListener("change", function () {
         }
     });
 });
+
+
+document.addEventListener("DOMContentLoaded", () => { // bloqea las fechas pasadas del selector de fecha en reservas
+    const inputFecha = document.getElementById("fecha");
+    const hoy = new Date();
+    const yyyy = hoy.getFullYear();
+    const mm = String(hoy.getMonth() + 1).padStart(2, "0");
+    const dd = String(hoy.getDate()).padStart(2, "0");
+    inputFecha.min = `${yyyy}-${mm}-${dd}`;
+});

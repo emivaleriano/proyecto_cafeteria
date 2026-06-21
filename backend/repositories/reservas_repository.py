@@ -143,10 +143,8 @@ def crear_reserva(
 
 
 def obtener_reserva(id_reserva):
-
     conn = obtener_conexion()
     cursor = conn.cursor(dictionary=True)
-
     try:
 
         cursor.execute(
@@ -172,7 +170,6 @@ def cancelar_reserva(id_reserva):
     cursor = conn.cursor(dictionary=True)
 
     try:
-
         cursor.execute(
             """
             SELECT *

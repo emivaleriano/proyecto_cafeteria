@@ -5,24 +5,22 @@ def registrar_manejadores(app):
     """Registra manejadores globales de errores HTTP."""
 
     # --- Excepciones de Python →  HTTP ---
-
     @app.errorhandler(ValueError)
     def handle_value_error(e):
-        return jsonify({"error": "Solicitud incorrecta", "detalle": str(e)}), 400
+        return jsonify({"exito": False, "mensaje": str(e), "detalle": str(e)}), 400
 
     @app.errorhandler(KeyError)
     def handle_key_error(e):
-        return jsonify({"error": "Conflicto", "detalle": str(e)}), 409
+        return jsonify({"exito": False, "mensaje": str(e), "detalle": str(e)}), 409
 
     @app.errorhandler(LookupError)
     def handle_lookup_error(e):
-        return jsonify({"error": "Recurso no encontrado", "detalle": str(e)}), 404
+        return jsonify({"exito": False, "mensaje": str(e), "detalle": str(e)}), 404
 
     @app.errorhandler(Exception)
     def handle_generic_error(e):
-        app.logger.exception(e)  # imprime el traceback completo en consola
-        return jsonify({"error": "Error interno del servidor", "detalle": str(e)}), 500
-
+        app.logger.exception(e)
+        return jsonify({"exito": False, "mensaje": "Error interno del servidor", "detalle": str(e)}), 500
 
     # --- HTTP
     @app.errorhandler(400)

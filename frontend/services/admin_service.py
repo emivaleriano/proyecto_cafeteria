@@ -260,7 +260,7 @@ def service_obtener_reserva(id, token):
     return _handle(res, 200, "Error al obtener la reserva.")
 
 def service_actualizar_reserva(id, estado):
-    res = requests.patch(f"{API_BASE_URL}/reservas/{id}/estado",json={"estado": estado}, timeout=10)
+    res = _request("PATCH", f"{API_BASE_URL}/reservas/{id}/estado", json={"estado": estado})
     if res is None:
         return None, "No se pudo conectar con el servidor."
     return _handle(res, 200, "Error al actualizar la reserva.")

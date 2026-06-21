@@ -26,91 +26,81 @@ import json
 from backend.utils.email import enviar_confirmacion_reserva
 
 def crear_nueva_reserva(data):
+
+    nombre = validar_texto(data.get("nombre"), "nombre")
+    email = validar_email(data.get("email"))
+    telefono = validar_texto(data.get("telefono"), "telefono")
+
+    cantidad_personas = validar_entero_positivo(
+        data.get("cantidad_personas"),
+        "cantidad_personas"
+    )
+
+    fecha_hora = data.get("fecha_hora")
     try:
-        nombre = validar_texto(data.get("nombre"), "nombre")
-        email = validar_email(data.get("email"))
-        telefono = validar_texto(data.get("telefono"), "telefono")
-
-        cantidad_personas = validar_entero_positivo(
-            data.get("cantidad_personas"),
-            "cantidad_personas"
-        )
-
-        fecha_hora = data.get("fecha_hora")
         fecha_obj = datetime.fromisoformat(fecha_hora)
-        dia_semana = fecha_obj.isoweekday() % 7 # Domingo = 0, Lunes = 1
+    except (TypeError, ValueError):
+        raise ValueError("La fecha y hora ingresadas no son válidas.")
 
-        franja = obtener_franja_por_dia(dia_semana)
-        capacidad_maxima = get_capacidad_maxima()
+    if fecha_obj < datetime.now():
+        raise ValueError("No se puede reservar para una fecha pasada.")
 
-        if not franja:
-            return {
-                "error": "No existe una franja horaria para ese día"
-            }
 
-        personas_reservadas = obtener_personas_reservadas(
-            fecha_obj
+    dia_semana = fecha_obj.isoweekday() % 7 # Domingo = 0, Lunes = 1
+
+    franja = obtener_franja_por_dia(dia_semana)
+    capacidad_maxima = get_capacidad_maxima()
+
+    if not franja:
+        raise ValueError("No existe una fecha horaria para ese dia")
+
+
+    personas_reservadas = obtener_personas_reservadas(fecha_obj)
+
+    if (personas_reservadas + cantidad_personas > capacidad_maxima):
+        raise ValueError("No hay disponibilidad para esa cantidad de personas ")
+
+
+    usuario = obtener_usuario_por_email(email)
+    if not usuario:
+        id_usuario = crear_usuario(
+            nombre,
+            email,
+            telefono
         )
+    else:
+        id_usuario = usuario["id_usuario"]
 
-        if (
-            personas_reservadas + cantidad_personas
-            > capacidad_maxima
-        ):
-            return {
-                "error": "No hay disponibilidad para esa cantidad de personas "
-            }
+    qr = str(uuid.uuid4())
 
-        usuario = obtener_usuario_por_email(email)
+    servicios_json = json.dumps(data.get("servicios", []))
 
-        if not usuario:
+    id_reserva = crear_reserva(
+        id_usuario,
+        fecha_hora,
+        cantidad_personas,
+        servicios_json,
+        data.get("observaciones"),
+        "Pendiente",
+        qr
+    )
 
-            id_usuario = crear_usuario(
-                nombre,
-                email,
-                telefono
-            )
-
-        else:
-
-            id_usuario = usuario["id_usuario"]
-
-        qr = str(uuid.uuid4())
-
-        servicios_json = json.dumps(data.get("servicios", []))
-
-        id_reserva = crear_reserva(
-            id_usuario,
-            fecha_hora,
-            cantidad_personas,
-            servicios_json,
-            data.get("observaciones"),
-            "Pendiente",
-            qr
-        )
-
-    # Envía email de confirmación con el QR
-        enviar_confirmacion_reserva(
-            email_destino=email,
-            nombre=nombre,
-            reserva={
-                "id_reserva": id_reserva,
-                "fecha_hora": fecha_hora,
-                "cantidad_personas": cantidad_personas,
-                "qr": qr,
-            }
-        )
-
-
-        return {
+# Envía email de confirmación con el QR
+    enviar_confirmacion_reserva(
+        email_destino=email,
+        nombre=nombre,
+        reserva={
             "id_reserva": id_reserva,
-            "qr": qr
+            "fecha_hora": fecha_hora,
+            "cantidad_personas": cantidad_personas,
+            "qr": qr,
         }
-    except Exception as e:
-        import traceback
-        print("ERROR en crear_nueva_reserva:")
-        traceback.print_exc()
-        return {"error": str(e)}
+    )
 
+    return {
+        "id_reserva": id_reserva,
+        "qr": qr
+    }
 
 
 
