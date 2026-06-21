@@ -96,6 +96,72 @@ def post_review(id_reserva, estrellas, comentario):
     return None, body.get("mensaje", "Error al crear la reseña.")
 
 
+def get_review(id_review):
+    try:
+        res = requests.get(
+            f"{API_BASE_URL}/reviews/{id_review}",
+            timeout=10
+        )
+
+    except requests.exceptions.ConnectionError:
+        return None, "No se pudo conectar con el servidor."
+    except requests.exceptions.Timeout:
+        return None, "El servidor tardó demasiado en responder."
+
+    body = res.json()
+
+    if res.status_code == 200 and body.get("exito"):
+        return body.get("datos", {}), None
+
+    return None, body.get("mensaje", "Error al obtener la reseña.")
+
+
+def patch_review(id_review, estrellas, comentario):
+    try:
+        res = requests.patch(
+            f"{API_BASE_URL}/reviews/{id_review}",
+            json={
+                "estrellas": estrellas,
+                "comentario": comentario
+            },
+            timeout=10
+        )
+
+    except requests.exceptions.ConnectionError:
+        return None, "No se pudo conectar con el servidor."
+
+    except requests.exceptions.Timeout:
+        return None, "El servidor tardó demasiado en responder."
+
+    body = res.json()
+
+    if res.status_code == 200 and body.get("exito"):
+        return body.get("datos", {}), None
+
+    return None, body.get(
+        "mensaje",
+        "Error al modificar la reseña."
+    )
+
+def delete_review(id_review):
+    try:
+        res = requests.delete(
+            f"{API_BASE_URL}/reviews/{id_review}",
+            timeout=10
+        )
+
+    except requests.exceptions.ConnectionError:
+        return None, "No se pudo conectar con el servidor."
+    except requests.exceptions.Timeout:
+        return None, "El servidor tardó demasiado en responder."
+
+    body = res.json()
+
+    if res.status_code == 200 and body.get("exito"):
+        return body.get("datos", {}), None
+
+    return None, body.get("mensaje", "Error al eliminar la reseña.")
+
 
 def get_datos_reserva():
     inicio, error = get_inicio()

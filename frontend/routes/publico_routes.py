@@ -11,7 +11,9 @@ from frontend.services.publico_service import (
     post_reserva,
     get_reserva,
     post_cancelar_reserva,
-    get_check_in
+    get_review,
+    patch_review,
+    delete_review,
 )
 from frontend.services.admin_service import service_actualizar_reserva
 from frontend.utils.tokens import verificar_token_resena
@@ -67,6 +69,50 @@ def crear_review(token):
 
     return redirect(url_for("publico.reviews"))
 
+
+@publico_bp.route("/reviews/<int:id>", methods=["GET"])
+def modificar_review(id):
+
+    resena, error = get_review(id)
+
+    if error:
+        return error
+
+    return render_template(
+        "editar_review.html",
+        resena=resena
+    )
+
+@publico_bp.route("/reviews/<int:id>", methods=["POST"])
+def guardar_modificacion_review(id):
+
+    estrellas = request.form.get("estrellas")
+    comentario = request.form.get("comentario")
+
+    _, error = patch_review(
+        id,
+        estrellas,
+        comentario
+    )
+
+    if error:
+        return error
+
+    return redirect(
+        url_for("publico.reviews")
+    )
+
+@publico_bp.route("/reviews/eliminar/<int:id>", methods=["POST"])
+def eliminar_review(id):
+
+    _, error = delete_review(id)
+
+    if error:
+        return error
+
+    return redirect(
+        url_for("publico.reviews")
+    )
 
 
 @publico_bp.route("/reservar", methods=["GET", "POST"])
