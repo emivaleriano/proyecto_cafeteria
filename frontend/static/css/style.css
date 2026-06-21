@@ -422,6 +422,55 @@ nav a:focus-visible {
   padding: 3rem 1.5rem 4rem;
 }
 
+.review {
+  max-width: 900px;
+  margin: 0 auto 3rem;
+  padding: 2.5rem;
+  background: var(--fondo-tarjeta);
+  border-radius: var(--radio);
+  box-shadow: var(--sombra);
+}
+
+.review > h1 {
+  margin-bottom: 1.2rem;
+}
+
+.review label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: var(--texto-secundario);
+}
+
+.review input[type='text'],
+.review input[type='email'],
+.review input[type='tel'],
+.review input[type='number'],
+.review input[type='date'],
+.review select,
+.review textarea {
+  width: 100%;
+  padding: 1rem 1.1rem;
+  border-radius: 18px;
+  border: 1px solid rgba(183, 120, 69, 0.12);
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--texto-principal);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.review input:focus,
+.review select:focus,
+.review textarea:focus {
+  outline: none;
+  border-color: var(--acento);
+  box-shadow: 0 0 0 4px rgba(183, 120, 69, 0.14);
+}
+
+.review textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
 .reviews__contenedor {
   display: grid;
   gap: 1.5rem;
@@ -450,6 +499,15 @@ nav a:focus-visible {
 .reviews__tarjeta time {
   color: var(--texto-secundario);
   font-size: 0.95rem;
+}
+
+.review__campo {
+    margin-bottom: 1.75rem;
+}
+
+.review__eliminar {
+    display: flex;
+    justify-content: flex-end;
 }
 
 /************************************************************************************************
