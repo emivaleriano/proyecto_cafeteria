@@ -1,13 +1,14 @@
 from backend.repositories.inicio_repository import (
-    get_franjas_horarias, get_resenas_publicas,
+    get_franjas_horarias, get_resenas_publicas, get_resena_por_id,
     get_reserva_para_resena,
     get_resena_por_reserva,
-    insertar_resena,
+    insertar_resena, actualizar_resena, borrar_resena,
     update_info_local,
     reemplazar_franjas_horarias
 )
 from backend.services.servicios_service import obtener_servicios_activos
 from backend.utils.validadores import validar_estrellas, validar_comentario
+
 from backend.db import obtener_conexion
 
 DIAS = {
@@ -102,6 +103,34 @@ def crear_resena(id_reserva, estrellas, comentario):
         estrellas=estrellas,
         comentario=comentario.strip(),
     )
+
+
+def obtener_resena(id_resena):
+
+    resena = get_resena_por_id(id_resena)
+
+    if not resena:
+        raise LookupError("La reseña no existe")
+
+    return resena
+
+def modificar_resena(id_resena, estrellas, comentario):
+
+    estrellas = int(estrellas)
+
+    validar_estrellas(estrellas)
+    validar_comentario(comentario)
+
+    return actualizar_resena(
+        id_resena,
+        estrellas,
+        comentario.strip()
+    )
+
+
+def eliminar_resena(id_resena):
+
+    return borrar_resena(id_resena)
 
 def get_info_local():
     conexion = obtener_conexion()

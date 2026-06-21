@@ -134,3 +134,76 @@ def update_info_local(nombre, direccion, telefono, email, capacidad):
     conexion.commit()
     cursor.close()
     conexion.close()
+
+def get_resena_por_id(id_resena):
+    conexion = obtener_conexion()
+    cursor = conexion.cursor(dictionary=True)
+
+    cursor.execute("""
+        SELECT
+            id_resena,
+            id_reserva,
+            estrellas,
+            comentario,
+            fecha
+        FROM resenas
+        WHERE id_resena = %s
+    """, (id_resena,))
+
+    resultado = cursor.fetchone()
+
+    cursor.close()
+    conexion.close()
+
+    return resultado
+
+
+def actualizar_resena(id_resena, estrellas, comentario):
+    conexion = obtener_conexion()
+    cursor = conexion.cursor(dictionary=True)
+
+    cursor.execute("""
+        UPDATE resenas
+        SET estrellas = %s,
+            comentario = %s
+        WHERE id_resena = %s
+    """, (
+        estrellas,
+        comentario,
+        id_resena
+    ))
+
+    conexion.commit()
+
+    cursor.execute("""
+        SELECT
+            id_resena,
+            id_reserva,
+            estrellas,
+            comentario,
+            fecha
+        FROM resenas
+        WHERE id_resena = %s
+    """, (id_resena,))
+
+    resultado = cursor.fetchone()
+
+    cursor.close()
+    conexion.close()
+
+    return resultado
+
+
+def borrar_resena(id_resena):
+    conexion = obtener_conexion()
+    cursor = conexion.cursor()
+
+    cursor.execute("""
+        DELETE FROM resenas
+        WHERE id_resena = %s
+    """, (id_resena,))
+
+    conexion.commit()
+
+    cursor.close()
+    conexion.close()

@@ -8,6 +8,9 @@ from backend.services.inicio_service import (
     obtener_info_local,
     obtener_resenas,
     crear_resena,
+    obtener_resena,
+    modificar_resena,
+    eliminar_resena,
     actualizar_info_local,
     obtener_franjas,
     actualizar_franjas_horarias
@@ -84,6 +87,75 @@ def post_review(id_reserva):
         return crear_error(
             codigo=HTTP_INTERNAL_ERROR_CODE,
             descripcion="Error al crear la reseña",
+            mensaje=str(e),
+            nivel="error",
+        ), HTTP_INTERNAL_ERROR_CODE
+
+
+@inicio_bp.route("/reviews/<int:id_resena>", methods=["GET"])
+def get_review(id_resena):
+    try:
+        resena = obtener_resena(id_resena)
+
+        return crear_respuesta_exito(
+            datos=resena,
+            mensaje="Reseña obtenida correctamente",
+            codigo=HTTP_OK_CODE,
+        )
+
+    except Exception as e:
+        return crear_error(
+            codigo=HTTP_INTERNAL_ERROR_CODE,
+            descripcion="Error al obtener reseña",
+            mensaje=str(e),
+            nivel="error",
+        ), HTTP_INTERNAL_ERROR_CODE
+
+
+@inicio_bp.route("/reviews/<int:id_resena>", methods=["PATCH"])
+def patch_review(id_resena):
+    try:
+        body = request.get_json(silent=True)
+
+        estrellas = body.get("estrellas")
+        comentario = body.get("comentario")
+
+        resena = modificar_resena(
+            id_resena,
+            estrellas,
+            comentario
+        )
+
+        return crear_respuesta_exito(
+            datos=resena,
+            mensaje="Reseña modificada correctamente",
+            codigo=HTTP_OK_CODE,
+        )
+
+    except Exception as e:
+        return crear_error(
+            codigo=HTTP_INTERNAL_ERROR_CODE,
+            descripcion="Error al modificar reseña",
+            mensaje=str(e),
+            nivel="error",
+        ), HTTP_INTERNAL_ERROR_CODE
+
+
+@inicio_bp.route("/reviews/<int:id_resena>", methods=["DELETE"])
+def delete_review(id_resena):
+    try:
+        eliminar_resena(id_resena)
+
+        return crear_respuesta_exito(
+            datos={},
+            mensaje="Reseña eliminada correctamente",
+            codigo=HTTP_OK_CODE,
+        )
+
+    except Exception as e:
+        return crear_error(
+            codigo=HTTP_INTERNAL_ERROR_CODE,
+            descripcion="Error al eliminar reseña",
             mensaje=str(e),
             nivel="error",
         ), HTTP_INTERNAL_ERROR_CODE
