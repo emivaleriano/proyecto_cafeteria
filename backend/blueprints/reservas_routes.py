@@ -1,9 +1,12 @@
 from flask import Blueprint, request
-
+from backend.utils.admin import requiere_admin
 from backend.services.reservas_service import (
     crear_nueva_reserva,
     data_obtener_reserva,
-    data_cancelar_reserva
+    data_cancelar_reserva,
+    data_actualizar_estado_reserva,
+    data_obtener_todas_reservas,
+    data_check_in
 )
 
 from backend.utils.respuestas import (
@@ -21,10 +24,10 @@ reservas_bp = Blueprint("reservas", __name__)
 
 @reservas_bp.route("/reservas", methods=["POST"])
 def crear_reserva_route():
-
     data = request.get_json()
 
     resultado = crear_nueva_reserva(data)
+    print(resultado)
 
     if "error" in resultado:
 
@@ -41,6 +44,7 @@ def crear_reserva_route():
         mensaje="Reserva creada correctamente",
         codigo=HTTP_CREATED_CODE
     )
+
 
 
 @reservas_bp.route("/reservas/<int:id>", methods=["GET"])
@@ -83,5 +87,48 @@ def cancelar_reserva_route(id):
     return crear_respuesta_exito(
         datos={"id_reserva": id},
         mensaje="Reserva cancelada correctamente",
+        codigo=HTTP_OK_CODE
+    )
+
+
+@reservas_bp.route("/reservas", methods=["GET"])
+@requiere_admin
+def obtener_reservas_route():
+    reservas = data_obtener_todas_reservas()
+    return crear_respuesta_exito(
+        datos=reservas,
+        mensaje="Reservas obtenidas correctamente",
+        codigo=HTTP_OK_CODE
+    )
+
+@reservas_bp.route("/reservas/<int:id>/estado", methods=["PATCH"])
+def actualizar_estado_route(id):
+    data = request.get_json()
+    estado = data.get("estado")
+    resultado = data_actualizar_estado_reserva(id, estado)
+    if "error" in resultado:
+        return crear_error(
+            codigo=HTTP_BAD_REQUEST_CODE,
+            descripcion="No se pudo actualizar la reserva",
+            mensaje=resultado["error"]
+        ), HTTP_BAD_REQUEST_CODE
+    return crear_respuesta_exito(
+        datos={"id_reserva": id},
+        mensaje="Reserva actualizada correctamente",
+        codigo=HTTP_OK_CODE
+    )
+
+@reservas_bp.route("/reservas/check-in/<string:token>", methods=["GET"])
+def obtener_check_in_route(token):
+    resultado = data_check_in(token)
+    if "error" in resultado:
+        return crear_error(
+            codigo=HTTP_BAD_REQUEST_CODE,
+            descripcion="No se pudo obtener la reserva",
+            mensaje=resultado["error"]
+        ), HTTP_BAD_REQUEST_CODE
+    return crear_respuesta_exito(
+        datos=resultado,
+        mensaje="Reserva obtenida correctamente",
         codigo=HTTP_OK_CODE
     )

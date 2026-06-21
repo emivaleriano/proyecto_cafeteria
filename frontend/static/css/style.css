@@ -1,5 +1,5 @@
 /************************************************************************************************
-                                        VARIABLES 
+                                        VARIABLES
 *************************************************************************************************/
 
 :root {
@@ -132,7 +132,7 @@ header {
   position: sticky;
   top: 0;
   z-index: 20;
-  background: rgba(255, 255, 255, 0.92);
+  background: rgba(214, 213, 213, 0.92);
   border-bottom: 1px solid rgba(178, 120, 74, 0.14);
   backdrop-filter: blur(10px);
 }
@@ -506,7 +506,6 @@ nav a:focus-visible {
 
 .reservar__datos-reserva,
 .reservar__datos-personales,
-.reservar__alergias,
 .reservar__servicios,
 .reservar__comentarios {
   margin-bottom: 1.75rem;
@@ -514,7 +513,6 @@ nav a:focus-visible {
   border-bottom: 1px solid rgba(183, 120, 69, 0.12);
 }
 
-.reservar__contenedor-alergias,
 .reservar__contenedor-servicios {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -524,7 +522,6 @@ nav a:focus-visible {
   border-radius: 18px;
 }
 
-.reservar__contenedor-alergias div,
 .reservar__contenedor-servicios div {
   display: flex;
   align-items: center;
@@ -743,6 +740,65 @@ footer {
 
 
 /************************************************************************************************
+                                        FRANJAS
+*************************************************************************************************/
+
+.franja {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+.franja label {
+    margin: 0;
+}
+.franja input[type="time"] {
+    width: auto;
+}
+.franja-quitar {
+    margin-left: auto;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    line-height: 1;
+}
+.dia-config {
+    margin-bottom: 1.5rem;
+    position: relative;
+    padding-bottom: 2.5rem;
+}
+.franja-agregar {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1.2rem;
+    line-height: 1;
+}
+.franja .franja-quitar,
+.dia-config .franja-agregar {
+    border-radius: 50% !important;
+    width: 28px !important;
+    height: 28px !important;
+    padding: 0 !important;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+.dia-config .franja-agregar {
+    width: 32px !important;
+    height: 32px !important;
+}
+
+/************************************************************************************************
                                         PARA OTROS TIPOS DE PANTALLA
 *************************************************************************************************/
 
@@ -756,7 +812,6 @@ footer {
     grid-template-columns: 1fr;
   }
 
-  .reservar__contenedor-alergias,
   .reservar__contenedor-servicios {
     grid-template-columns: 1fr;
   }

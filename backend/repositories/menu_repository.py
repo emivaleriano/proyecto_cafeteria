@@ -18,7 +18,39 @@ def obtener_menu_activo():
         cursor.close()
         conn.close()
 
-def crear_producto(nombre, descripcion, precio, categoria, tags, imagen, activo):
+def obtener_menu():
+    """
+    Muestra todos los platos (activos e inactivos).
+    """
+    conn = obtener_conexion()
+    cursor = conn.cursor(dictionary=True)
+    try:
+        cursor.execute("SELECT * FROM menu")
+        productos = cursor.fetchall()
+        for producto in productos:
+            if producto["tags"]:
+                producto["tags"] = json.loads(producto["tags"])
+        return productos
+    finally:
+        cursor.close()
+        conn.close()
+
+def obtener_plato(id):
+    """Devuelve un plato a partir de su id"""
+    conn = obtener_conexion()
+    cursor = conn.cursor(dictionary=True)
+    try:
+        cursor.execute("SELECT * FROM menu WHERE id = %s", (id,))
+        plato = cursor.fetchone()
+        if plato["tags"]:
+                plato["tags"] = json.loads(plato["tags"])
+        return plato
+    finally:
+        cursor.close()
+        conn.close()
+
+
+def crear_producto(nombre, descripcion, precio, categoria, tags, imagen, activo=True):
 
     conn = obtener_conexion()
     cursor = conn.cursor(dictionary=True)
@@ -34,7 +66,7 @@ def crear_producto(nombre, descripcion, precio, categoria, tags, imagen, activo)
         cursor.close()
         conn.close()
 
-def modificar_producto(nombre, descripcion, precio, categoria, tags, imagen, activo, id_producto):
+def modificar_producto(id_producto,nombre, descripcion, precio, categoria, tags, imagen, activo):
     conn = obtener_conexion()
     cursor = conn.cursor(dictionary=True)
 

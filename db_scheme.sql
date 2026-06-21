@@ -5,8 +5,7 @@ CREATE TABLE IF NOT EXISTS franjas_horarias(
 	id_franja INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
     dia_semana INT NOT NULL,
     hora_apertura TIME DEFAULT '09:00:00',
-    hora_cierre TIME DEFAULT '20:00:00',
-    capacidad_maxima INT NOT NULL
+    hora_cierre TIME DEFAULT '20:00:00'
 );
 
 CREATE TABLE IF NOT EXISTS usuarios(
@@ -22,7 +21,6 @@ CREATE TABLE IF NOT EXISTS reservas(
     fecha_hora DATETIME NOT NULL,
     fecha_creacion DATETIME DEFAULT current_timestamp(),
     cantidad_personas INT NOT NULL DEFAULT 1,
-    alergias JSON,
     servicios JSON,
     observaciones VARCHAR(100),
     estado enum("Pendiente", "Confirmada", "Cancelada", "Completada"),
@@ -64,3 +62,15 @@ CREATE TABLE IF NOT EXISTS administrador(
     usuario VARCHAR(30) NOT NULL UNIQUE,
     contrasenia VARCHAR(255) NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS info_local(
+    id INT AUTO_INCREMENT PRIMARY KEY NOT NULL,
+    nombre VARCHAR(100) NOT NULL,
+    direccion VARCHAR(200) NOT NULL,
+    telefono VARCHAR(50) NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    capacidad_maxima INT NOT NULL
+);
+
+INSERT INTO info_local (nombre, direccion, telefono, email) VALUES
+('Cafetería El Rincón', ' Av Santa Fe 1234 , CABA', '+54 11 4987-6543', 'info@elricon.com');

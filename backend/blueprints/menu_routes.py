@@ -1,5 +1,5 @@
-from flask import Blueprint, request
-from backend.services.menu_service import listar_menu, data_nuevo_producto, data_modificacion_producto, data_eliminar_producto
+from flask import Blueprint, request, jsonify
+from backend.services.menu_service import listar_menu, data_nuevo_producto, data_modificacion_producto, data_eliminar_producto, data_obtener_plato
 from backend.utils.admin import requiere_admin
 from backend.utils.respuestas import (
     crear_respuesta_exito,
@@ -39,7 +39,6 @@ def nuevo_producto():
 def cambios_producto(id):
 
     data = request.get_json()
-
     filas_modificadas = data_modificacion_producto(id, data)
 
     if filas_modificadas == 0:
@@ -50,11 +49,20 @@ def cambios_producto(id):
             mensaje="No existe un producto con ese id"
         )
 
-        return error, HTTP_NOT_FOUND_CODE
+        return jsonify(error), HTTP_NOT_FOUND_CODE
+    respuesta, codigo = crear_respuesta_exito(
+    datos={"id": id},
+    mensaje="Producto modificado correctamente",
+    codigo=HTTP_OK_CODE
+)
+    return jsonify(respuesta), codigo
 
+@menu_bp.route("/admin/menu/<int:id>", methods=["GET"])
+@requiere_admin
+def get_plato(id):
+    plato = data_obtener_plato(id)
     return crear_respuesta_exito(
-        datos={"id": id},
-        mensaje="Producto modificado correctamente",
+        datos=plato,
         codigo=HTTP_OK_CODE
     )
 

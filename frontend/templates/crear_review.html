@@ -3,16 +3,18 @@
 {% block title %}Reseñas - {{ datos.nombre }}{% endblock %}
 
 {% block body %}
+
 <section class="encabezado-pagina">
     <h1>Reseñas</h1>
     <hr>
     <p>Dejanos tu opinión sobre tu experiencia en nuestro local</p>
 </section>
 
-<form class="review" method="POST" action="{{ url_for('publico.reviews') }}">
-    <label for="review__id">Número de reserva</label>
-    <input type="review__id" id="review__id" name="id_reserva" >
+{% if error %}
+<p class="error">{{ error }}</p>
+{% endif %}
 
+<form class="review" method="POST" action="{{ url_for('publico.crear_review', token=token) }}">
 
     <label for="review__estrellas">Valoración</label>
     <select id="review__estrellas" name="estrellas">
@@ -25,7 +27,11 @@
     </select>
 
     <label for="review__comentario">Comentarios</label>
-    <input type="textarea" id="review__comentario" name="comentario" >
+    <textarea id="review__comentario" name="comentario" ></textarea>
+
+
+
+    <button class="boton boton--submit" type="submit">Subir reseña</button>
 
 </form>
 

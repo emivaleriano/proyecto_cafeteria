@@ -7,6 +7,14 @@
     <h1>Admin Login</h1>
     <p>Ingresá tus credenciales para acceder al panel de administración</p>
 </section>
+<<<<<<< HEAD
+=======
+
+
+{% if error %}
+    <div class="alert alert-error">{{ error }}</div>
+{% endif %}
+>>>>>>> main
 
 <form class="login" method="POST" action="{{ url_for('admin.login') }}">
 

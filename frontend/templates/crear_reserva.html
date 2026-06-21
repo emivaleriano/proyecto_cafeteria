@@ -2,12 +2,18 @@
 
 {% block title %} Reservar - Sistema de reservas {% endblock %}
 
+
 {% block body %}
 <section class="encabezado-pagina">
     <h1>Reservar</h1>
     <hr>
     <p>Reservá una mesa para visitarnos</p>
 </section>
+
+
+{% if error %}
+    <div class="alert alert-error">{{ error }}</div>
+{% endif %}
 
 <form class="reservar" method="POST" action="{{ url_for('publico.crear_reserva') }}">
 
@@ -27,7 +33,7 @@
         </select>
 
         <label for="cantidad_personas" >Cantidad de personas</label>
-        <input type="number" name="cantidad_personas">
+        <input type="number" name="cantidad_personas" required min="1">
 
     </section>
 
@@ -36,33 +42,13 @@
         <h2>Tus datos</h2>
 
         <label for="nombre">Nombre</label>
-        <input type="text" name="nombre" id="nombre">
+        <input type="text" name="nombre" id="nombre" required>
 
         <label for="email">Email</label>
-        <input type="email" name="email" id="email">
+        <input type="email" name="email" id="email" required>
 
         <label for="telefono">Telefono</label>
-        <input type="tel" name="telefono" id="telefono">
-
-    </section>
-
-    <section class="reservar__alergias">
-
-        <h2>Alergias o restricciones alimenticias</h2>
-
-        <div class="reservar__contenedor-alergias">
-
-            {% for alergia in alergias_opciones %}
-            <div>
-            <input type="checkbox" name="alergias[]" value="{{ alergia.id }}">
-            <span>{{ alergia.nombre }}</span>
-            </div>
-            {% endfor %}
-
-            <label for="otras_restricciones">Otras restricciones</label>
-            <input type="text" name="otras_restricciones" id="otras_restricciones">
-
-        </div>
+        <input type="tel" name="telefono" id="telefono" required>
 
     </section>
 

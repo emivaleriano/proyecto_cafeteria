@@ -1,10 +1,18 @@
-from backend.repositories.inicio_repository import get_franjas_horarias, get_resenas_publicas, get_reserva_para_resena, get_resena_por_reserva, insertar_resena
+from backend.repositories.inicio_repository import (
+    get_franjas_horarias, get_resenas_publicas,
+    get_reserva_para_resena,
+    get_resena_por_reserva,
+    insertar_resena,
+    update_info_local,
+    reemplazar_franjas_horarias
+)
 from backend.services.servicios_service import obtener_servicios_activos
 from backend.utils.validadores import validar_estrellas, validar_comentario
+from backend.db import obtener_conexion
 
 DIAS = {
-    0: "Lunes", 1: "Martes", 2: "Miércoles", 3: "Jueves",
-    4: "Viernes", 5: "Sábado", 6: "Domingo",
+    0: "Domingo", 1: "Lunes", 2: "Martes", 3: "Miércoles",
+    4: "Jueves", 5: "Viernes", 6: "Sábado",
 }
 
 
@@ -23,25 +31,42 @@ def obtener_info_local():
     servicios = obtener_servicios_activos()
     nombres_servicios = [s["nombre"] for s in servicios]
 
+    info = get_info_local()
+
     horarios = [
         {
             "id_franja":        f["id_franja"],
             "dia":              DIAS.get(f["dia_semana"], f["dia_semana"]),
             "hora_apertura":    _timedelta_a_str(f["hora_apertura"]),
             "hora_cierre":      _timedelta_a_str(f["hora_cierre"]),
-            "capacidad_maxima": f["capacidad_maxima"],
         }
         for f in franjas
     ]
 
     return {
-        "nombre":    "La Brasa — Cocina de Fuego",
-        "direccion": "Av. Santa Fe 1234, Palermo, Buenos Aires",
-        "telefono":  "+54 11 4987-6543",
-        "email":     "hola@labrasa.com.ar",
+         "nombre":                info["nombre"],
+        "direccion":             info["direccion"],
+        "telefono":              info["telefono"],
+        "email":                 info["email"],
+        "capacidad":             info["capacidad_maxima"],
         "servicios_disponibles": nombres_servicios,
-        "horarios": horarios,
+        "horarios":              horarios,
     }
+
+def obtener_franjas():
+    franjas = get_franjas_horarias()
+    for f in franjas:
+        f["hora_apertura"] = _timedelta_a_str(f["hora_apertura"])
+        f["hora_cierre"] = _timedelta_a_str(f["hora_cierre"])
+    return franjas
+
+def actualizar_franjas_horarias(franjas):
+    if not isinstance(franjas, list):
+        raise ValueError("Formato inválido de franjas horarias")
+    for f in franjas:
+        if "dia_semana" not in f or "hora_apertura" not in f or "hora_cierre" not in f:
+            raise ValueError("Cada franja debe tener dia_semana, hora_apertura y hora_cierre")
+    reemplazar_franjas_horarias(franjas)
 
 
 def obtener_resenas():
@@ -77,3 +102,21 @@ def crear_resena(id_reserva, estrellas, comentario):
         estrellas=estrellas,
         comentario=comentario.strip(),
     )
+
+def get_info_local():
+    conexion = obtener_conexion()
+    cursor = conexion.cursor(dictionary=True)
+    cursor.execute("""
+        SELECT nombre, direccion, telefono, email, capacidad_maxima
+        FROM info_local
+        LIMIT 1
+    """)
+    resultado = cursor.fetchone()
+    cursor.close()
+    conexion.close()
+    return resultado
+
+def actualizar_info_local(nombre, direccion, telefono, email, capacidad):
+    if not nombre or not direccion or not telefono or not email or not capacidad:
+        raise ValueError("Faltan datos obligatorios: nombre, direccion, telefono, email, capacidad")
+    update_info_local(nombre, direccion, telefono, email, capacidad)

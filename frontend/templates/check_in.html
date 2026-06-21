@@ -1,0 +1,47 @@
+{% extends "base_usuarios.html" %}
+{% block title %}Check-in - Reserva #{{ reserva.id_reserva }}{% endblock %}
+{% block body %}
+<section class="encabezado-pagina">
+  <h1>Check-in</h1>
+  <hr>
+  <p>Información de la reserva</p>
+</section>
+<div class="reservar">
+  <div class="reservar__panel">
+    <h2>Datos de la reserva</h2>
+    <dl>
+      <dt>ID</dt>
+      <dd>{{ reserva.id_reserva }}</dd>
+      <dt>Cliente</dt>
+      <dd>{{ reserva.nombre }}</dd>
+      <dt>Fecha y horario</dt>
+      <dd>{{ reserva.fecha_hora }}</dd>
+      <dt>Personas</dt>
+      <dd>{{ reserva.cantidad_personas }}</dd>
+      <dt>Estado</dt>
+      <dd>{{ reserva.estado }}</dd>
+    </dl>
+  </div>
+
+  {% if reserva.servicios %}
+  <div class="reservar__panel">
+    <h2>Servicios solicitados</h2>
+    <div class="reservar__contenedor-servicios">
+      {% for servicio in reserva.servicios %}
+      <div><span>{{ servicio }}</span></div>
+      {% endfor %}
+    </div>
+  </div>
+  {% endif %}
+
+  <div class="reservar__panel">
+    {% if completada %}
+      <p>La reserva fue marcada como completada exitosamente.</p>
+    {% else %}
+      <form method="POST">
+        <button type="submit" class="boton boton--submit">Marcar como completada</button>
+      </form>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

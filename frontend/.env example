@@ -1,2 +1,4 @@
 SECRET_KEY=clave-local-desarrollo
 API_BASE_URL=http://localhost:5000
+
+FRONTEND_BASE_URL=http://localhost:3000

@@ -10,10 +10,8 @@
         <a class="boton boton--menu" href="{{ url_for('publico.menu') }}">
             Menú
         </a>
-        <a class="boton boton--reservar" href="{{ url_for('publico.crear_reserva') }}">
-            Reservar
-        </a>
-                <a class="boton boton--reviews" href="{{ url_for('publico.reviews') }}">
+
+        <a class="boton boton--reviews" href="{{ url_for('publico.reviews') }}">
             Reseñas
         </a>
     </section>
@@ -27,23 +25,22 @@
                     <dd>{{ datos.direccion }}</dd>
                 </div>
 
-                <hr>                
-                
                 <div id="datos__telefono">
                     <dt>Teléfono</dt>
                     <dd>{{ datos.telefono }}</dd>
                 </div>
-                
+
                 <div id="datos__email">
                     <dt>Email</dt>
                     <dd>{{ datos.email }}</dd>
                 </div>
-                
+
             </dl>
         </div>
 
         <div class="servicios">
             <h2>Servicios disponibles</h2>
+
                 <ul>
                     {% for servicio in datos.servicios_disponibles %}
                     <li>{{ servicio }}</li>
@@ -52,7 +49,6 @@
             </div>
 
         <div class="horarios">
-            
             <div class="horarios__header">
                 <h2>¡Visitános!</h2>
                 <a class="boton boton--reservar" href="{{ url_for('publico.crear_reserva') }}">Reservar</a>

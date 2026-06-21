@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block title %}Admin - Actualizar Franjas Horarias{% endblock %}
+
+{% block nav %}
+<nav id="nav-admin">
+    <span></span>
+    <a href="{{ url_for('admin.logout') }}">Logout</a>
+</nav>
+{% endblock %}
+
+{% block body %}
+<section class="encabezado-pagina">
+    <h1>Editar Franjas Horarias</h1>
+</section>
+
+{% if error %}
+<div class="alert alert-error">{{ error }}</div>
+{% endif %}
+
+<form class="login" method="POST" action="{{ url_for('admin.franjas_horarias') }}" id="form-franjas">
+
+    {% set dias = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'] %}
+
+    {% for dia in range(7) %}
+    <div class="dia-config" data-dia="{{ dia }}">
+        <h3>{{ dias[dia] }}</h3>
+        <div class="franjas-container">
+            {% set franjas_dia = franjas | selectattr('dia_semana', 'equalto', dia) | list %}
+            {% for franja in franjas_dia %}
+            <div class="franja">
+                <label>Apertura</label>
+                <input type="time" name="hora_apertura" value="{{ franja.hora_apertura }}" required>
+                <label>Cierre</label>
+                <input type="time" name="hora_cierre" value="{{ franja.hora_cierre }}" required>
+                <button type="button" class="quitar-franja boton-cancelar franja-quitar">-</button>
+            </div>
+            {% endfor %}
+        </div>
+        <button type="button" class="agregar-franja boton franja-agregar" data-dia="{{ dia }}">+</button>
+    </div>
+    {% endfor %}
+    <input type="hidden" name="franjas_json" id="franjas_json">
+
+    <button class="boton boton--submit" type="submit">Guardar</button>
+    <a href="{{ url_for('admin.dashboard') }}">Cancelar</a>
+</form>
+
+<script src="{{ url_for('static', filename='franjas_horarias.js') }}"></script>
+{% endblock %}

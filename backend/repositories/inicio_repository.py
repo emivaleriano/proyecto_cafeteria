@@ -5,15 +5,34 @@ def get_franjas_horarias():
     conexion = obtener_conexion()
     cursor = conexion.cursor(dictionary=True)
     cursor.execute("""
-        SELECT id_franja, dia_semana, hora_apertura, hora_cierre, capacidad_maxima
+        SELECT id_franja, dia_semana, hora_apertura, hora_cierre
         FROM franjas_horarias
-        ORDER BY dia_semana ASC
+        ORDER BY dia_semana, hora_apertura ASC
     """)
     resultado = cursor.fetchall()
     cursor.close()
     conexion.close()
     return resultado
 
+
+def reemplazar_franjas_horarias(franjas):
+    """Borra las franjas existentes y las reemplaza por nuevas (en caso de que se agregue otra franja dentro de un dia)"""
+    conexion = obtener_conexion()
+    cursor = conexion.cursor(dictionary=True)
+    try:
+        cursor.execute("DELETE FROM franjas_horarias")
+        for f in franjas:
+            cursor.execute(
+                "INSERT INTO franjas_horarias (dia_semana, hora_apertura, hora_cierre) values (%s, %s, %s)",
+                (f["dia_semana"], f["hora_apertura"], f["hora_cierre"])
+            )
+            conexion.commit()
+    except Exception as e:
+        conexion.rollback()
+        raise e
+    finally:
+        cursor.close()
+        conexion.close()
 
 def get_resenas_publicas():
     """Devuelve una lista de reseñas publicadas a nombre del usuario"""
@@ -79,3 +98,39 @@ def insertar_resena(id_reserva, estrellas, comentario):
     cursor.close()
     conexion.close()
     return nuevo_id
+
+def get_info_local():
+    conexion = obtener_conexion()
+    cursor = conexion.cursor(dictionary=True)
+    cursor.execute("""
+        SELECT nombre, direccion, telefono, email
+        FROM info_local
+        LIMIT 1
+    """)
+    resultado = cursor.fetchone()
+    cursor.close()
+    conexion.close()
+    return resultado
+
+def get_capacidad_maxima():
+    conexion = obtener_conexion()
+    cursor = conexion.cursor(dictionary=True)
+    cursor.execute("""
+        SELECT capacidad_maxima
+        FROM info_local
+        LIMIT 1
+    """)
+    resultado = cursor.fetchone()
+    cursor.close()
+    conexion.close()
+    return resultado["capacidad_maxima"]
+
+def update_info_local(nombre, direccion, telefono, email, capacidad):
+    conexion = obtener_conexion()
+    cursor = conexion.cursor(dictionary=True)
+    cursor.execute("""
+                   update info_local set nombre=%s, direccion=%s, telefono=%s,email=%s, capacidad_maxima=%s where id = 1""",
+                   (nombre, direccion, telefono, email, capacidad))
+    conexion.commit()
+    cursor.close()
+    conexion.close()

@@ -7,14 +7,6 @@ import os
 load_dotenv(Path(__file__).parent / ".env")
 
 API_BASE_URL = os.getenv("API_BASE_URL")
-ALERGIAS_OPCIONES = [
-    {"id": "gluten",       "nombre": "Gluten"},
-    {"id": "lactosa",      "nombre": "Lactosa"},
-    {"id": "mariscos",     "nombre": "Mariscos"},
-    {"id": "frutos_secos", "nombre": "Frutos secos"},
-    {"id": "huevo",        "nombre": "Huevo"},
-    {"id": "soja",         "nombre": "Soja"},
-]
 
 def get_inicio():
     """
@@ -124,7 +116,6 @@ def get_datos_reserva():
     return {
         "horarios":              inicio.get("horarios", []),
         "servicios_disponibles": body.get("datos", []),
-        "alergias_opciones":     ALERGIAS_OPCIONES,
     }, None
 
 
@@ -139,7 +130,6 @@ def post_reserva(form):
         "telefono":          form.get("telefono", "").strip(),
         "cantidad_personas": form.get("cantidad_personas"),
         "fecha_hora":        fecha_hora,
-        "alergias":          form.getlist("alergias[]"),
         "servicios":         form.getlist("servicios[]"),
         "observaciones":     form.get("comentarios", "").strip(),
     }
@@ -185,3 +175,15 @@ def post_cancelar_reserva(id_reserva):
     if res.status_code == 200 and body.get("exito"):
         return body.get("datos", {}), None
     return None, body.get("mensaje", "Error al cancelar la reserva.")
+
+def get_check_in(token):
+    try:
+        res = requests.get(f"{API_BASE_URL}/reservas/check-in/{token}", timeout=10)
+    except requests.exceptions.ConnectionError:
+        return None, "No se pudo conectar con el servidor."
+    except requests.exceptions.Timeout:
+        return None, "El servidor tardó demasiado en responder."
+    body = res.json()
+    if res.status_code == 200 and body.get("exito"):
+        return body.get("datos", {}), None
+    return None, body.get("mensaje", "Error al realizar obtener la reserva.")
