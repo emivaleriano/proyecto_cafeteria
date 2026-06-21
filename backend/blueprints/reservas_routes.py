@@ -29,16 +29,6 @@ def crear_reserva_route():
     resultado = crear_nueva_reserva(data)
     print(resultado)
 
-    if "error" in resultado:
-
-        error = crear_error(
-            codigo=HTTP_BAD_REQUEST_CODE,
-            descripcion="Error al crear reserva",
-            mensaje=resultado["error"]
-        )
-
-        return error, HTTP_BAD_REQUEST_CODE
-
     return crear_respuesta_exito(
         datos=resultado,
         mensaje="Reserva creada correctamente",
