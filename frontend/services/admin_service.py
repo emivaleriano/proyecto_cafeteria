@@ -264,3 +264,9 @@ def service_actualizar_reserva(id, estado):
     if res is None:
         return None, "No se pudo conectar con el servidor."
     return _handle(res, 200, "Error al actualizar la reserva.")
+
+def service_actualizar_reservas_vencidas(token):
+    res = _request("PATCH", f"{API_BASE_URL}/reservas/actualizar-vencidas", token=token)
+    if res is None:
+        return None, "No se pudo conectar con el servidor."
+    return _handle(res, 200, "Error al actualizar las reservas vencidas.")

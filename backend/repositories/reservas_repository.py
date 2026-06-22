@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from backend.db import obtener_conexion
 from backend.utils.formatos import formatear_reserva
 
@@ -283,6 +285,27 @@ def obtener_reserva_por_token(token):
             WHERE r.qr = %s
         """, (token,))
         return cursor.fetchone()
+    finally:
+        cursor.close()
+        conn.close()
+
+def actualizar_no_completadas():
+    """
+    Actualiza a 'No Completada' todas las reservas que ya pasaron y que
+    no fueron canceladas o completadas.
+
+    """
+    conn = obtener_conexion()
+    cursor = conn.cursor(dictionary=True)
+    try:
+        cursor.execute("""
+            UPDATE reservas
+            SET estado = 'No Completada'
+            WHERE fecha_hora < %s
+            AND estado NOT IN ('Completada', 'Cancelada', 'No Completada')
+        """, (datetime.now(),))
+        conn.commit()
+        return cursor.rowcount
     finally:
         cursor.close()
         conn.close()

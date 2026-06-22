@@ -1,4 +1,4 @@
-from flask import Blueprint, request
+from flask import Blueprint, jsonify, request
 from backend.utils.admin import requiere_admin
 from backend.services.reservas_service import (
     crear_nueva_reserva,
@@ -6,7 +6,8 @@ from backend.services.reservas_service import (
     data_cancelar_reserva,
     data_actualizar_estado_reserva,
     data_obtener_todas_reservas,
-    data_check_in
+    data_check_in,
+    data_actualizar_reservas_vencidas,
 )
 
 from backend.utils.respuestas import (
@@ -126,3 +127,13 @@ def obtener_check_in_route(token):
         mensaje="Reserva obtenida correctamente",
         codigo=HTTP_OK_CODE
     )
+
+@reservas_bp.route("/reservas/actualizar-vencidas", methods=["PATCH"])
+@requiere_admin
+def actualizar_reservas_vencidas():
+    cantidad = data_actualizar_reservas_vencidas()
+    respuesta, codigo = crear_respuesta_exito(
+        datos={"actualizadas": cantidad},
+        mensaje=f"Se actualizaron {cantidad} reserva(s) vencida(s)."
+    )
+    return jsonify(respuesta), codigo
