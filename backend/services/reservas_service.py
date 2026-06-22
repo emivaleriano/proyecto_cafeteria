@@ -116,7 +116,6 @@ def data_obtener_reserva(id_reserva):
         if str(s["id_servicio"]) in [str(id) for id in reserva["servicios"]] #si el id coincide con los servicios de la reserva
     ]
 
-    print(reserva)
     return reserva
 
 

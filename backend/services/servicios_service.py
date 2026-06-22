@@ -51,12 +51,11 @@ def modificar_servicio(id, nombre, descripcion, activo):
     descripcion = (descripcion or "").strip()
     if not nombre or not descripcion or activo is None:
         raise ValueError("Faltan datos obligatorios: nombre, descripcion, activo")
-    servicio = obtener_servicio_por_nombre(nombre)
-    if servicio["id_servicio"] != id:
-        raise KeyError("Ya existe servicio con ese nombre")
-    servicio = obtener_servicio_bd(id)
-    if not servicio:
+    if not obtener_servicio_bd(id):
         raise LookupError("No existe un servicio con ese ID")
+    existente = obtener_servicio_por_nombre(nombre)
+    if existente and existente["id_servicio"] != id:
+        raise KeyError("Ya existe servicio con ese nombre")
     modificar_servicio_bd(id, nombre, descripcion, activo)
 
 def activar_desactivar_servicio(id):

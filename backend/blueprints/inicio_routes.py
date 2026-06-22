@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from backend.utils.admin import requiere_admin
 from backend.utils.respuestas import (
     HTTP_OK_CODE, HTTP_INTERNAL_ERROR_CODE,
-    crear_respuesta_exito, crear_error,
+    crear_respuesta_exito, crear_respuesta_error,
 )
 from backend.services.inicio_service import (
     obtener_info_local,
@@ -30,12 +30,12 @@ def get_inicio():
             codigo=HTTP_OK_CODE,
         )
     except Exception as e:
-        return crear_error(
+        return crear_respuesta_error(
             codigo=HTTP_INTERNAL_ERROR_CODE,
             descripcion="Error al obtener información del local",
             mensaje=str(e),
             nivel="error",
-        ), HTTP_INTERNAL_ERROR_CODE
+        )
 
 
 """/reviews: Devuelve las reseñas publicadas"""
@@ -49,12 +49,12 @@ def get_reviews():
             codigo=HTTP_OK_CODE,
         )
     except Exception as e:
-        return crear_error(
+        return crear_respuesta_error(
             codigo=HTTP_INTERNAL_ERROR_CODE,
             descripcion="Error al obtener reseñas",
             mensaje=str(e),
             nivel="error",
-        ), HTTP_INTERNAL_ERROR_CODE
+        )
 
 
 """/reservas/<id_reserva>/review: Permite publicar una reseña para una reserva completada"""
@@ -63,7 +63,7 @@ def post_review(id_reserva):
     try:
         body = request.get_json(silent=True)
         if not body:
-            return crear_error(400, "Body inválido", "Se esperaba JSON"), 400
+            return crear_respuesta_error(400, "Body inválido", "Se esperaba JSON")
 
         estrellas  = body.get("estrellas")
         comentario = body.get("comentario")
@@ -71,11 +71,11 @@ def post_review(id_reserva):
         try:
             nuevo_id = crear_resena(id_reserva, estrellas, comentario)
         except LookupError as le:
-            return crear_error(404, "No encontrada", str(le)), 404
+            return crear_respuesta_error(404, "No encontrada", str(le))
         except ValueError as ve:
             msg = str(ve)
             codigo = 409 if "Ya existe" in msg else 400
-            return crear_error(codigo, "Datos inválidos", msg), codigo
+            return crear_respuesta_error(codigo, "Datos inválidos", msg)
 
         return crear_respuesta_exito(
             datos={"id_resena": nuevo_id},
@@ -84,12 +84,12 @@ def post_review(id_reserva):
         )
 
     except Exception as e:
-        return crear_error(
+        return crear_respuesta_error(
             codigo=HTTP_INTERNAL_ERROR_CODE,
             descripcion="Error al crear la reseña",
             mensaje=str(e),
             nivel="error",
-        ), HTTP_INTERNAL_ERROR_CODE
+        )
 
 
 @inicio_bp.route("/reviews/<int:id_resena>", methods=["GET"])
@@ -104,18 +104,20 @@ def get_review(id_resena):
         )
 
     except Exception as e:
-        return crear_error(
+        return crear_respuesta_error(
             codigo=HTTP_INTERNAL_ERROR_CODE,
             descripcion="Error al obtener reseña",
             mensaje=str(e),
             nivel="error",
-        ), HTTP_INTERNAL_ERROR_CODE
+        )
 
 
 @inicio_bp.route("/reviews/<int:id_resena>", methods=["PATCH"])
 def patch_review(id_resena):
     try:
         body = request.get_json(silent=True)
+        if not body:
+            return crear_respuesta_error(400, "Body inválido", "Se esperaba JSON")
 
         estrellas = body.get("estrellas")
         comentario = body.get("comentario")
@@ -133,12 +135,12 @@ def patch_review(id_resena):
         )
 
     except Exception as e:
-        return crear_error(
+        return crear_respuesta_error(
             codigo=HTTP_INTERNAL_ERROR_CODE,
             descripcion="Error al modificar reseña",
             mensaje=str(e),
             nivel="error",
-        ), HTTP_INTERNAL_ERROR_CODE
+        )
 
 
 @inicio_bp.route("/reviews/<int:id_resena>", methods=["DELETE"])
@@ -153,12 +155,12 @@ def delete_review(id_resena):
         )
 
     except Exception as e:
-        return crear_error(
+        return crear_respuesta_error(
             codigo=HTTP_INTERNAL_ERROR_CODE,
             descripcion="Error al eliminar reseña",
             mensaje=str(e),
             nivel="error",
-        ), HTTP_INTERNAL_ERROR_CODE
+        )
 
 @inicio_bp.route("/admin/inicio/config", methods=["PUT"])
 @requiere_admin
@@ -171,8 +173,7 @@ def put_info_local():
     capacidad = data.get("capacidad")
 
     actualizar_info_local(nombre, direccion, telefono, email, capacidad)
-    respuesta, codigo = crear_respuesta_exito(mensaje="Información del local modificada", codigo=HTTP_OK_CODE)
-    return jsonify(respuesta), codigo
+    return crear_respuesta_exito(mensaje="Información del local modificada", codigo=HTTP_OK_CODE)
 
 @inicio_bp.route("/inicio/franjas", methods=["GET"])
 def get_franjas_horarias():
@@ -183,8 +184,7 @@ def get_franjas_horarias():
         traceback.print_exc()
         return jsonify({"error": str(e)}), 500
 
-    respuesta, codigo = crear_respuesta_exito(datos=franjas, mensaje="Franjas horarias obtenidas", codigo=HTTP_OK_CODE)
-    return jsonify(respuesta), codigo
+    return crear_respuesta_exito(datos=franjas, mensaje="Franjas horarias obtenidas", codigo=HTTP_OK_CODE)
 
 @inicio_bp.route("/admin/inicio/franjas", methods=["PUT"])
 @requiere_admin
@@ -194,5 +194,4 @@ def put_franjas_horarias():
 
     actualizar_franjas_horarias(franjas)
 
-    respuesta, codigo = crear_respuesta_exito(mensaje="Franjas horarias actualizadas", codigo=HTTP_OK_CODE)
-    return jsonify(respuesta), codigo
+    return crear_respuesta_exito(mensaje="Franjas horarias actualizadas", codigo=HTTP_OK_CODE)

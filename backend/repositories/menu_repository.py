@@ -42,8 +42,8 @@ def obtener_plato(id):
     try:
         cursor.execute("SELECT * FROM menu WHERE id = %s", (id,))
         plato = cursor.fetchone()
-        if plato["tags"]:
-                plato["tags"] = json.loads(plato["tags"])
+        if plato and plato["tags"]:
+            plato["tags"] = json.loads(plato["tags"])
         return plato
     finally:
         cursor.close()
