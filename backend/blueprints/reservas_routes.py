@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, request
 from backend.utils.admin import requiere_admin
 from backend.services.reservas_service import (
     crear_nueva_reserva,
@@ -12,7 +12,7 @@ from backend.services.reservas_service import (
 
 from backend.utils.respuestas import (
     crear_respuesta_exito,
-    crear_error,
+    crear_respuesta_error,
     HTTP_OK_CODE,
     HTTP_NOT_FOUND_CODE,
     HTTP_CREATED_CODE,
@@ -25,10 +25,15 @@ reservas_bp = Blueprint("reservas", __name__)
 
 @reservas_bp.route("/reservas", methods=["POST"])
 def crear_reserva_route():
-    data = request.get_json()
+    data = request.get_json(silent=True)
+    if not data:
+        return crear_respuesta_error(
+            codigo=HTTP_BAD_REQUEST_CODE,
+            descripcion="Body inválido",
+            mensaje="Se esperaba un cuerpo JSON con los datos de la reserva"
+        )
 
     resultado = crear_nueva_reserva(data)
-    print(resultado)
 
     return crear_respuesta_exito(
         datos=resultado,
@@ -45,13 +50,11 @@ def obtener_reserva_route(id):
 
     if not reserva:
 
-        error = crear_error(
+        return crear_respuesta_error(
             codigo=HTTP_NOT_FOUND_CODE,
             descripcion=MENSAJE_NO_ENCONTRADO,
             mensaje="No existe una reserva con ese id"
         )
-
-        return error, HTTP_NOT_FOUND_CODE
 
     return crear_respuesta_exito(
         datos=reserva,
@@ -67,13 +70,11 @@ def cancelar_reserva_route(id):
 
     if "error" in resultado:
 
-        error = crear_error(
+        return crear_respuesta_error(
             codigo=HTTP_BAD_REQUEST_CODE,
             descripcion="No se pudo cancelar la reserva",
             mensaje=resultado["error"]
         )
-
-        return error, HTTP_BAD_REQUEST_CODE
 
     return crear_respuesta_exito(
         datos={"id_reserva": id},
@@ -98,15 +99,15 @@ def obtener_reservas_route():
 
 @reservas_bp.route("/reservas/<int:id>/estado", methods=["PATCH"])
 def actualizar_estado_route(id):
-    data = request.get_json()
+    data = request.get_json(silent=True) or {}
     estado = data.get("estado")
     resultado = data_actualizar_estado_reserva(id, estado)
     if "error" in resultado:
-        return crear_error(
+        return crear_respuesta_error(
             codigo=HTTP_BAD_REQUEST_CODE,
             descripcion="No se pudo actualizar la reserva",
             mensaje=resultado["error"]
-        ), HTTP_BAD_REQUEST_CODE
+        )
     return crear_respuesta_exito(
         datos={"id_reserva": id},
         mensaje="Reserva actualizada correctamente",
@@ -117,11 +118,11 @@ def actualizar_estado_route(id):
 def obtener_check_in_route(token):
     resultado = data_check_in(token)
     if "error" in resultado:
-        return crear_error(
+        return crear_respuesta_error(
             codigo=HTTP_BAD_REQUEST_CODE,
             descripcion="No se pudo obtener la reserva",
             mensaje=resultado["error"]
-        ), HTTP_BAD_REQUEST_CODE
+        )
     return crear_respuesta_exito(
         datos=resultado,
         mensaje="Reserva obtenida correctamente",
@@ -132,8 +133,7 @@ def obtener_check_in_route(token):
 @requiere_admin
 def actualizar_reservas_vencidas():
     cantidad = data_actualizar_reservas_vencidas()
-    respuesta, codigo = crear_respuesta_exito(
+    return crear_respuesta_exito(
         datos={"actualizadas": cantidad},
         mensaje=f"Se actualizaron {cantidad} reserva(s) vencida(s)."
     )
-    return jsonify(respuesta), codigo

@@ -4,10 +4,10 @@ from functools import wraps
 
 import bcrypt
 import jwt
-from flask import request, jsonify
+from flask import request
 
 from backend.utils.respuestas import (
-    crear_error,
+    crear_respuesta_error,
     HTTP_UNAUTHORIZED_CODE,
 )
 
@@ -61,20 +61,18 @@ def requiere_admin(funcion):
     def wrapper(*args, **kwargs):
         header = request.headers.get("Authorization", "")
         if not header.startswith("Bearer "):
-            error = crear_error(
+            return crear_respuesta_error(
                 HTTP_UNAUTHORIZED_CODE,
                 "Token faltante",
                 "Debe enviar el header Authorization con formato 'Bearer <token>'",
             )
-            return jsonify({"exito": False, "mensaje": error["mensaje"], "datos": error}), HTTP_UNAUTHORIZED_CODE
 
         token = header[len("Bearer "):].strip()
 
         try:
             payload = decodificar_token(token)
         except ValueError as e:
-            error = crear_error(HTTP_UNAUTHORIZED_CODE, "Token invalido", str(e))
-            return jsonify({"exito": False, "mensaje": error["mensaje"], "datos": error}), HTTP_UNAUTHORIZED_CODE
+            return crear_respuesta_error(HTTP_UNAUTHORIZED_CODE, "Token invalido", str(e))
 
         request.admin_actual = payload
         return funcion(*args, **kwargs)

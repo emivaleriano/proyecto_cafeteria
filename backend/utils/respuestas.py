@@ -40,6 +40,23 @@ def crear_error(codigo, descripcion, mensaje, nivel="error"):
     }
 
 
+def crear_respuesta_error(codigo, descripcion, mensaje, nivel="error"):
+    """
+    Crea una respuesta de error estandarizada con el mismo sobre que las
+    respuestas exitosas: {exito, mensaje, datos}.
+
+    Returns:
+        tuple: (diccionario, codigo_http)
+    """
+    error = crear_error(codigo, descripcion, mensaje, nivel)
+    respuesta = {
+        "exito": False,
+        "mensaje": mensaje,
+        "datos": error,
+    }
+    return respuesta, codigo
+
+
 def crear_respuesta_exito(datos=None, mensaje="OK", codigo=200):
     """
     Crea una respuesta exitosa estandarizada.
