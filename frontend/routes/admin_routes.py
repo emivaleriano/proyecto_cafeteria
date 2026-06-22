@@ -19,6 +19,7 @@ from frontend.services.admin_service import (
     obtener_franjas_horarias,
     cambiar_franjas_horarias,
     service_obtener_reservas,
+    service_actualizar_reservas_vencidas,
     )
 
 import json
@@ -256,4 +257,12 @@ def reserva_detalle(id):
 def actualizar_estado_reserva(id):
     estado = request.form.get("estado")
     service_actualizar_reserva(id, estado)
+    return redirect(url_for("admin.dashboard"))
+
+@admin_front_bp.route("/reservas/actualizar-vencidas", methods=["POST"])
+@requiere_sesion
+def actualizar_reservas_vencidas():
+    token = session.get("admin_token")
+    service_actualizar_reservas_vencidas(token)
+
     return redirect(url_for("admin.dashboard"))

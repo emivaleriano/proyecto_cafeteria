@@ -8,7 +8,8 @@ from backend.repositories.reservas_repository import (
     cancelar_reserva,
     obtener_todas_reservas,
     actualizar_estado_reserva,
-    obtener_reserva_por_token
+    obtener_reserva_por_token,
+    actualizar_no_completadas
 )
 from backend.repositories.inicio_repository import get_capacidad_maxima
 from backend.repositories.servicios_repository import obtener_servicios
@@ -132,7 +133,7 @@ def data_obtener_todas_reservas(pagina, max, estados, orden):
 
 def data_actualizar_estado_reserva(id_reserva, estado):
     id_reserva = validar_id(id_reserva)
-    ESTADOS_VALIDOS = {"Pendiente", "Confirmada", "Cancelada", "Completada"}
+    ESTADOS_VALIDOS = {"Pendiente", "Confirmada", "Cancelada", "Completada", "No Completada"}
     if estado not in ESTADOS_VALIDOS:
         return {"error": f"Estado inválido. Debe ser uno de: {', '.join(ESTADOS_VALIDOS)}"}
     return actualizar_estado_reserva(id_reserva, estado)
@@ -158,3 +159,6 @@ def data_check_in(token):
         if str(s["id_servicio"]) in [str(id) for id in ids]
     ]
     return formatear_reserva(reserva)
+
+def data_actualizar_reservas_vencidas():
+    return actualizar_no_completadas()

@@ -42,7 +42,12 @@
         </ul>
     </div>
 
+    <div style="display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap;">
     <h2 id="tabla-reservas">Reservas</h2>
+    <form method="POST" action="{{ url_for('admin.actualizar_reservas_vencidas') }}">
+        <button type="submit" class="boton">Actualizar reservas vencidas</button>
+    </form>
+</div>
         <table class="tabla-admin">
             <thead>
                 <tr>
@@ -61,7 +66,7 @@
                             <form method="GET" action="{{ url_for('admin.dashboard') }}#tabla-reservas">
                                 <input type="hidden" name="orden" value="{{ orden }}">
                                 <input type="hidden" name="pagina" value="1">
-                                {% for e in ['Pendiente', 'Confirmada', 'Completada', 'Cancelada'] %}
+                                {% for e in ['Pendiente', 'Confirmada', 'Completada', 'Cancelada', 'No Completada'] %}
                                 <label style="display:block;">
                                     <input type="checkbox" name="estado" value="{{ e }}" {{ 'checked' if e in estados }}> {{ e }}
                                 </label>
@@ -97,6 +102,9 @@
                                 <button type="submit" class="boton-cancelar">Cancelar</button>
                             </form>
                             {% elif reserva.estado == 'Completada' %}
+                            <a href="{{ url_for('admin.reserva_detalle', id=reserva.id_reserva) }}">Ver reserva</a>
+
+                            {% elif reserva.estado == 'No Completada' %}
                             <a href="{{ url_for('admin.reserva_detalle', id=reserva.id_reserva) }}">Ver reserva</a>
                             {% endif %}
                         </td>
