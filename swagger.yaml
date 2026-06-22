@@ -1,217 +1,1633 @@
 openapi: 3.0.0
 info:
-  title: API Sistema Gastronómico
-  description: 
+  title: API Sistema Gastronómico - Cafetería
+  description: |-
+    API para la gestión de una cafetería: información del local, menú, servicios,
+    reservas (con generación de QR), reseñas y panel de administración.
+
+    ## Convenciones de respuesta
+
+    Las respuestas exitosas usan un sobre estándar:
+
+    ```json
+    { "exito": true, "mensaje": "OK", "datos": { ... } }
+    ```
+
+    Los errores controlados a nivel de endpoint devuelven un objeto de error:
+
+    ```json
+    { "codigo": 404, "descripcion": "Recurso no encontrado", "mensaje": "...", "nivel": "error" }
+    ```
+
+    Los errores capturados por los manejadores globales devuelven:
+
+    ```json
+    { "exito": false, "mensaje": "...", "detalle": "..." }
+    ```
+
+    ## Autenticación
+
+    Los endpoints de administración requieren un token JWT en el header
+    `Authorization: Bearer <token>`, obtenido en `POST /admin/login`.
   version: 1.0.0
+
+servers:
+  - url: http://localhost:5000
+    description: Servidor de desarrollo
 
 tags:
   - name: Inicio
+    description: Información general del local, horarios y reseñas públicas
   - name: Menu
+    description: Listado del menú y administración de productos
+  - name: Servicios
+    description: Servicios ofrecidos por el local
   - name: Reservas
+    description: Creación, consulta, cancelación y check-in de reservas
   - name: Reseñas
+    description: Reseñas vinculadas a reservas completadas
   - name: Admin
+    description: Autenticación y panel de administración
 
 paths:
+  # ----------------------------------------------------------------------------
+  # INICIO
+  # ----------------------------------------------------------------------------
   /inicio:
     get:
-      tags:
-        - Inicio
-      summary: Datos del local
+      tags: [Inicio]
+      summary: Obtener información general del local
+      description: Devuelve datos del local, horarios y servicios activos.
       responses:
         '200':
-          description: Datos obtenidos correctamente.
+          description: Información del local obtenida correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RespuestaInfoLocal'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
 
-  /menu:
+  /inicio/franjas:
     get:
-      tags:
-        - Menu
-      summary: Listar platos
+      tags: [Inicio]
+      summary: Obtener las franjas horarias
       responses:
         '200':
-          description: Listado de platos.
-
-  /reservas:
-    post:
-      tags:
-        - Reservas
-      summary: Crear reserva
-      responses:
-        '201':
-          description: Reserva creada y QR generado.
-
-  /reservas/{id}:
-    get:
-      tags:
-        - Reservas
-      summary: Detalle reserva
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: Información de la reserva.
-
-  /reservas/{id}/cancelar:
-    patch:
-      tags:
-        - Reservas
-      summary: Cancelar reserva (Usuario)
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: Reserva anulada.
-
-  /reservas/{id}/review:
-    post:
-      tags:
-        - Reseñas
-      summary: Crear reseña vinculada a reserva
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-      responses:
-        '201':
-          description: Reseña publicada.
+          description: Franjas horarias obtenidas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RespuestaFranjas'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
 
   /reviews:
     get:
-      tags:
-        - Reseñas
-      summary: Listar todas las reseñas
+      tags: [Reseñas]
+      summary: Listar reseñas públicas
       responses:
         '200':
-          description: Lista de reseñas públicas.
+          description: Reseñas obtenidas correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RespuestaResenas'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
 
-  /admin/login:
-    put:
-      tags:
-        - Admin
-      summary: Login administrador
-      responses:
-        '200':
-          description: Autenticación exitosa.
-
-  /admin/reservas:
+  /reviews/{id_resena}:
+    parameters:
+      - $ref: '#/components/parameters/IdResena'
     get:
-      tags:
-        - Admin
-      summary: Ver todas las reservas
+      tags: [Reseñas]
+      summary: Obtener una reseña por ID
       responses:
         '200':
-          description: Listado total.
+          description: Reseña obtenida correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RespuestaResena'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    patch:
+      tags: [Reseñas]
+      summary: Modificar una reseña
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResenaActualizacion'
+      responses:
+        '200':
+          description: Reseña modificada correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RespuestaResena'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags: [Reseñas]
+      summary: Eliminar una reseña
+      responses:
+        '200':
+          description: Reseña eliminada correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RespuestaExitoVacia'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
 
-  /admin/reservas/{id}:
-    put:
-      tags:
-        - Admin
-      summary: Actualizar estado de reserva
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
+  /reservas/{id_reserva}/review:
+    parameters:
+      - $ref: '#/components/parameters/IdReserva'
+    post:
+      tags: [Reseñas]
+      summary: Crear una reseña para una reserva completada
+      description: Solo se permite reseñar reservas con estado "Completada" y una única vez por reserva.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResenaBase'
+      responses:
+        '201':
+          description: Reseña creada exitosamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RespuestaResenaCreada'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  # ----------------------------------------------------------------------------
+  # MENU
+  # ----------------------------------------------------------------------------
+  /menu:
+    get:
+      tags: [Menu]
+      summary: Listar el menú (solo productos activos)
       responses:
         '200':
-          description: Estado actualizado.
+          description: Menú obtenido correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RespuestaMenu'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
 
   /admin/menu:
     post:
-      tags:
-        - Admin
-      summary: Crear producto
+      tags: [Menu]
+      summary: Crear un producto
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductoBase'
       responses:
         '201':
-          description: Producto creado.
+          description: Producto creado correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RespuestaProductoCreado'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
 
   /admin/menu/{id}:
-    put:
-      tags:
-        - Admin
-      summary: Editar producto
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: Producto editado.
-    delete:
-      tags:
-        - Admin
-      summary: Eliminar producto
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: Producto eliminado.
-
-  /admin/servicios:
+    parameters:
+      - $ref: '#/components/parameters/IdPath'
     get:
-      tags:
-        - Admin
-      summary: Listar servicios
+      tags: [Menu]
+      summary: Obtener un producto por ID
+      security:
+        - BearerAuth: []
       responses:
         '200':
-          description: Lista de servicios.
+          description: Producto obtenido correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RespuestaProducto'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    put:
+      tags: [Menu]
+      summary: Modificar un producto
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProductoBase'
+      responses:
+        '200':
+          description: Producto modificado correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RespuestaProductoCreado'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    delete:
+      tags: [Menu]
+      summary: Eliminar un producto
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Producto eliminado correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RespuestaProductoCreado'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  # ----------------------------------------------------------------------------
+  # SERVICIOS
+  # ----------------------------------------------------------------------------
+  /servicios/:
+    get:
+      tags: [Servicios]
+      summary: Listar todos los servicios (activos e inactivos)
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Servicios obtenidos correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RespuestaServicios'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
     post:
-      tags:
-        - Admin
-      summary: Crear servicio
+      tags: [Servicios]
+      summary: Crear un servicio
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServicioBase'
       responses:
         '201':
-          description: Servicio creado.
+          description: Servicio creado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RespuestaExitoVacia'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
 
-  /admin/servicios/{id}:
+  /servicios/activos:
+    get:
+      tags: [Servicios]
+      summary: Listar solo los servicios activos
+      description: Endpoint público utilizado en el formulario de reservas.
+      responses:
+        '200':
+          description: Servicios activos obtenidos correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RespuestaServicios'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /servicios/{id}:
+    parameters:
+      - $ref: '#/components/parameters/IdPath'
+    get:
+      tags: [Servicios]
+      summary: Obtener un servicio por ID
+      responses:
+        '200':
+          description: Servicio obtenido correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RespuestaServicio'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
     put:
-      tags:
-        - Admin
-      summary: Editar servicio
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
+      tags: [Servicios]
+      summary: Modificar un servicio
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ServicioActualizacion'
       responses:
         '200':
-          description: Servicio editado.
+          description: Servicio modificado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RespuestaExitoVacia'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    patch:
+      tags: [Servicios]
+      summary: Activar o desactivar un servicio
+      description: Alterna el estado `activo` del servicio y devuelve el nuevo valor.
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Servicio modificado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RespuestaServicioActivo'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
     delete:
-      tags:
-        - Admin
-      summary: Eliminar servicio
+      tags: [Servicios]
+      summary: Eliminar un servicio
+      security:
+        - BearerAuth: []
+      responses:
+        '204':
+          description: Servicio eliminado (sin contenido)
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  # ----------------------------------------------------------------------------
+  # RESERVAS
+  # ----------------------------------------------------------------------------
+  /reservas:
+    post:
+      tags: [Reservas]
+      summary: Crear una reserva
+      description: |-
+        Crea una reserva, genera un QR único y envía un email de confirmación.
+        Valida disponibilidad según la capacidad máxima y la franja horaria del día.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReservaBase'
+      responses:
+        '201':
+          description: Reserva creada correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RespuestaReservaCreada'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    get:
+      tags: [Reservas]
+      summary: Listar todas las reservas (admin)
+      security:
+        - BearerAuth: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
+        - $ref: '#/components/parameters/Pagina'
+        - $ref: '#/components/parameters/Max'
+        - $ref: '#/components/parameters/EstadoFiltro'
+        - $ref: '#/components/parameters/Orden'
       responses:
         '200':
-          description: Servicio eliminado.
+          description: Reservas obtenidas correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RespuestaReservasPaginadas'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /reservas/{id}:
+    parameters:
+      - $ref: '#/components/parameters/IdPath'
+    get:
+      tags: [Reservas]
+      summary: Obtener una reserva por ID
+      responses:
+        '200':
+          description: Reserva obtenida correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RespuestaReserva'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /reservas/{id}/cancelar:
+    parameters:
+      - $ref: '#/components/parameters/IdPath'
+    patch:
+      tags: [Reservas]
+      summary: Cancelar una reserva
+      responses:
+        '200':
+          description: Reserva cancelada correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RespuestaReservaId'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /reservas/{id}/estado:
+    parameters:
+      - $ref: '#/components/parameters/IdPath'
+    patch:
+      tags: [Reservas]
+      summary: Actualizar el estado de una reserva
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EstadoReserva'
+      responses:
+        '200':
+          description: Reserva actualizada correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RespuestaReservaId'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /reservas/check-in/{token}:
+    parameters:
+      - $ref: '#/components/parameters/Token'
+    get:
+      tags: [Reservas]
+      summary: Validar el check-in de una reserva mediante el token del QR
+      description: |-
+        Devuelve la reserva si el QR es válido. Rechaza reservas canceladas,
+        completadas o cuyo QR no corresponda al día de la reserva.
+      responses:
+        '200':
+          description: Reserva obtenida correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RespuestaReserva'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /reservas/actualizar-vencidas:
+    patch:
+      tags: [Reservas]
+      summary: Marcar como "No Completada" las reservas vencidas (admin)
+      description: |-
+        Actualiza a "No Completada" todas las reservas cuya fecha ya pasó y que
+        no fueron canceladas ni completadas.
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Reservas vencidas actualizadas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RespuestaActualizarVencidas'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  # ----------------------------------------------------------------------------
+  # ADMIN
+  # ----------------------------------------------------------------------------
+  /admin/login:
+    post:
+      tags: [Admin]
+      summary: Iniciar sesión como administrador
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AdminLogin'
+      responses:
+        '200':
+          description: Login exitoso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RespuestaLogin'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /admin/me:
+    get:
+      tags: [Admin]
+      summary: Validar el token del administrador actual
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Token válido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RespuestaMe'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /admin/contrasenia:
+    patch:
+      tags: [Admin]
+      summary: Cambiar la contraseña del administrador
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CambioContrasenia'
+      responses:
+        '200':
+          description: Contraseña actualizada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RespuestaExitoVacia'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
 
   /admin/dashboard:
     get:
-      tags:
-        - Admin
-      summary: Ver estadísticas
+      tags: [Admin]
+      summary: Obtener los datos del panel de administración
+      description: Devuelve estadísticas, reservas paginadas, platos y servicios.
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: '#/components/parameters/Pagina'
+        - $ref: '#/components/parameters/Orden'
+        - $ref: '#/components/parameters/EstadoFiltro'
       responses:
         '200':
-          description: Estadísticas obtenidas.
+          description: Dashboard obtenido
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RespuestaDashboard'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /admin/inicio/config:
+    put:
+      tags: [Admin]
+      summary: Actualizar la información del local
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/InfoLocalBase'
+      responses:
+        '200':
+          description: Información del local modificada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RespuestaExitoVacia'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+  /admin/inicio/franjas:
+    put:
+      tags: [Admin]
+      summary: Reemplazar las franjas horarias
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FranjasActualizacion'
+      responses:
+        '200':
+          description: Franjas horarias actualizadas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RespuestaExitoVacia'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+
+# ==============================================================================
+# COMPONENTS
+# ==============================================================================
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: "Token JWT obtenido en POST /admin/login. Enviar como 'Bearer <token>'."
+
+  # ----------------------------------------------------------------------------
+  parameters:
+    IdPath:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+      description: Identificador del recurso
+      example: 1
+    IdReserva:
+      name: id_reserva
+      in: path
+      required: true
+      schema:
+        type: integer
+      description: ID de la reserva
+      example: 1
+    IdResena:
+      name: id_resena
+      in: path
+      required: true
+      schema:
+        type: integer
+      description: ID de la reseña
+      example: 1
+    Token:
+      name: token
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Token UUID del QR de la reserva
+      example: "550e8400-e29b-41d4-a716-446655440000"
+    Pagina:
+      name: pagina
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+      description: Número de página
+      example: 1
+    Max:
+      name: max
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 1
+        default: 10
+      description: Cantidad de registros por página
+      example: 10
+    Orden:
+      name: orden
+      in: query
+      required: false
+      schema:
+        type: string
+        enum: [asc, desc]
+        default: asc
+      description: Orden de los resultados por fecha
+      example: asc
+    EstadoFiltro:
+      name: estado
+      in: query
+      required: false
+      schema:
+        type: array
+        items:
+          $ref: '#/components/schemas/Estado'
+      style: form
+      explode: true
+      description: Filtra por uno o más estados (parámetro repetible)
+      example: ["Pendiente", "Confirmada"]
+
+  # ----------------------------------------------------------------------------
+  schemas:
+    Estado:
+      type: string
+      description: Estado de una reserva
+      enum:
+        - Pendiente
+        - Confirmada
+        - Cancelada
+        - Completada
+        - No Completada
+      example: "Pendiente"
+
+    # ----- Sobres de respuesta genéricos -----
+    RespuestaExitoVacia:
+      type: object
+      description: Respuesta de éxito sin datos relevantes
+      properties:
+        exito:
+          type: boolean
+          example: true
+        mensaje:
+          type: string
+          example: "OK"
+        datos:
+          nullable: true
+          example: null
+
+    # ----- Info del local -----
+    InfoLocalBase:
+      type: object
+      description: Datos editables de la información del local
+      required: [nombre, direccion, telefono, email, capacidad]
+      properties:
+        nombre:
+          type: string
+          example: "Cafetería El Rincón"
+        direccion:
+          type: string
+          example: "Av Santa Fe 1234, CABA"
+        telefono:
+          type: string
+          example: "+54 11 4987-6543"
+        email:
+          type: string
+          example: "info@elrincon.com"
+        capacidad:
+          type: integer
+          example: 50
+
+    InfoLocal:
+      type: object
+      description: Información completa del local con horarios y servicios
+      properties:
+        nombre:
+          type: string
+          example: "Cafetería El Rincón"
+        direccion:
+          type: string
+          example: "Av Santa Fe 1234, CABA"
+        telefono:
+          type: string
+          example: "+54 11 4987-6543"
+        email:
+          type: string
+          example: "info@elrincon.com"
+        capacidad:
+          type: integer
+          example: 50
+        servicios_disponibles:
+          type: array
+          items:
+            type: string
+          example: ["WiFi", "Estacionamiento"]
+        horarios:
+          type: array
+          items:
+            $ref: '#/components/schemas/Horario'
+
+    Horario:
+      type: object
+      properties:
+        id_franja:
+          type: integer
+          example: 1
+        dia:
+          type: string
+          example: "Lunes"
+        hora_apertura:
+          type: string
+          example: "09:00"
+        hora_cierre:
+          type: string
+          example: "20:00"
+
+    RespuestaInfoLocal:
+      type: object
+      properties:
+        exito:
+          type: boolean
+          example: true
+        mensaje:
+          type: string
+          example: "Información del local obtenida correctamente"
+        datos:
+          $ref: '#/components/schemas/InfoLocal'
+
+    # ----- Franjas horarias -----
+    Franja:
+      type: object
+      properties:
+        id_franja:
+          type: integer
+          example: 1
+        dia_semana:
+          type: integer
+          description: "Día de la semana (0 = Domingo, 1 = Lunes, ... 6 = Sábado)"
+          example: 1
+        hora_apertura:
+          type: string
+          example: "09:00"
+        hora_cierre:
+          type: string
+          example: "20:00"
+
+    FranjaInput:
+      type: object
+      required: [dia_semana, hora_apertura, hora_cierre]
+      properties:
+        dia_semana:
+          type: integer
+          example: 1
+        hora_apertura:
+          type: string
+          example: "09:00"
+        hora_cierre:
+          type: string
+          example: "20:00"
+
+    FranjasActualizacion:
+      type: object
+      required: [franjas]
+      properties:
+        franjas:
+          type: array
+          items:
+            $ref: '#/components/schemas/FranjaInput'
+
+    RespuestaFranjas:
+      type: object
+      properties:
+        exito:
+          type: boolean
+          example: true
+        mensaje:
+          type: string
+          example: "Franjas horarias obtenidas"
+        datos:
+          type: array
+          items:
+            $ref: '#/components/schemas/Franja'
+
+    # ----- Menú -----
+    ProductoBase:
+      type: object
+      description: Datos de un producto del menú
+      required: [nombre, descripcion, precio, categoria, imagen]
+      properties:
+        nombre:
+          type: string
+          example: "Café con leche"
+        descripcion:
+          type: string
+          example: "Café espresso con leche cremada"
+        precio:
+          type: number
+          format: float
+          example: 1500.00
+        categoria:
+          type: string
+          example: "Bebidas calientes"
+        tags:
+          type: array
+          items:
+            type: string
+          example: ["sin tacc", "vegano"]
+        imagen:
+          type: string
+          example: "cafe_con_leche.jpg"
+        activo:
+          type: boolean
+          default: true
+          example: true
+
+    Producto:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        nombre:
+          type: string
+          example: "Café con leche"
+        descripcion:
+          type: string
+          example: "Café espresso con leche cremada"
+        precio:
+          type: number
+          format: float
+          example: 1500.00
+        categoria:
+          type: string
+          example: "Bebidas calientes"
+        tags:
+          type: array
+          items:
+            type: string
+          example: ["sin tacc"]
+        imagen:
+          type: string
+          example: "cafe_con_leche.jpg"
+        activo:
+          type: boolean
+          example: true
+
+    RespuestaMenu:
+      type: object
+      properties:
+        exito:
+          type: boolean
+          example: true
+        mensaje:
+          type: string
+          example: "Menu obtenido correctamente"
+        datos:
+          type: array
+          items:
+            $ref: '#/components/schemas/Producto'
+
+    RespuestaProducto:
+      type: object
+      properties:
+        exito:
+          type: boolean
+          example: true
+        mensaje:
+          type: string
+          example: "OK"
+        datos:
+          $ref: '#/components/schemas/Producto'
+
+    RespuestaProductoCreado:
+      type: object
+      properties:
+        exito:
+          type: boolean
+          example: true
+        mensaje:
+          type: string
+          example: "Producto creado correctamente"
+        datos:
+          type: object
+          properties:
+            id:
+              type: integer
+              example: 1
+
+    # ----- Servicios -----
+    ServicioBase:
+      type: object
+      required: [nombre, descripcion]
+      properties:
+        nombre:
+          type: string
+          example: "WiFi"
+        descripcion:
+          type: string
+          example: "Conexión a internet gratuita"
+        activo:
+          type: boolean
+          default: true
+          example: true
+
+    ServicioActualizacion:
+      type: object
+      required: [nombre, descripcion, activo]
+      properties:
+        nombre:
+          type: string
+          example: "WiFi"
+        descripcion:
+          type: string
+          example: "Conexión a internet gratuita"
+        activo:
+          type: boolean
+          example: true
+
+    Servicio:
+      type: object
+      properties:
+        id_servicio:
+          type: integer
+          example: 1
+        nombre:
+          type: string
+          example: "WiFi"
+        descripcion:
+          type: string
+          example: "Conexión a internet gratuita"
+        activo:
+          type: boolean
+          example: true
+
+    RespuestaServicios:
+      type: object
+      properties:
+        exito:
+          type: boolean
+          example: true
+        mensaje:
+          type: string
+          example: "OK"
+        datos:
+          type: array
+          items:
+            $ref: '#/components/schemas/Servicio'
+
+    RespuestaServicio:
+      type: object
+      properties:
+        exito:
+          type: boolean
+          example: true
+        mensaje:
+          type: string
+          example: "OK"
+        datos:
+          $ref: '#/components/schemas/Servicio'
+
+    RespuestaServicioActivo:
+      type: object
+      properties:
+        exito:
+          type: boolean
+          example: true
+        mensaje:
+          type: string
+          example: "Servicio Modificado"
+        datos:
+          type: object
+          properties:
+            activo:
+              type: boolean
+              example: false
+
+    # ----- Reservas -----
+    ReservaBase:
+      type: object
+      description: Datos necesarios para crear una reserva
+      required: [nombre, email, telefono, cantidad_personas, fecha_hora]
+      properties:
+        nombre:
+          type: string
+          example: "Juan González"
+        email:
+          type: string
+          example: "juan@example.com"
+        telefono:
+          type: string
+          example: "+54 11 1234-5678"
+        cantidad_personas:
+          type: integer
+          minimum: 1
+          example: 4
+        fecha_hora:
+          type: string
+          format: date-time
+          description: Fecha y hora en formato ISO 8601
+          example: "2026-07-15T20:30:00"
+        servicios:
+          type: array
+          description: Lista de IDs de servicios solicitados
+          items:
+            type: integer
+          example: [1, 2]
+        observaciones:
+          type: string
+          example: "Mesa cerca de la ventana"
+
+    Reserva:
+      type: object
+      description: Reserva con datos del usuario asociado
+      properties:
+        id_reserva:
+          type: integer
+          example: 1
+        id_usuario:
+          type: integer
+          example: 1
+        nombre:
+          type: string
+          example: "Juan González"
+        email:
+          type: string
+          example: "juan@example.com"
+        telefono:
+          type: string
+          example: "+54 11 1234-5678"
+        fecha_hora:
+          type: string
+          description: "Fecha formateada para mostrar (ej: 'Mie 15/07/2026 20:30')"
+          example: "Mie 15/07/2026 20:30"
+        fecha_creacion:
+          type: string
+          format: date-time
+          example: "2026-06-20T18:00:00"
+        cantidad_personas:
+          type: integer
+          example: 4
+        servicios:
+          type: array
+          description: Nombres de los servicios solicitados
+          items:
+            type: string
+          example: ["WiFi", "Estacionamiento"]
+        observaciones:
+          type: string
+          example: "Mesa cerca de la ventana"
+        estado:
+          $ref: '#/components/schemas/Estado'
+        qr:
+          type: string
+          example: "550e8400-e29b-41d4-a716-446655440000"
+
+    EstadoReserva:
+      type: object
+      required: [estado]
+      properties:
+        estado:
+          $ref: '#/components/schemas/Estado'
+
+    RespuestaReservaCreada:
+      type: object
+      properties:
+        exito:
+          type: boolean
+          example: true
+        mensaje:
+          type: string
+          example: "Reserva creada correctamente"
+        datos:
+          type: object
+          properties:
+            id_reserva:
+              type: integer
+              example: 1
+            qr:
+              type: string
+              example: "550e8400-e29b-41d4-a716-446655440000"
+
+    RespuestaReserva:
+      type: object
+      properties:
+        exito:
+          type: boolean
+          example: true
+        mensaje:
+          type: string
+          example: "Reserva obtenida correctamente"
+        datos:
+          $ref: '#/components/schemas/Reserva'
+
+    RespuestaReservaId:
+      type: object
+      properties:
+        exito:
+          type: boolean
+          example: true
+        mensaje:
+          type: string
+          example: "Reserva cancelada correctamente"
+        datos:
+          type: object
+          properties:
+            id_reserva:
+              type: integer
+              example: 1
+
+    ReservasPaginadas:
+      type: object
+      properties:
+        reservas:
+          type: array
+          items:
+            $ref: '#/components/schemas/Reserva'
+        total:
+          type: integer
+          example: 42
+        pagina:
+          type: integer
+          example: 1
+        max:
+          type: integer
+          example: 10
+        total_paginas:
+          type: integer
+          example: 5
+
+    RespuestaReservasPaginadas:
+      type: object
+      properties:
+        exito:
+          type: boolean
+          example: true
+        mensaje:
+          type: string
+          example: "Reservas obtenidas correctamente"
+        datos:
+          $ref: '#/components/schemas/ReservasPaginadas'
+
+    RespuestaActualizarVencidas:
+      type: object
+      properties:
+        exito:
+          type: boolean
+          example: true
+        mensaje:
+          type: string
+          example: "Se actualizaron 3 reserva(s) vencida(s)."
+        datos:
+          type: object
+          properties:
+            actualizadas:
+              type: integer
+              example: 3
+
+    # ----- Reseñas -----
+    ResenaBase:
+      type: object
+      required: [estrellas, comentario]
+      properties:
+        estrellas:
+          type: integer
+          minimum: 1
+          maximum: 5
+          example: 5
+        comentario:
+          type: string
+          example: "Excelente atención y muy buen café."
+
+    ResenaActualizacion:
+      type: object
+      required: [estrellas, comentario]
+      properties:
+        estrellas:
+          type: integer
+          minimum: 1
+          maximum: 5
+          example: 4
+        comentario:
+          type: string
+          example: "Muy bueno."
+
+    Resena:
+      type: object
+      properties:
+        id_resena:
+          type: integer
+          example: 1
+        id_reserva:
+          type: integer
+          example: 1
+        estrellas:
+          type: integer
+          example: 5
+        comentario:
+          type: string
+          example: "Excelente atención y muy buen café."
+        fecha:
+          type: string
+          example: "2026-06-20 18:00:00"
+
+    ResenaPublica:
+      type: object
+      properties:
+        id_resena:
+          type: integer
+          example: 1
+        nombre_usuario:
+          type: string
+          example: "Juan González"
+        estrellas:
+          type: integer
+          example: 5
+        comentario:
+          type: string
+          example: "Excelente atención y muy buen café."
+        fecha:
+          type: string
+          example: "2026-06-20 18:00:00"
+
+    RespuestaResenas:
+      type: object
+      properties:
+        exito:
+          type: boolean
+          example: true
+        mensaje:
+          type: string
+          example: "Reseñas obtenidas correctamente"
+        datos:
+          type: array
+          items:
+            $ref: '#/components/schemas/ResenaPublica'
+
+    RespuestaResena:
+      type: object
+      properties:
+        exito:
+          type: boolean
+          example: true
+        mensaje:
+          type: string
+          example: "Reseña obtenida correctamente"
+        datos:
+          $ref: '#/components/schemas/Resena'
+
+    RespuestaResenaCreada:
+      type: object
+      properties:
+        exito:
+          type: boolean
+          example: true
+        mensaje:
+          type: string
+          example: "Reseña creada exitosamente"
+        datos:
+          type: object
+          properties:
+            id_resena:
+              type: integer
+              example: 1
+
+    # ----- Admin -----
+    AdminLogin:
+      type: object
+      required: [usuario, contrasenia]
+      properties:
+        usuario:
+          type: string
+          example: "admin"
+        contrasenia:
+          type: string
+          format: password
+          example: "miClaveSegura123"
+
+    RespuestaLogin:
+      type: object
+      properties:
+        exito:
+          type: boolean
+          example: true
+        mensaje:
+          type: string
+          example: "Login exitoso"
+        datos:
+          type: object
+          properties:
+            access_token:
+              type: string
+              example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+            usuario:
+              type: string
+              example: "admin"
+
+    RespuestaMe:
+      type: object
+      properties:
+        exito:
+          type: boolean
+          example: true
+        mensaje:
+          type: string
+          example: "Token valido"
+        datos:
+          type: object
+          properties:
+            id_admin:
+              type: string
+              example: "1"
+
+    CambioContrasenia:
+      type: object
+      required: [contra_actual, nueva_contra]
+      properties:
+        contra_actual:
+          type: string
+          format: password
+          example: "claveVieja123"
+        nueva_contra:
+          type: string
+          format: password
+          description: Mínimo 8 caracteres
+          example: "claveNueva456"
+
+    DashboardStats:
+      type: object
+      properties:
+        total_reservas:
+          type: integer
+          example: 120
+        reservas_hoy:
+          type: integer
+          example: 8
+        cancelaciones:
+          type: integer
+          example: 15
+        resenas:
+          type: integer
+          example: 30
+
+    RespuestaDashboard:
+      type: object
+      properties:
+        exito:
+          type: boolean
+          example: true
+        mensaje:
+          type: string
+          example: "Dashboard obtenido"
+        datos:
+          type: object
+          properties:
+            stats:
+              $ref: '#/components/schemas/DashboardStats'
+            reservas:
+              $ref: '#/components/schemas/ReservasPaginadas'
+            platos:
+              type: array
+              items:
+                $ref: '#/components/schemas/Producto'
+            servicios:
+              type: array
+              items:
+                $ref: '#/components/schemas/Servicio'
+
+    # ----- Errores -----
+    Error:
+      type: object
+      description: Estructura de error devuelta por los endpoints
+      properties:
+        codigo:
+          type: integer
+          description: Código HTTP del error
+          example: 404
+        descripcion:
+          type: string
+          description: Descripción corta del tipo de error
+          example: "Recurso no encontrado"
+        mensaje:
+          type: string
+          description: Mensaje detallado para el usuario
+          example: "No existe una reserva con ese id"
+        nivel:
+          type: string
+          enum: [info, warning, error]
+          example: "error"
+
+    ErrorAuth:
+      type: object
+      description: Error devuelto por las rutas de autenticación y el decorador de admin
+      properties:
+        exito:
+          type: boolean
+          example: false
+        mensaje:
+          type: string
+          example: "Token invalido"
+        datos:
+          $ref: '#/components/schemas/Error'
+
+    ErrorGlobal:
+      type: object
+      description: Error capturado por los manejadores globales (excepciones de Python)
+      properties:
+        exito:
+          type: boolean
+          example: false
+        mensaje:
+          type: string
+          example: "Error interno del servidor"
+        detalle:
+          type: string
+          example: "Detalle técnico de la excepción"
+
+  # ----------------------------------------------------------------------------
+  responses:
+    BadRequest:
+      description: Solicitud incorrecta
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - $ref: '#/components/schemas/Error'
+              - $ref: '#/components/schemas/ErrorGlobal'
+    Unauthorized:
+      description: No autorizado (token faltante o inválido)
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorAuth'
+    NotFound:
+      description: Recurso no encontrado
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - $ref: '#/components/schemas/Error'
+              - $ref: '#/components/schemas/ErrorGlobal'
+    Conflict:
+      description: Conflicto con el estado actual del recurso
+      content:
+        application/json:
+          schema:
+            oneOf:
+              - $ref: '#/components/schemas/Error'
+              - $ref: '#/components/schemas/ErrorGlobal'
+    InternalServerError:
+      description: Error interno del servidor
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorGlobal'
