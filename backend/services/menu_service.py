@@ -1,5 +1,5 @@
 import json
-from backend.repositories.menu_repository import obtener_menu_activo, crear_producto, modificar_producto, eliminar_producto, obtener_plato
+from backend.repositories.menu_repository import obtener_menu_activo, crear_producto, modificar_producto, eliminar_producto, obtener_plato, actualizar_estado
 
 def listar_menu():
     return obtener_menu_activo()
@@ -34,6 +34,12 @@ def data_modificacion_producto(id_producto, data):
         data["imagen"],
         data.get("activo", True)
     )
+
+def data_actualizar_estado(id_producto):
+    plato = data_obtener_plato(id_producto)
+    activo = not plato.get("activo")
+    actualizar_estado(id_producto, activo)
+    return activo
 
 
 def data_eliminar_producto(id_producto):

@@ -207,6 +207,11 @@ def service_eliminar_plato(id, token):
         return {}, None
     return _handle(res, 200, "Error al eliminar el plato.")
 
+def service_cambiar_estado_plato(id, token):
+    res = _request("PATCH", f"{API_BASE_URL}/menu/activo/{id}", token=token)
+    if res is None:
+        return None, "No se pudo conectar con el servidor."
+    return _handle(res, 200, "Error al cambiar el estado del plato.")
 
 
 # ------------ Servicios

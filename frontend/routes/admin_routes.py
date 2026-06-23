@@ -20,6 +20,7 @@ from frontend.services.admin_service import (
     cambiar_franjas_horarias,
     service_obtener_reservas,
     service_actualizar_reservas_vencidas,
+    service_cambiar_estado_plato
     )
 
 import json
@@ -197,6 +198,14 @@ def editar_plato(id):
 def eliminar_plato(id):
     service_eliminar_plato(id, session["admin_token"])
     return redirect(url_for("admin.dashboard"))
+
+@admin_front_bp.route("/menu/<int:id>/estado")
+@requiere_sesion
+def cambiar_estado_plato(id):
+    service_cambiar_estado_plato(id, session["admin_token"])
+    return redirect(url_for("admin.dashboard"))
+
+
 
 # ------------- Servicios
 

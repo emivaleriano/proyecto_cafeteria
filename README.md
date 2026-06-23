@@ -58,7 +58,7 @@ pip install -r requirements.txt
 
 ### Variables de entorno
 
-Crear un archivo `.env` en la carpeta `backend/` basado en el `template.env`:
+Crear un archivo `.env` en la carpeta `backend/` basado en el `.env.example`:
 
 ```env
 MYSQL_ROOT_PASSWORD=root

@@ -10,6 +10,10 @@
     <p>Dejanos tu opinión sobre tu experiencia en nuestro local</p>
 </section>
 
+{% if error %}
+    <div class="error">⚠ {{ error }}</div>
+{% endif %}
+
 <form class="review" method="POST" action="{{ url_for('publico.crear_review', token=token) }}">
 
     <div class="review__campo">
