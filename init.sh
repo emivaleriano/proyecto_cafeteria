@@ -33,7 +33,11 @@ fi
 echo "Ejecutando db_scheme.sql..."
 mysql -u root -p < db_scheme.sql
 
+echo "Creando el primer administrador"
+python -m backend.scripts.creacion_primer_admin
+
 echo "Inicialización completa."
 echo "El entorno virtual está listo. Para usarlo, ejecuta:"
 echo "  source .venv/bin/activate"
-echo "  python app.py"
+echo "  python -m backend.app"
+echo "  python -m frontend.app"
