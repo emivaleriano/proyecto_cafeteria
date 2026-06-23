@@ -1,5 +1,5 @@
 from flask import Blueprint, request
-from backend.services.menu_service import listar_menu, data_nuevo_producto, data_modificacion_producto, data_eliminar_producto, data_obtener_plato
+from backend.services.menu_service import listar_menu, data_nuevo_producto, data_modificacion_producto, data_eliminar_producto, data_obtener_plato, data_actualizar_estado
 from backend.utils.admin import requiere_admin
 from backend.utils.respuestas import (
     crear_respuesta_exito,
@@ -83,3 +83,9 @@ def eliminacion_producto(id):
         mensaje="Producto eliminado correctamente",
         codigo=HTTP_OK_CODE
     )
+
+@menu_bp.route("/menu/activo/<int:id>", methods=["PATCH"])
+@requiere_admin
+def update_activo(id):
+    nuevo_estado = data_actualizar_estado(id)
+    return crear_respuesta_exito(datos={"activo": nuevo_estado}, mensaje="Plato Modificado", codigo=HTTP_OK_CODE)
