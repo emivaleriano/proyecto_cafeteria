@@ -1,6 +1,6 @@
 {% extends "base_usuarios.html" %}
 
-{% block title %}Reseñas - {{ datos.nombre }}{% endblock %}
+{% block title %}Dejá tu reseña{% endblock %}
 
 {% block body %}
 
@@ -9,17 +9,6 @@
     <hr>
     <p>Dejanos tu opinión sobre tu experiencia en nuestro local</p>
 </section>
-
-<form class="review" method="POST" action="{{ url_for('publico.reviews') }}">
-
-    <div class="review__campo">
-        <label for="review__id">Número de reserva</label>
-        <input 
-            type="text" 
-            id="review__id" 
-            name="id_reserva"
-        >
-    </div>
 
 <form class="review" method="POST" action="{{ url_for('publico.crear_review', token=token) }}">
 
@@ -30,7 +19,6 @@
             <option value="" disabled selected>
                 Seleccioná la cantidad de estrellas
             </option>
-
             <option value="1">★</option>
             <option value="2">★★</option>
             <option value="3">★★★</option>
@@ -39,22 +27,12 @@
         </select>
     </div>
 
-
     <div class="review__campo">
-        <label for="review__comentario">
-            Comentarios
-        </label>
-
-        <textarea 
-            id="review__comentario" 
-            name="comentario">
-        </textarea>
+        <label for="review__comentario">Comentarios</label>
+        <textarea id="review__comentario" name="comentario"></textarea>
     </div>
 
-
-    <button class="boton boton--submit" type="submit">
-    Enviar
-    </button>
+    <button class="boton boton--submit" type="submit">Enviar</button>
 
 </form>
 

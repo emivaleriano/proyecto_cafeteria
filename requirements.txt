@@ -1,4 +1,5 @@
 flask
+flask-mail
 mysql-connector-python
 python-dotenv
 qrcode

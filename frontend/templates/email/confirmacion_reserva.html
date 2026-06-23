@@ -1,0 +1,52 @@
+{% extends 'email/_base.html' %}
+
+{% block subject %}Confirmación de reserva #{{ id_reserva }} - Cafetería{% endblock %}
+
+{% block content %}
+<h2 style="margin:0 0 16px 0; font-size:20px; color:#1f2937;">¡Reserva confirmada, {{ nombre }}!</h2>
+
+<p style="margin:0 0 16px 0; font-size:15px; line-height:1.6;">
+  Tu reserva fue registrada exitosamente. Presentá el código QR al llegar al local.
+</p>
+
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%"
+       style="border-collapse:collapse; margin-bottom:24px;">
+  <tr>
+    <td style="padding:8px; border:1px solid #e5e7eb; font-weight:bold; width:50%;">Número de reserva</td>
+    <td style="padding:8px; border:1px solid #e5e7eb;">#{{ id_reserva }}</td>
+  </tr>
+  <tr>
+    <td style="padding:8px; border:1px solid #e5e7eb; font-weight:bold;">Fecha y horario</td>
+    <td style="padding:8px; border:1px solid #e5e7eb;">{{ fecha_hora }}</td>
+  </tr>
+  <tr>
+    <td style="padding:8px; border:1px solid #e5e7eb; font-weight:bold;">Cantidad de personas</td>
+    <td style="padding:8px; border:1px solid #e5e7eb;">{{ cantidad_personas }}</td>
+  </tr>
+</table>
+
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin: 0 auto 24px auto;">
+  <tr>
+    <td align="center" style="border:2px solid #e5e7eb; border-radius:8px; padding:12px;">
+      <img src="cid:qr_image" alt="Código QR de tu reserva" width="180" height="180" />
+      <p style="margin:8px 0 0 0; font-size:12px; color:#6b7280;">Código: {{ codigo_qr }}</p>
+    </td>
+  </tr>
+</table>
+
+<p style="margin:0 0 16px 0; font-size:15px; line-height:1.6;">
+  ¿No podés asistir? Cancelá tu reserva desde el botón de abajo.
+</p>
+
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin: 0 auto 8px auto;">
+  <tr>
+    <td align="center" bgcolor="#c0392b" style="border-radius:8px;">
+      <a href="{{ url_cancelar }}"
+         style="display:inline-block; padding:14px 32px; font-size:15px; font-weight:600;
+                color:#ffffff; text-decoration:none; border-radius:8px;">
+        Cancelar reserva
+      </a>
+    </td>
+  </tr>
+</table>
+{% endblock %}

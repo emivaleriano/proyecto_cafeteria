@@ -24,8 +24,6 @@ from datetime import datetime
 import uuid
 import json
 
-from backend.utils.email import enviar_confirmacion_reserva
-
 def crear_nueva_reserva(data):
 
     nombre = validar_texto(data.get("nombre"), "nombre")
@@ -86,21 +84,13 @@ def crear_nueva_reserva(data):
         qr
     )
 
-# Envía email de confirmación con el QR
-    enviar_confirmacion_reserva(
-        email_destino=email,
-        nombre=nombre,
-        reserva={
-            "id_reserva": id_reserva,
-            "fecha_hora": fecha_hora,
-            "cantidad_personas": cantidad_personas,
-            "qr": qr,
-        }
-    )
-
     return {
         "id_reserva": id_reserva,
-        "qr": qr
+        "qr": qr,
+        "email": email,
+        "nombre": nombre,
+        "fecha_hora": fecha_hora,
+        "cantidad_personas": cantidad_personas,
     }
 
 
@@ -116,6 +106,7 @@ def data_obtener_reserva(id_reserva):
         if str(s["id_servicio"]) in [str(id) for id in reserva["servicios"]] #si el id coincide con los servicios de la reserva
     ]
 
+    print(reserva)
     return reserva
 
 
