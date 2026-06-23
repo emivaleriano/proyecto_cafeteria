@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, current_app
+from flask import Blueprint, render_template, request, redirect, url_for
 import qrcode
 import io
 import base64
@@ -18,7 +18,7 @@ from frontend.services.publico_service import (
 )
 from frontend.services.admin_service import service_actualizar_reserva
 from frontend.utils.tokens import verificar_token_resena, generar_token_resena
-from backend.utils.email import enviar_confirmacion_reserva, enviar_email_check_in
+from frontend.services.mailer import enviar_confirmacion_reserva, enviar_email_check_in
 import os
 publico_bp = Blueprint("publico", __name__)
 
@@ -134,7 +134,6 @@ def crear_reserva():
         email_destino=datos.get("email"),
         nombre=datos.get("nombre"),
         reserva=datos,
-        app=current_app._get_current_object(),
     )
 
     return redirect(url_for(
@@ -211,7 +210,6 @@ def confirmar_check_in(token):
         nombre=reserva["nombre"],
         id_reserva=reserva["id_reserva"],
         link_resena=link_resena,
-        app=current_app._get_current_object(),
     )
 
     return render_template("check_in.html", reserva=reserva, completada=True)
