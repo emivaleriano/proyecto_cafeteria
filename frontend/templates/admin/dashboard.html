@@ -155,7 +155,7 @@
                     <form method="POST" action="{{ url_for('admin.eliminar_plato', id=plato.id) }}" style="display:inline">
                         <button type="submit" class="boton-cancelar">Eliminar</button>
                     </form>
-                    {#<a class="boton" href="{{ url_for('admin.cambiar_estado_plato', id=plato.id) }}">{{ 'Desactivar' if plato.activo else 'Activar' }}</a>#}
+                    <a class="boton" href="{{ url_for('admin.cambiar_estado_plato', id=plato.id) }}">{{ 'Desactivar' if plato.activo else 'Activar' }}</a>
             </td>
         </tr>
         {% endfor %}
