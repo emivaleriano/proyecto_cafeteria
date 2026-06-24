@@ -44,6 +44,8 @@ La base de datos se llama *cafeteria* y contiene las siguientes tablas:
 | info_local       | Datos generales del local (nombre, dirección, capacidad máxima, contacto)|
 
 
+![alt text](DER.png)
+
 **Endpoints desarrollados**: declarados en el archivo *swagger.yaml*
 
 ## Dificultades presentadas:
