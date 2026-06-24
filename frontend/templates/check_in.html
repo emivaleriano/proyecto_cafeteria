@@ -36,6 +36,15 @@
     </div>
     {% endif %}
 
+    {% if reserva.observaciones %}
+    <div class="tarjeta-detalle">
+        <div class="tarjeta-detalle__header"><h2>Observaciones</h2></div>
+        <div class="tarjeta-detalle__body">
+            <p class="detalle-comentario">{{ reserva.observaciones }}</p>
+        </div>
+    </div>
+    {% endif %}
+
     <div class="tarjeta-detalle">
         <div class="tarjeta-detalle__header"><h2>Completar visita</h2></div>
         <div class="tarjeta-detalle__body">

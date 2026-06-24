@@ -1,10 +1,12 @@
 import requests
+
+from dotenv import load_dotenv
+from pathlib import Path
 import os
 
+load_dotenv(Path(__file__).parent / ".env")
 
-def _api():
-    return os.getenv("API_BASE_URL")
-
+API_BASE_URL = os.getenv("API_BASE_URL")
 
 def get_inicio():
     """
@@ -12,7 +14,7 @@ def get_inicio():
     Retorna (datos, None) o (None, mensaje_error).
     """
     try:
-        res = requests.get(f"{_api()}/inicio", timeout=10)
+        res = requests.get(f"{API_BASE_URL}/inicio", timeout=10)
     except requests.exceptions.ConnectionError:
         return None, "No se pudo conectar con el servidor."
     except requests.exceptions.Timeout:
@@ -26,7 +28,7 @@ def get_inicio():
     return None, body.get("mensaje", "Error al obtener la información del local.")
 
 
-# menu
+# menu -------------------------------------------------
 
 def get_menu():
     """
@@ -34,7 +36,7 @@ def get_menu():
     Retorna (lista_productos, None) o (None, mensaje_error).
     """
     try:
-        res = requests.get(f"{_api()}/menu", timeout=10)
+        res = requests.get(f"{API_BASE_URL}/menu", timeout=10)
     except requests.exceptions.ConnectionError:
         return None, "No se pudo conectar con el servidor."
     except requests.exceptions.Timeout:
@@ -48,7 +50,7 @@ def get_menu():
     return None, body.get("mensaje", "Error al obtener el menú.")
 
 
-# reviews
+# reviews -----------------------------------
 
 def get_reviews():
     """
@@ -56,7 +58,7 @@ def get_reviews():
     Retorna (lista_reviews, None) o (None, mensaje_error).
     """
     try:
-        res = requests.get(f"{_api()}/reviews", timeout=10)
+        res = requests.get(f"{API_BASE_URL}/reviews", timeout=10)
     except requests.exceptions.ConnectionError:
         return None, "No se pudo conectar con el servidor."
     except requests.exceptions.Timeout:
@@ -77,7 +79,7 @@ def post_review(id_reserva, estrellas, comentario):
     """
     try:
         res = requests.post(
-            f"{_api()}/reservas/{id_reserva}/review",
+            f"{API_BASE_URL}/reservas/{id_reserva}/review",
             json={"estrellas": estrellas, "comentario": comentario},
             timeout=10,
         )
@@ -97,7 +99,7 @@ def post_review(id_reserva, estrellas, comentario):
 def get_review(id_review):
     try:
         res = requests.get(
-            f"{_api()}/reviews/{id_review}",
+            f"{API_BASE_URL}/reviews/{id_review}",
             timeout=10
         )
 
@@ -117,7 +119,7 @@ def get_review(id_review):
 def patch_review(id_review, estrellas, comentario):
     try:
         res = requests.patch(
-            f"{_api()}/reviews/{id_review}",
+            f"{API_BASE_URL}/reviews/{id_review}",
             json={
                 "estrellas": estrellas,
                 "comentario": comentario
@@ -141,11 +143,10 @@ def patch_review(id_review, estrellas, comentario):
         "Error al modificar la reseña."
     )
 
-
 def delete_review(id_review):
     try:
         res = requests.delete(
-            f"{_api()}/reviews/{id_review}",
+            f"{API_BASE_URL}/reviews/{id_review}",
             timeout=10
         )
 
@@ -162,13 +163,14 @@ def delete_review(id_review):
     return None, body.get("mensaje", "Error al eliminar la reseña.")
 
 
+# reservas ---------------------------------------
 def get_datos_reserva():
     inicio, error = get_inicio()
     if error:
         return None, error
 
     try:
-        res = requests.get(f"{_api()}/servicios/activos", timeout=10)
+        res = requests.get(f"{API_BASE_URL}/servicios/activos", timeout=10)
     except requests.exceptions.ConnectionError:
         return None, "No se pudo conectar con el servidor."
     except requests.exceptions.Timeout:
@@ -200,7 +202,7 @@ def post_reserva(form):
     }
 
     try:
-        res = requests.post(f"{_api()}/reservas", json=payload, timeout=10)
+        res = requests.post(f"{API_BASE_URL}/reservas", json=payload, timeout=10)
     except requests.exceptions.ConnectionError:
         return None, "No se pudo conectar con el servidor."
     except requests.exceptions.Timeout:
@@ -211,10 +213,9 @@ def post_reserva(form):
         return body.get("datos", {}), None
     return None, body.get("mensaje", "Error al crear la reserva.")
 
-
 def get_reserva(id_reserva):
     try:
-        res = requests.get(f"{_api()}/reservas/{id_reserva}", timeout=10)
+        res = requests.get(f"{API_BASE_URL}/reservas/{id_reserva}", timeout=10)
     except requests.exceptions.ConnectionError:
         return None, "No se pudo conectar con el servidor."
     except requests.exceptions.Timeout:
@@ -229,7 +230,7 @@ def get_reserva(id_reserva):
 def post_cancelar_reserva(id_reserva):
     try:
         res = requests.patch(
-            f"{_api()}/reservas/{id_reserva}/cancelar",
+            f"{API_BASE_URL}/reservas/{id_reserva}/cancelar",
             timeout=10,
         )
     except requests.exceptions.ConnectionError:
@@ -243,9 +244,39 @@ def post_cancelar_reserva(id_reserva):
     return None, body.get("mensaje", "Error al cancelar la reserva.")
 
 
+def get_reserva_por_qr(qr):
+    try:
+        res = requests.get(f"{API_BASE_URL}/reservas/qr/{qr}", timeout=10)
+    except requests.exceptions.ConnectionError:
+        return None, "No se pudo conectar con el servidor."
+    except requests.exceptions.Timeout:
+        return None, "El servidor tardó demasiado en responder."
+
+    body = res.json()
+    if res.status_code == 200 and body.get("exito"):
+        return body.get("datos", {}), None
+    return None, body.get("mensaje", "Error al obtener la reserva.")
+
+
+def post_cancelar_reserva_por_qr(qr):
+    try:
+        res = requests.patch(
+            f"{API_BASE_URL}/reservas/qr/{qr}/cancelar",
+            timeout=10,
+        )
+    except requests.exceptions.ConnectionError:
+        return None, "No se pudo conectar con el servidor."
+    except requests.exceptions.Timeout:
+        return None, "El servidor tardó demasiado en responder."
+
+    body = res.json()
+    if res.status_code == 200 and body.get("exito"):
+        return body.get("datos", {}), None
+    return None, body.get("mensaje", "Error al cancelar la reserva.")
+
 def get_check_in(token):
     try:
-        res = requests.get(f"{_api()}/reservas/check-in/{token}", timeout=10)
+        res = requests.get(f"{API_BASE_URL}/reservas/check-in/{token}", timeout=10)
     except requests.exceptions.ConnectionError:
         return None, "No se pudo conectar con el servidor."
     except requests.exceptions.Timeout:

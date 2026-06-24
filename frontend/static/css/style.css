@@ -653,7 +653,7 @@ nav a:focus-visible {
 *************************************************************************************************/
 .login,
 .admin-login {
-  max-width: 420px;
+  max-width: 620px;
   margin: 3rem auto;
   padding: 2.5rem;
   background: var(--fondo-tarjeta);
@@ -890,6 +890,19 @@ footer {
 
 .detalle-grilla dd {
     margin: 0 0 0.5rem;
+}
+
+.login a {
+  display: block;
+  text-align: center;
+  margin-top: 0.75rem;
+  color: var(--texto-secundario);
+}
+
+.login + div {
+  display: flex;
+  justify-content: center;
+  margin-top: 1.25rem;
 }
 
 /* Badge de estado */

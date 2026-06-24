@@ -31,7 +31,7 @@
 
             <p>Esta acción no se puede deshacer.</p>
 
-            <form method="POST" action="{{ url_for('publico.cancelar_reserva', id_reserva=reserva.id_reserva) }}">
+            <form method="POST" action="{{ url_for('publico.cancelar_reserva', qr=reserva.qr) }}">
                 <button class="btn_cancelar_reserva" type="submit">Sí, cancelar reserva</button>
             </form>
 

@@ -48,7 +48,7 @@ def enviar_confirmacion_reserva(email_destino: str, nombre: str, reserva: dict) 
     cantidad   = reserva.get("cantidad_personas", "")
     codigo_qr  = reserva["qr"]
 
-    url_cancelar    = f"{FRONTEND_BASE_URL}/reservar/{id_reserva}/cancelar"
+    url_cancelar    = f"{FRONTEND_BASE_URL}/reservar/{codigo_qr}/cancelar"
     url_qr          = f"{FRONTEND_BASE_URL}/check-in/{codigo_qr}"
     imagen_qr_bytes = _generar_imagen_qr(url_qr)
 

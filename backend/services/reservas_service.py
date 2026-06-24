@@ -117,6 +117,28 @@ def data_cancelar_reserva(id_reserva):
     return cancelar_reserva(id_reserva)
 
 
+def data_obtener_reserva_por_qr(qr):
+    reserva = obtener_reserva_por_token(qr)
+    if not reserva:
+        raise LookupError("No existe una reserva con ese código")
+
+    todos = obtener_servicios()
+    ids = json.loads(reserva["servicios"] or "[]")
+    reserva["servicios"] = [
+        s["nombre"] for s in todos
+        if str(s["id_servicio"]) in [str(id) for id in ids]
+    ]
+    return formatear_reserva(reserva)
+
+
+def data_cancelar_reserva_por_qr(qr):
+    reserva = obtener_reserva_por_token(qr)
+    if not reserva:
+        raise LookupError("No existe una reserva con ese código")
+
+    return cancelar_reserva(reserva["id_reserva"])
+
+
 
 def data_obtener_todas_reservas(pagina, max, estados, orden):
     return obtener_todas_reservas(pagina, max, estados, orden)

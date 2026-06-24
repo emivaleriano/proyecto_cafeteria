@@ -10,7 +10,8 @@ from frontend.services.publico_service import (
     get_datos_reserva,
     post_reserva,
     get_reserva,
-    post_cancelar_reserva,
+    get_reserva_por_qr,
+    post_cancelar_reserva_por_qr,
     get_review,
     patch_review,
     delete_review,
@@ -157,14 +158,13 @@ def crear_reserva():
 
     return redirect(url_for(
         "publico.confirmacion_reserva",
-        id_reserva=datos.get("id_reserva"),
         qr=datos.get("qr"),
     ))
 
 
-@publico_bp.route("/reservar/confirmacion/<int:id_reserva>")
-def confirmacion_reserva(id_reserva):
-    reserva, error = get_reserva(id_reserva)
+@publico_bp.route("/reservar/confirmacion/<string:qr>")
+def confirmacion_reserva(qr):
+    reserva, error = get_reserva_por_qr(qr)
     if error:
         return render_template("error.html", mensaje=error), 503
 
@@ -186,18 +186,18 @@ def confirmacion_reserva(id_reserva):
     return render_template("confirmacion.html", reserva=reserva, datos=datos, qr_img=qr_data_url)
 
 
-@publico_bp.route("/reservar/<int:id_reserva>/cancelar", methods=["GET"])
-def confirmar_cancelacion(id_reserva):
+@publico_bp.route("/reservar/<string:qr>/cancelar", methods=["GET"])
+def confirmar_cancelacion(qr):
     """Página de confirmación antes de cancelar (link del email llega acá)."""
-    reserva, error = get_reserva(id_reserva)
+    reserva, error = get_reserva_por_qr(qr)
     if error:
         return render_template("cancelar_reserva.html", reserva=None, error=error)
     return render_template("cancelar_reserva.html", reserva=reserva, error=None)
 
 
-@publico_bp.route("/reservar/<int:id_reserva>/cancelar", methods=["POST"])
-def cancelar_reserva(id_reserva):
-    _, error = post_cancelar_reserva(id_reserva)
+@publico_bp.route("/reservar/<string:qr>/cancelar", methods=["POST"])
+def cancelar_reserva(qr):
+    _, error = post_cancelar_reserva_por_qr(qr)
     if error:
         return render_template("error.html", mensaje=error), 503
     return render_template("reserva_cancelada.html")

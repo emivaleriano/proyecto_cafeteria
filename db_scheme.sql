@@ -73,4 +73,4 @@ CREATE TABLE IF NOT EXISTS info_local(
 );
 
 INSERT INTO info_local (nombre, direccion, telefono, email, capacidad_maxima) VALUES
-('Cafetería El Rincón', ' Av Santa Fe 1234 , CABA', '+54 11 4987-6543', 'info@elricon.com', 100);
+('Cafetería El Rincón', ' Av Santa Fe 1234 , CABA', '+54 11 4987-6543', 'info@elricon.com', 50);

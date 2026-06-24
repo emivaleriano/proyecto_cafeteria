@@ -8,6 +8,8 @@ from backend.services.reservas_service import (
     data_obtener_todas_reservas,
     data_check_in,
     data_actualizar_reservas_vencidas,
+    data_obtener_reserva_por_qr,
+    data_cancelar_reserva_por_qr,
 )
 
 from backend.utils.respuestas import (
@@ -128,6 +130,31 @@ def obtener_check_in_route(token):
         mensaje="Reserva obtenida correctamente",
         codigo=HTTP_OK_CODE
     )
+
+@reservas_bp.route("/reservas/qr/<string:qr>", methods=["GET"])
+def obtener_reserva_por_qr_route(qr):
+    reserva = data_obtener_reserva_por_qr(qr)
+    return crear_respuesta_exito(
+        datos=reserva,
+        mensaje="Reserva obtenida correctamente",
+        codigo=HTTP_OK_CODE
+    )
+
+
+@reservas_bp.route("/reservas/qr/<string:qr>/cancelar", methods=["PATCH"])
+def cancelar_reserva_por_qr_route(qr):
+    resultado = data_cancelar_reserva_por_qr(qr)
+    if "error" in resultado:
+        return crear_respuesta_error(
+            codigo=HTTP_BAD_REQUEST_CODE,
+            descripcion="No se pudo cancelar la reserva",
+            mensaje=resultado["error"]
+        )
+    return crear_respuesta_exito(
+        mensaje="Reserva cancelada correctamente",
+        codigo=HTTP_OK_CODE
+    )
+
 
 @reservas_bp.route("/reservas/actualizar-vencidas", methods=["PATCH"])
 @requiere_admin
