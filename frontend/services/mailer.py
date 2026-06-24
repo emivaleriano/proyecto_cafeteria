@@ -18,8 +18,23 @@ logger = logging.getLogger(__name__)
 FRONTEND_BASE_URL = os.getenv("FRONTEND_BASE_URL", "http://localhost:3000")
 
 
-def _enviar(asunto: str, destinatario: str, template_base: str, contexto: dict) -> None:
-    """Renderiza el template HTML y envía el email."""
+ERROR_ENVIO = "No se pudo enviar el email."
+
+
+def _despachar(mensaje: Message, descripcion: str):
+    """Envía un Message ya armado. Devuelve (True, None) o (False, mensaje)."""
+    try:
+        mail = Mail(current_app)
+        mail.send(mensaje)
+    except Exception as e:
+        logger.exception(f"Falló el envío del email ({descripcion}): {e}")
+        return False, ERROR_ENVIO
+    logger.info(f"Email enviado: {descripcion}")
+    return True, None
+
+
+def _enviar(asunto: str, destinatario: str, template_base: str, contexto: dict):
+    """Renderiza el template HTML y envía el email. Devuelve (True, None) o (False, mensaje)."""
     contexto.setdefault("frontend_base_url", FRONTEND_BASE_URL)
     cuerpo_html = render_template(f"email/{template_base}.html", **contexto)
 
@@ -29,9 +44,7 @@ def _enviar(asunto: str, destinatario: str, template_base: str, contexto: dict) 
         html=cuerpo_html,
     )
 
-    mail = Mail(current_app)
-    mail.send(mensaje)
-    logger.info(f"Email '{asunto}' enviado a {destinatario} (template: {template_base})")
+    return _despachar(mensaje, f"'{asunto}' a {destinatario} (template: {template_base})")
 
 
 def _generar_imagen_qr(texto_qr: str) -> bytes:
@@ -42,47 +55,48 @@ def _generar_imagen_qr(texto_qr: str) -> bytes:
     return buffer.read()
 
 
-def enviar_confirmacion_reserva(email_destino: str, nombre: str, reserva: dict) -> None:
-    id_reserva = reserva["id_reserva"]
-    fecha_hora = reserva.get("fecha_hora", "")
-    cantidad   = reserva.get("cantidad_personas", "")
-    codigo_qr  = reserva["qr"]
+def enviar_confirmacion_reserva(email_destino: str, nombre: str, reserva: dict):
+    """Envía la confirmación con el QR adjunto. Devuelve (True, None) o (False, mensaje)."""
+    try:
+        id_reserva = reserva["id_reserva"]
+        codigo_qr  = reserva["qr"]
 
-    url_cancelar    = f"{FRONTEND_BASE_URL}/reservar/{codigo_qr}/cancelar"
-    url_qr          = f"{FRONTEND_BASE_URL}/check-in/{codigo_qr}"
-    imagen_qr_bytes = _generar_imagen_qr(url_qr)
+        url_cancelar    = f"{FRONTEND_BASE_URL}/reservar/{codigo_qr}/cancelar"
+        url_qr          = f"{FRONTEND_BASE_URL}/check-in/{codigo_qr}"
+        imagen_qr_bytes = _generar_imagen_qr(url_qr)
 
-    contexto = {
-        "nombre":            nombre,
-        "id_reserva":        id_reserva,
-        "fecha_hora":        fecha_hora,
-        "cantidad_personas": cantidad,
-        "codigo_qr":         codigo_qr,
-        "url_cancelar":      url_cancelar,
-        "frontend_base_url": FRONTEND_BASE_URL,
-    }
-    cuerpo_html = render_template("email/confirmacion_reserva.html", **contexto)
+        contexto = {
+            "nombre":            nombre,
+            "id_reserva":        id_reserva,
+            "fecha_hora":        reserva.get("fecha_hora", ""),
+            "cantidad_personas": reserva.get("cantidad_personas", ""),
+            "codigo_qr":         codigo_qr,
+            "url_cancelar":      url_cancelar,
+            "frontend_base_url": FRONTEND_BASE_URL,
+        }
+        cuerpo_html = render_template("email/confirmacion_reserva.html", **contexto)
 
-    mensaje = Message(
-        subject=f"Confirmación de reserva #{id_reserva} - Cafetería",
-        recipients=[email_destino],
-        html=cuerpo_html,
-    )
-    mensaje.attach(
-        filename="qr_reserva.png",
-        content_type="image/png",
-        data=imagen_qr_bytes,
-        disposition="inline",
-        headers={"Content-ID": "<qr_image>"},
-    )
+        mensaje = Message(
+            subject=f"Confirmación de reserva #{id_reserva} - Cafetería",
+            recipients=[email_destino],
+            html=cuerpo_html,
+        )
+        mensaje.attach(
+            filename="qr_reserva.png",
+            content_type="image/png",
+            data=imagen_qr_bytes,
+            disposition="inline",
+            headers={"Content-ID": "<qr_image>"},
+        )
+    except Exception as e:
+        logger.exception(f"Falló el armado del email de confirmación de reserva: {e}")
+        return False, ERROR_ENVIO
 
-    mail = Mail(current_app)
-    mail.send(mensaje)
-    logger.info(f"Email de confirmación de reserva #{id_reserva} enviado a {email_destino}")
+    return _despachar(mensaje, f"confirmación de reserva #{id_reserva} a {email_destino}")
 
 
-def enviar_email_check_in(email_destino: str, nombre: str, id_reserva: int, link_resena: str) -> None:
-    _enviar(
+def enviar_email_check_in(email_destino: str, nombre: str, id_reserva: int, link_resena: str):
+    return _enviar(
         asunto="¡Gracias por tu visita! Dejanos tu reseña — Cafetería",
         destinatario=email_destino,
         template_base="check_in_completado",
@@ -93,8 +107,8 @@ def enviar_email_check_in(email_destino: str, nombre: str, id_reserva: int, link
         },
     )
 
-def enviar_email_edicion_resena(email_destino: str, nombre: str, id_resena: int, link_edicion_resena: str) -> None:
-    _enviar(
+def enviar_email_edicion_resena(email_destino: str, nombre: str, id_resena: int, link_edicion_resena: str):
+    return _enviar(
         asunto="¡Gracias por tu comentario!",
         destinatario=email_destino,
         template_base="edicion_resena",

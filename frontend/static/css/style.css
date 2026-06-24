@@ -801,6 +801,20 @@ footer {
   font-weight: 500;
 }
 
+.aviso {
+  background: rgba(183, 120, 69, 0.12);
+  border-radius: 20px;
+  border: 1px solid rgba(183, 120, 69, 0.22);
+  color: var(--acento);
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  max-width: 720px;
+  margin: 1.5rem auto;
+  padding: 1.1rem 1.5rem;
+  font-weight: 500;
+}
+
 
 /* Paginación de reservas */
 .paginacion {

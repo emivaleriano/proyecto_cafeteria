@@ -17,6 +17,13 @@
         {% endblock %}
     </header>
     <main>
+        {% with mensajes = get_flashed_messages(with_categories=true) %}
+            {% if mensajes %}
+                {% for categoria, mensaje in mensajes %}
+                <div class="{{ 'aviso' if categoria == 'aviso' else 'error' }}">{{ mensaje }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
         {% block body %}{% endblock %}
     </main>
     <footer>

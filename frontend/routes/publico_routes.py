@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for
+from flask import Blueprint, render_template, request, redirect, url_for, flash
 import qrcode
 import io
 import base64
@@ -74,12 +74,14 @@ def crear_review(token):
     if reserva:
         token_edicion = generar_token_edicion_resena(datos["id_resena"])
         link_edicion_resena = url_for("publico.modificar_review", token=token_edicion, _external=True)
-        enviar_email_edicion_resena(
+        _, error_mail = enviar_email_edicion_resena(
             email_destino=reserva["email"],
             nombre=reserva["nombre"],
             id_resena=datos["id_resena"],
             link_edicion_resena=link_edicion_resena,
         )
+        if error_mail:
+            flash("Tu reseña se guardó correctamente, pero no pudimos enviarte el email con el link de edición.", "aviso")
 
     return redirect(url_for("publico.reviews"))
 
@@ -150,11 +152,13 @@ def crear_reserva():
         form_datos, _ = get_datos_reserva()
         return render_template("crear_reserva.html", **(form_datos or {}), error=error)
 
-    enviar_confirmacion_reserva(
+    _, error_mail = enviar_confirmacion_reserva(
         email_destino=datos.get("email"),
         nombre=datos.get("nombre"),
         reserva=datos,
     )
+    if error_mail:
+        flash("Tu reserva se creó correctamente, pero no pudimos enviarte el email de confirmación.", "aviso")
 
     return redirect(url_for(
         "publico.confirmacion_reserva",
@@ -224,11 +228,13 @@ def confirmar_check_in(token):
     token_resena = generar_token_resena(reserva["id_reserva"])
     link_resena = url_for("publico.crear_review", token=token_resena, _external=True)
 
-    enviar_email_check_in(
+    _, error_mail = enviar_email_check_in(
         email_destino=reserva["email"],
         nombre=reserva["nombre"],
         id_reserva=reserva["id_reserva"],
         link_resena=link_resena,
     )
+    if error_mail:
+        flash("Error al enviar el email con el link de reseña.", "aviso")
 
     return render_template("check_in.html", reserva=reserva, completada=True)
