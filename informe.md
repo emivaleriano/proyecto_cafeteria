@@ -47,9 +47,30 @@ La base de datos se llama *cafeteria* y contiene las siguientes tablas:
 **Endpoints desarrollados**: declarados en el archivo *swagger.yaml*
 
 ## Dificultades presentadas:
+Las principales dificultades fueron:
+- La configuración inicial de la base de datos y la conexión entre el backend y el frontend en puertos distintos.
+- La implementación de la autenticación con JWT y su validación en cada request.
+- El manejo de la paginación y los filtros en el dashboard sin afectar el rendimiento.
+- La generación y envío de códigos QR por email.
+- La coordinación entre los integrantes del equipo y la integración de las diferentes partes del proyecto.
 
 ## Aprendizajes:
+A lo largo del desarrollo aprendimos:
+- A diseñar una API RESTful con Flask, separando correctamente las capas de rutas, servicios y repositorios.
+- A manejar autenticación con JWT y hashear contraseñas con bcrypt.
+- A generar códigos QR y enviar emails automáticos con Flask-Mail.
+- A trabajar con paginación y filtros en el backend para optimizar la carga de datos.
+- A organizar un proyecto en equipo usando Git y GitHub.
 
 ## Mejoras:
+Para futuras versiones del proyecto, se podría mejorar:
+- El dashboard, agregando gráficos visuales de reservas por día, semana o mes.
+- El sistema de reseñas, permitiendo que los usuarios puedan adjuntar fotos a sus reseñas.
+- El despliegue de la aplicación con Docker para facilitar la instalación en cualquier entorno.
+- La implementación de pruebas unitarias para verificar el correcto funcionamiento de los endpoints.
 
 ## Conclusion:
+El proyecto logró implementar un sistema funcional de gestión de reservas para una cafetería, cubriendo los requisitos principales: reservas con QR, panel de administración, gestión de menú y servicios, y sistema de reseñas.
+La separación entre frontend y backend mediante una API RESTful permitió un desarrollo modular, y el uso de autenticación por JWT asegura el control de acceso al panel administrativo.
+El código está estructurado en capas (rutas, servicios, repositorios) siguiendo buenas prácticas, y se utilizó Git para el control de versiones durante el desarrollo.
+El sistema es funcional y puede ser utilizado en un entorno real, aunque existen aspectos que podrían optimizarse.
