@@ -92,3 +92,15 @@ def enviar_email_check_in(email_destino: str, nombre: str, id_reserva: int, link
             "link_resena": link_resena,
         },
     )
+
+def enviar_email_edicion_resena(email_destino: str, nombre: str, id_resena: int, link_edicion_resena: str) -> None:
+    _enviar(
+        asunto="¡Gracias por tu comentario!",
+        destinatario=email_destino,
+        template_base="edicion_resena",
+        contexto={
+            "nombre": nombre,
+            "id_resena": id_resena,
+            "link_edicion_resena": link_edicion_resena,
+        },
+    )
