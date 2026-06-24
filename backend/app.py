@@ -6,11 +6,11 @@ from backend.utils.manejador_errores import registrar_manejadores
 
 load_dotenv(Path(__file__).parent / ".env")
 
-from backend.blueprints.admin_routes import admin_bp # noqa: E402
-from backend.blueprints.servicios_routes import servicios_bp # noqa: E402
-from backend.blueprints.inicio_routes import inicio_bp  # noqa: E402
-from backend.blueprints.menu_routes import menu_bp  # noqa: E402
-from backend.blueprints.reservas_routes import reservas_bp # noqa: E402
+from backend.routes.admin_routes import admin_bp # noqa: E402
+from backend.routes.servicios_routes import servicios_bp # noqa: E402
+from backend.routes.inicio_routes import inicio_bp  # noqa: E402
+from backend.routes.menu_routes import menu_bp  # noqa: E402
+from backend.routes.reservas_routes import reservas_bp # noqa: E402
 
 
 
