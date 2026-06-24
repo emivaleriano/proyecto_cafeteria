@@ -1,0 +1,27 @@
+{% extends 'email/_base.html' %}
+
+{% block subject %}Tu reseña — Cafetería{% endblock %}
+
+{% block content %}
+<h2 style="margin:0 0 16px 0; font-size:20px; color:#1f2937;">¡Gracias por tu reseña, {{ nombre }}!</h2>
+
+<p style="margin:0 0 16px 0; font-size:15px; line-height:1.6;">
+  Muchas gracias por tu comentario. Si querés modificarlo, tenés 90 días para hacerlo.
+</p>
+
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin: 0 auto 24px auto;">
+  <tr>
+    <td align="center" bgcolor="#c0392b" style="border-radius:8px;">
+      <a href="{{ link_edicion_resena }}"
+         style="display:inline-block; padding:14px 32px; font-size:15px; font-weight:600;
+                color:#ffffff; text-decoration:none; border-radius:8px;">
+        Editar mi reseña
+      </a>
+    </td>
+  </tr>
+</table>
+
+<p style="margin:0; font-size:13px; color:#6b7280; line-height:1.6;">
+  Este link es personal y válido por 90 días.
+</p>
+{% endblock %}
