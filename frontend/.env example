@@ -2,3 +2,13 @@ SECRET_KEY=clave-local-desarrollo
 API_BASE_URL=http://localhost:5000
 
 FRONTEND_BASE_URL=http://localhost:3000
+
+# Configuración de Flask-Mail (SMTP)
+# Para Gmail: activar "Contraseñas de aplicación" en la cuenta
+MAIL_SERVER=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USE_TLS=true
+MAIL_USE_SSL=false
+MAIL_USERNAME=tu_email@gmail.com
+MAIL_PASSWORD=tu_contrasenia_de_aplicacion
+MAIL_DEFAULT_SENDER=tu_email@gmail.com

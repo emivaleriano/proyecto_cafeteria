@@ -1,9 +1,9 @@
-from flask import Blueprint, request, jsonify
-from backend.services.menu_service import listar_menu, data_nuevo_producto, data_modificacion_producto, data_eliminar_producto, data_obtener_plato
+from flask import Blueprint, request
+from backend.services.menu_service import listar_menu, data_nuevo_producto, data_modificacion_producto, data_eliminar_producto, data_obtener_plato, data_actualizar_estado
 from backend.utils.admin import requiere_admin
 from backend.utils.respuestas import (
     crear_respuesta_exito,
-    crear_error,
+    crear_respuesta_error,
     HTTP_OK_CODE,
     HTTP_NOT_FOUND_CODE,
     MENSAJE_NO_ENCONTRADO,
@@ -43,19 +43,17 @@ def cambios_producto(id):
 
     if filas_modificadas == 0:
 
-        error = crear_error(
+        return crear_respuesta_error(
             codigo=HTTP_NOT_FOUND_CODE,
             descripcion=MENSAJE_NO_ENCONTRADO,
             mensaje="No existe un producto con ese id"
         )
 
-        return jsonify(error), HTTP_NOT_FOUND_CODE
-    respuesta, codigo = crear_respuesta_exito(
-    datos={"id": id},
-    mensaje="Producto modificado correctamente",
-    codigo=HTTP_OK_CODE
-)
-    return jsonify(respuesta), codigo
+    return crear_respuesta_exito(
+        datos={"id": id},
+        mensaje="Producto modificado correctamente",
+        codigo=HTTP_OK_CODE
+    )
 
 @menu_bp.route("/admin/menu/<int:id>", methods=["GET"])
 @requiere_admin
@@ -74,16 +72,20 @@ def eliminacion_producto(id):
 
     if filas_eliminadas == 0:
 
-        error = crear_error(
+        return crear_respuesta_error(
             codigo=HTTP_NOT_FOUND_CODE,
             descripcion=MENSAJE_NO_ENCONTRADO,
             mensaje="No existe un producto con ese id"
         )
-
-        return error, HTTP_NOT_FOUND_CODE
 
     return crear_respuesta_exito(
         datos={"id": id},
         mensaje="Producto eliminado correctamente",
         codigo=HTTP_OK_CODE
     )
+
+@menu_bp.route("/menu/activo/<int:id>", methods=["PATCH"])
+@requiere_admin
+def update_activo(id):
+    nuevo_estado = data_actualizar_estado(id)
+    return crear_respuesta_exito(datos={"activo": nuevo_estado}, mensaje="Plato Modificado", codigo=HTTP_OK_CODE)

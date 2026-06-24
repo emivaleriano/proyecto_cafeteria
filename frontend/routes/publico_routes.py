@@ -14,9 +14,11 @@ from frontend.services.publico_service import (
     get_review,
     patch_review,
     delete_review,
+    get_check_in
 )
 from frontend.services.admin_service import service_actualizar_reserva
-from frontend.utils.tokens import verificar_token_resena
+from frontend.utils.tokens import verificar_token_resena, generar_token_resena
+from frontend.services.mailer import enviar_confirmacion_reserva, enviar_email_check_in
 import os
 publico_bp = Blueprint("publico", __name__)
 
@@ -128,6 +130,12 @@ def crear_reserva():
         form_datos, _ = get_datos_reserva()
         return render_template("crear_reserva.html", **(form_datos or {}), error=error)
 
+    enviar_confirmacion_reserva(
+        email_destino=datos.get("email"),
+        nombre=datos.get("nombre"),
+        reserva=datos,
+    )
+
     return redirect(url_for(
         "publico.confirmacion_reserva",
         id_reserva=datos.get("id_reserva"),
@@ -189,17 +197,19 @@ def confirmar_check_in(token):
     reserva, error = get_check_in(token)
     if error:
         return render_template("error.html", mensaje=error), 503
+
     _, error = service_actualizar_reserva(reserva["id_reserva"], "Completada")
     if error:
         return render_template("error.html", mensaje=error), 503
+
+    token_resena = generar_token_resena(reserva["id_reserva"])
+    link_resena = url_for("publico.crear_review", token=token_resena, _external=True)
+
+    enviar_email_check_in(
+        email_destino=reserva["email"],
+        nombre=reserva["nombre"],
+        id_reserva=reserva["id_reserva"],
+        link_resena=link_resena,
+    )
+
     return render_template("check_in.html", reserva=reserva, completada=True)
-
-"""
-Para generar el mail:
-from utils.tokens import generar_token_resena
-
-token = generar_token_resena(id_reserva)
-link  = url_for("publico.crear_review", token=token, _external=True) # el external true es para que genere la URL completa
-# usas link en el cuerpo del mail
-# usar siempre id_reserva, no id solo
-"""

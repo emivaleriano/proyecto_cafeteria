@@ -21,7 +21,7 @@ def _handle(res, codigo_exito, mensaje_default):
         return body.get("datos", {}), None
     return None, body.get("mensaje", mensaje_default)
 
-def _request(method, url, token=None, json=None):
+def _request(method, url, token=None, json=None, params=None):
     """ConnectionError y Timeout.
     Unifica el connection y timeout para evitar la repeticion en cada funcion"""
     try:
@@ -30,6 +30,7 @@ def _request(method, url, token=None, json=None):
             url,
             headers=_headers(token) if token else {},
             json=json,
+            params=params,
             timeout=10,
         )
     except requests.exceptions.ConnectionError:
@@ -60,6 +61,28 @@ def login_admin(usuario, contrasenia):
         return body.get("datos", {}), None
 
     return None, body.get("mensaje", "Error al iniciar sesión.")
+
+
+def validar_token(token):
+    """
+    Consulta al back si el token sigue siendo válido.
+    """
+    try:
+        res = requests.get(
+            f"{API_BASE_URL}/admin/me",
+            headers={"Authorization": f"Bearer {token}"},
+            timeout=5,
+        )
+    except requests.exceptions.ConnectionError:
+        return None, "No se pudo conectar con el servidor."
+    except requests.exceptions.Timeout:
+        return None, "El servidor tardó demasiado en responder."
+
+    body = res.json()
+    if res.status_code == 200 and body.get("exito"):
+        return body.get("datos", {}), None
+    return None, body.get("mensaje", "Token inválido o expirado.")
+
 
 def service_cambiar_contrasenia(contra_actual, nueva_contra, confirmar_contra, token):
     if nueva_contra != confirmar_contra:
@@ -107,17 +130,21 @@ def cambiar_franjas_horarias(franjas, token):
         return None, "No se pudo conectar con el servidor."
     return _handle(res, 200, "Error al editar las franjas horarias.")
 
-def obtener_dashboard(token): #stats
+def obtener_dashboard(token, pagina=1, orden="asc", estados=None):#stats
     """
     Retorna (datos, None) si la request es exitosa.
     Retorna (None, mensaje_error) si algo falla.
     """
     headers = {'Authorization': f'Bearer {token}'}
+    params = {"pagina": pagina, "orden": orden}
+    if estados:
+        params["estado"] = estados
 
     try:
         res = requests.get(
             f"{API_BASE_URL}/admin/dashboard",
             headers=headers,
+            params=params,
             timeout=10,
         )
     except requests.exceptions.ConnectionError:
@@ -180,6 +207,11 @@ def service_eliminar_plato(id, token):
         return {}, None
     return _handle(res, 200, "Error al eliminar el plato.")
 
+def service_cambiar_estado_plato(id, token):
+    res = _request("PATCH", f"{API_BASE_URL}/menu/activo/{id}", token=token)
+    if res is None:
+        return None, "No se pudo conectar con el servidor."
+    return _handle(res, 200, "Error al cambiar el estado del plato.")
 
 
 # ------------ Servicios
@@ -217,6 +249,15 @@ def service_cambiar_estado_servicio(id, token):
     return _handle(res, 200, "Error al cambiar el estado del servicio.")
 
 # ------------- Reservas
+def service_obtener_reservas(token, pagina=1, orden="asc", estados=None):
+    params = {"pagina": pagina, "orden": orden}
+    if estados:
+        params["estado"] = estados
+    res = _request("GET", f"{API_BASE_URL}/reservas", token=token, params=params)
+    if res is None:
+        return None, "No se pudo conectar con el servidor."
+    return _handle(res, 200, "Error al obtener las reservas.")
+
 def service_obtener_reserva(id, token):
     res = _request("GET", f"{API_BASE_URL}/reservas/{id}", token=token)
     if res is None:
@@ -224,7 +265,13 @@ def service_obtener_reserva(id, token):
     return _handle(res, 200, "Error al obtener la reserva.")
 
 def service_actualizar_reserva(id, estado):
-    res = requests.patch(f"{API_BASE_URL}/reservas/{id}/estado",json={"estado": estado}, timeout=10)
+    res = _request("PATCH", f"{API_BASE_URL}/reservas/{id}/estado", json={"estado": estado})
     if res is None:
         return None, "No se pudo conectar con el servidor."
     return _handle(res, 200, "Error al actualizar la reserva.")
+
+def service_actualizar_reservas_vencidas(token):
+    res = _request("PATCH", f"{API_BASE_URL}/reservas/actualizar-vencidas", token=token)
+    if res is None:
+        return None, "No se pudo conectar con el servidor."
+    return _handle(res, 200, "Error al actualizar las reservas vencidas.")

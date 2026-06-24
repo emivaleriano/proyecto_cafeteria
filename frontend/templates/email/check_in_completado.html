@@ -1,0 +1,32 @@
+{% extends 'email/_base.html' %}
+
+{% block subject %}¡Gracias por tu visita! Dejanos tu reseña — Cafetería{% endblock %}
+
+{% block content %}
+<h2 style="margin:0 0 16px 0; font-size:20px; color:#1f2937;">¡Gracias por visitarnos, {{ nombre }}!</h2>
+
+<p style="margin:0 0 16px 0; font-size:15px; line-height:1.6;">
+  Fue un placer recibirte en la cafetería. Esperamos que hayas disfrutado tu visita
+  (reserva <strong>#{{ id_reserva }}</strong>).
+</p>
+
+<p style="margin:0 0 24px 0; font-size:15px; line-height:1.6;">
+  Tu opinión nos ayuda a mejorar. Si tenés un minuto, contanos cómo fue tu experiencia:
+</p>
+
+<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin: 0 auto 24px auto;">
+  <tr>
+    <td align="center" bgcolor="#c0392b" style="border-radius:8px;">
+      <a href="{{ link_resena }}"
+         style="display:inline-block; padding:14px 32px; font-size:15px; font-weight:600;
+                color:#ffffff; text-decoration:none; border-radius:8px;">
+        Dejar mi reseña
+      </a>
+    </td>
+  </tr>
+</table>
+
+<p style="margin:0; font-size:13px; color:#6b7280; line-height:1.6;">
+  Este link es personal y válido por 7 días. Solo puede usarse una vez.
+</p>
+{% endblock %}

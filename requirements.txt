@@ -1,8 +1,10 @@
 flask
+flask-mail
 mysql-connector-python
 python-dotenv
 qrcode
 pillow
+requests
 pre-commit
 PyJWT
 bcrypt

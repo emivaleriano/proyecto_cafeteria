@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from backend.db import obtener_conexion
 from backend.utils.formatos import formatear_reserva
 
@@ -63,7 +65,7 @@ def obtener_franja_por_dia(dia_semana):
             (dia_semana,)
         )
 
-        return cursor.fetchone()
+        return cursor.fetchall()
 
     finally:
         cursor.close()
@@ -143,10 +145,8 @@ def crear_reserva(
 
 
 def obtener_reserva(id_reserva):
-
     conn = obtener_conexion()
     cursor = conn.cursor(dictionary=True)
-
     try:
 
         cursor.execute(
@@ -172,7 +172,6 @@ def cancelar_reserva(id_reserva):
     cursor = conn.cursor(dictionary=True)
 
     try:
-
         cursor.execute(
             """
             SELECT *
@@ -209,17 +208,48 @@ def cancelar_reserva(id_reserva):
         cursor.close()
         conn.close()
 
-def obtener_todas_reservas():
+
+def obtener_todas_reservas(pagina=1, max=10, estados=None, orden="asc"):
     conn = obtener_conexion()
     cursor = conn.cursor(dictionary=True)
     try:
-        cursor.execute("""
+        offset = (pagina - 1) * max
+        filtros = []
+        valores = []
+
+        if estados:
+            placeholders = ", ".join(["%s"] * len(estados)) # [%s, %s, %s]
+            filtros.append(f"r.estado IN ({placeholders})")
+            valores.extend(estados)
+
+        where = f"WHERE {' AND '.join(filtros)}" if filtros else "" # and r.estado in [...]
+        direccion = "ASC" if orden == "asc" else "DESC"
+
+        cursor.execute(f"""
             SELECT r.*, u.nombre, u.email, u.telefono
             FROM reservas r
             JOIN usuarios u ON r.id_usuario = u.id_usuario
-            ORDER BY r.fecha_hora DESC
-        """)
-        return [formatear_reserva(r) for r in cursor.fetchall()]
+            {where}
+            ORDER BY r.fecha_hora {direccion}
+            LIMIT %s OFFSET %s
+        """, valores + [max, offset])
+        reservas = [formatear_reserva(r) for r in cursor.fetchall()]
+
+        cursor.execute(f"""
+            SELECT COUNT(*) as total
+            FROM reservas r
+            JOIN usuarios u ON r.id_usuario = u.id_usuario
+            {where}
+        """, valores)
+        total = cursor.fetchone()["total"]
+
+        return {
+            "reservas": reservas,
+            "total": total,
+            "pagina": pagina,
+            "max": max,
+            "total_paginas": -(-total // max) # menos para el redondeo
+        }
     finally:
         cursor.close()
         conn.close()
@@ -255,6 +285,27 @@ def obtener_reserva_por_token(token):
             WHERE r.qr = %s
         """, (token,))
         return cursor.fetchone()
+    finally:
+        cursor.close()
+        conn.close()
+
+def actualizar_no_completadas():
+    """
+    Actualiza a 'No Completada' todas las reservas que ya pasaron y que
+    no fueron canceladas o completadas.
+
+    """
+    conn = obtener_conexion()
+    cursor = conn.cursor(dictionary=True)
+    try:
+        cursor.execute("""
+            UPDATE reservas
+            SET estado = 'No Completada'
+            WHERE fecha_hora < %s
+            AND estado NOT IN ('Completada', 'Cancelada', 'No Completada')
+        """, (datetime.now(),))
+        conn.commit()
+        return cursor.rowcount
     finally:
         cursor.close()
         conn.close()

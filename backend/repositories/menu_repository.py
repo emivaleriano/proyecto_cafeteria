@@ -42,8 +42,8 @@ def obtener_plato(id):
     try:
         cursor.execute("SELECT * FROM menu WHERE id = %s", (id,))
         plato = cursor.fetchone()
-        if plato["tags"]:
-                plato["tags"] = json.loads(plato["tags"])
+        if plato and plato["tags"]:
+            plato["tags"] = json.loads(plato["tags"])
         return plato
     finally:
         cursor.close()
@@ -76,6 +76,17 @@ def modificar_producto(id_producto,nombre, descripcion, precio, categoria, tags,
         conn.commit()
         return cursor.rowcount
 
+    finally:
+        cursor.close()
+        conn.close()
+
+def actualizar_estado(id_producto, estado):
+    conn = obtener_conexion()
+    cursor = conn.cursor(dictionary=True)
+
+    try:
+        cursor.execute("UPDATE menu SET activo = %s WHERE id = %s", (estado, id_producto))
+        conn.commit()
     finally:
         cursor.close()
         conn.close()

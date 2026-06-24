@@ -1,0 +1,46 @@
+{# Layout HTML base para los emails de la cafetería.
+   Todo va con estilos inline y tablas para que se vea bien en Gmail, Outlook, etc. #}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block subject %}Cafetería{% endblock %}</title>
+</head>
+<body style="margin:0; padding:0; background:#f3f4f6; font-family: Arial, sans-serif; color:#1f2937;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0"
+         style="background:#f3f4f6; padding: 24px 0;">
+    <tr>
+      <td align="center">
+        <table role="presentation" width="560" cellpadding="0" cellspacing="0" border="0"
+               style="background:#ffffff; border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,0.06); overflow:hidden;">
+
+          <!-- Header -->
+          <tr>
+            <td style="background:#c0392b; padding: 24px 32px; color:#ffffff;">
+              <h1 style="margin:0; font-size:22px; font-weight:700;">Cafetería</h1>
+            </td>
+          </tr>
+
+          <!-- Body -->
+          <tr>
+            <td style="padding: 32px;">
+              {% block content %}{% endblock %}
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="background:#f9fafb; padding: 20px 32px; border-top:1px solid #e5e7eb;">
+              <p style="margin:0; font-size:12px; color:#6b7280; line-height:1.5;">
+                Si no realizaste esta acción, podés ignorar este mensaje.<br>
+                Cafetería &mdash; {{ frontend_base_url }}
+              </p>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

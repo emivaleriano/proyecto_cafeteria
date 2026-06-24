@@ -14,7 +14,7 @@
 </section>
 
 {% if error %}
-    <div class="alert alert-error">{{ error }}</div>
+    <div class="error">⚠ {{ error }}</div>
 {% endif %}
 
 <form class="login" method="POST" action="{{ url_for('admin.config_local') }}">

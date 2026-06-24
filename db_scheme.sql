@@ -23,8 +23,8 @@ CREATE TABLE IF NOT EXISTS reservas(
     cantidad_personas INT NOT NULL DEFAULT 1,
     servicios JSON,
     observaciones VARCHAR(100),
-    estado enum("Pendiente", "Confirmada", "Cancelada", "Completada"),
-    qr VARCHAR(100) NOT NULL,
+    estado enum("Pendiente", "Confirmada", "Cancelada", "Completada","No Completada"),
+    qr VARCHAR(100) NOT NULL UNIQUE,
     FOREIGN KEY (id_usuario) REFERENCES usuarios (id_usuario)
 );
 
@@ -72,5 +72,5 @@ CREATE TABLE IF NOT EXISTS info_local(
     capacidad_maxima INT NOT NULL
 );
 
-INSERT INTO info_local (nombre, direccion, telefono, email) VALUES
-('Cafetería El Rincón', ' Av Santa Fe 1234 , CABA', '+54 11 4987-6543', 'info@elricon.com');
+INSERT INTO info_local (nombre, direccion, telefono, email, capacidad_maxima) VALUES
+('Cafetería El Rincón', ' Av Santa Fe 1234 , CABA', '+54 11 4987-6543', 'info@elricon.com', 100);

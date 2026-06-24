@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, session
+from flask import Blueprint, render_template, request, redirect, url_for, session, jsonify
 from frontend.services.admin_service import (
     login_admin,
     service_actualizar_reserva,
@@ -17,17 +17,16 @@ from frontend.services.admin_service import (
     cambiar_info_local,
     obtener_info_local,
     obtener_franjas_horarias,
-    cambiar_franjas_horarias
+    cambiar_franjas_horarias,
+    service_obtener_reservas,
+    service_actualizar_reservas_vencidas,
+    service_cambiar_estado_plato
     )
 
 import json
+from frontend.utils.admin import requiere_sesion
 
 admin_front_bp = Blueprint("admin", __name__, template_folder="../templates")
-
-
-def requiere_sesion():
-    if not session.get("admin_token"):
-        return redirect(url_for("admin.login"))
 
 
 @admin_front_bp.route("/login", methods=["GET", "POST"])
@@ -58,10 +57,8 @@ def logout():
 
 
 @admin_front_bp.route("/nueva_clave", methods=["GET", "POST"])
+@requiere_sesion
 def cambiar_contrasenia():
-    sesion = requiere_sesion()
-    if sesion:
-        return sesion
 
     if request.method == "POST":
         contra_actual    = request.form.get("contra_actual")
@@ -81,10 +78,8 @@ def cambiar_contrasenia():
     return render_template("admin/cambiar_contrasenia.html")# get
 
 @admin_front_bp.route("/inicio/config", methods=["GET", "POST"])
+@requiere_sesion
 def config_local():
-    sesion = requiere_sesion()
-    if sesion:
-        return sesion
     if request.method =="GET":
         datos, error = obtener_info_local()
         if error:
@@ -103,11 +98,8 @@ def config_local():
 
 
 @admin_front_bp.route("/inicio/franjas", methods=["GET", "POST"])
+@requiere_sesion
 def franjas_horarias():
-    sesion = requiere_sesion()
-    if sesion:
-        return sesion
-
     if request.method == "GET":
         franjas, error = obtener_franjas_horarias()
         if error:
@@ -123,30 +115,50 @@ def franjas_horarias():
     return redirect(url_for("admin.dashboard"))
 
 @admin_front_bp.route("/dashboard")
+@requiere_sesion
 def dashboard():
-    if not session.get("admin_token"):
-        return redirect(url_for("admin.login"))
-
     token = session.get("admin_token")
-    datos, error = obtener_dashboard(token)
+
+    pagina = int(request.args.get("pagina", 1))
+    orden = request.args.get("orden", "asc")
+    estados = request.args.getlist("estado")
+
+    datos, error = obtener_dashboard(token, pagina, orden, estados)
+    reservas_data = datos.get("reservas", {})
 
     if error:
         datos = {"stats": {}, "reservas": [], "platos": [], "servicios": []}
 
     return render_template("admin/dashboard.html",
         stats = datos.get("stats", {}),
-        reservas = datos.get("reservas", []),
+        reservas=reservas_data.get("reservas", []),
+        total_paginas=reservas_data.get("total_paginas", 1),
         platos = datos.get("platos", []),
-        servicios = datos.get("servicios", [])
+        servicios = datos.get("servicios", []),
+        pagina=pagina,
+        orden=orden,
+        estados=estados
     )
 
+@admin_front_bp.route("/dashboard/reservas")
+@requiere_sesion
+def dashboard_reservas():
+    token = session.get("admin_token")
+
+    pagina = int(request.args.get("pagina", 1))
+    orden = request.args.get("orden", "asc")
+    estados = request.args.getlist("estado")
+
+    reservas, error = service_obtener_reservas(token, pagina, orden, estados)
+    if error:
+        return render_template("admin/dashboard.html", error=error), 500
+        # return jsonify({"error": error}), 500
+    return jsonify(reservas)
 # ------- Platos
 
 @admin_front_bp.route("/platos/nuevo", methods=["GET", "POST"])
+@requiere_sesion
 def crear_plato():
-    sesion = requiere_sesion()
-    if sesion:
-        return sesion
 
     if request.method == "GET":
         return render_template("admin/plato_form.html")
@@ -163,11 +175,8 @@ def crear_plato():
 
 
 @admin_front_bp.route("/platos/<int:id>/editar", methods=["GET", "POST"])
+@requiere_sesion
 def editar_plato(id):
-    sesion = requiere_sesion()
-    if sesion:
-        return sesion
-
     if request.method == "GET":
         plato, error = service_obtener_plato(id, session["admin_token"])
         if error:
@@ -185,22 +194,24 @@ def editar_plato(id):
     return redirect(url_for("admin.dashboard"))
 
 @admin_front_bp.route("/platos/<int:id>/eliminar", methods=["POST"])
+@requiere_sesion
 def eliminar_plato(id):
-    sesion = requiere_sesion()
-    if sesion:
-        return sesion
-
     service_eliminar_plato(id, session["admin_token"])
     return redirect(url_for("admin.dashboard"))
+
+@admin_front_bp.route("/menu/<int:id>/estado")
+@requiere_sesion
+def cambiar_estado_plato(id):
+    service_cambiar_estado_plato(id, session["admin_token"])
+    return redirect(url_for("admin.dashboard"))
+
+
 
 # ------------- Servicios
 
 @admin_front_bp.route("/servicios/nuevo", methods=["GET", "POST"])
+@requiere_sesion
 def crear_servicio():
-    sesion = requiere_sesion()
-    if sesion:
-        return sesion
-
     if request.method == "GET":
         return render_template("admin/servicio_form.html")
     datos = {
@@ -213,11 +224,8 @@ def crear_servicio():
 
 
 @admin_front_bp.route("/servicios/<int:id>/editar", methods=["GET", "POST"])
+@requiere_sesion
 def editar_servicio(id):
-    sesion = requiere_sesion()
-    if sesion:
-        return sesion
-
     if request.method == "GET":
         servicio, error = service_obtener_servicio(id, session["admin_token"])
         if error:
@@ -233,20 +241,14 @@ def editar_servicio(id):
     return redirect(url_for("admin.dashboard"))
 
 @admin_front_bp.route("/servicios/<int:id>/eliminar", methods=["POST"])
+@requiere_sesion
 def eliminar_servicio(id):
-    sesion = requiere_sesion()
-    if sesion:
-        return sesion
-
     service_eliminar_servicio(id, session["admin_token"])
     return redirect(url_for("admin.dashboard"))
 
 @admin_front_bp.route("/servicios/<int:id>/estado")
+@requiere_sesion
 def cambiar_estado_servicio(id):
-    sesion = requiere_sesion()
-    if sesion:
-        return sesion
-
     service_cambiar_estado_servicio(id, session["admin_token"])
     return redirect(url_for("admin.dashboard"))
 
@@ -254,20 +256,22 @@ def cambiar_estado_servicio(id):
 
 # ----------- Reservas
 @admin_front_bp.route("/reservas/<int:id>", methods=["GET"])
+@requiere_sesion
 def reserva_detalle(id):
-    sesion = requiere_sesion()
-    if sesion:
-        return sesion
-
     reserva, error = service_obtener_reserva(id, session["admin_token"])
     return render_template("admin/reserva_detalle.html", reserva=reserva)
 
 @admin_front_bp.route("/reservas/<int:id>/actualizar", methods=["POST"])
+@requiere_sesion
 def actualizar_estado_reserva(id):
-    sesion = requiere_sesion()
-    if sesion:
-        return sesion
-
     estado = request.form.get("estado")
     service_actualizar_reserva(id, estado)
+    return redirect(url_for("admin.dashboard"))
+
+@admin_front_bp.route("/reservas/actualizar-vencidas", methods=["POST"])
+@requiere_sesion
+def actualizar_reservas_vencidas():
+    token = session.get("admin_token")
+    service_actualizar_reservas_vencidas(token)
+
     return redirect(url_for("admin.dashboard"))
