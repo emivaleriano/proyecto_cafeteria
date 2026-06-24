@@ -12,7 +12,7 @@
 </section>
 
 
-<form class="review" method="POST" action="{{ url_for('publico.modificar_review', id=resena.id_resena) }}">
+<form class="review" method="POST" action="{{ url_for('publico.guardar_modificacion_review', token=token) }}">
 
 
     <div class="review__campo">
