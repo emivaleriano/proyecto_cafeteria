@@ -17,8 +17,8 @@ from frontend.services.publico_service import (
     get_check_in
 )
 from frontend.services.admin_service import service_actualizar_reserva
-from frontend.utils.tokens import verificar_token_resena, generar_token_resena
-from frontend.services.mailer import enviar_confirmacion_reserva, enviar_email_check_in
+from frontend.utils.tokens import verificar_token_resena, generar_token_resena, generar_token_edicion_resena
+from frontend.services.mailer import enviar_confirmacion_reserva, enviar_email_check_in, verificar_token_edicion_resena
 import os
 publico_bp = Blueprint("publico", __name__)
 
@@ -69,36 +69,55 @@ def crear_review(token):
     if error:
         return render_template("crear_review.html", datos={}, error=error, token=token)
 
+    reserva, _ = get_reserva(id_reserva)
+    if reserva:
+        token_edicion = generar_token_edicion_resena(datos["id_resena"])
+        link_edicion_resena = url_for("publico.modificar_review", token=token_edicion, _external=True)
+        enviar_email_edicion_resena(
+            email_destino=reserva["email"],
+            nombre=reserva["nombre"],
+            id_resena=datos["id_resena"],
+            link_edicion_resena=link_edicion_resena,
+        )
+
     return redirect(url_for("publico.reviews"))
 
 
-@publico_bp.route("/reviews/<int:id>", methods=["GET"])
-def modificar_review(id):
+@publico_bp.route("/reviews/<token>", methods=["GET"])
+def modificar_review(token):
 
-    resena, error = get_review(id)
-
+    id_resena, error = verificar_token_edicion_resena(token)
     if error:
-        return error
+        return render_template("error.html", mensaje=error), 503
+
+    resena, error = get_review(token)
+    if error:
+        return render_template("error.html", mensaje=error), 503
 
     return render_template(
         "editar_review.html",
-        resena=resena
+        resena=resena,
+        token=token
     )
 
-@publico_bp.route("/reviews/<int:id>", methods=["POST"])
-def guardar_modificacion_review(id):
+@publico_bp.route("/reviews/<token>", methods=["POST"])
+def guardar_modificacion_review(token):
+
+    id_resena, error = verificar_token_edicion_resena(token)
+    if error:
+        return render_template("error.html", mensaje=error), 403
 
     estrellas = request.form.get("estrellas")
     comentario = request.form.get("comentario")
 
     _, error = patch_review(
-        id,
+        id_resena,
         estrellas,
         comentario
     )
 
     if error:
-        return error
+        return render_template("error.html", mensaje=error), 503
 
     return redirect(
         url_for("publico.reviews")
