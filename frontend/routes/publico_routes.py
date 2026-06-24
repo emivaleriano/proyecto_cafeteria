@@ -17,8 +17,8 @@ from frontend.services.publico_service import (
     get_check_in
 )
 from frontend.services.admin_service import service_actualizar_reserva
-from frontend.utils.tokens import verificar_token_resena, generar_token_resena, generar_token_edicion_resena
-from frontend.services.mailer import enviar_confirmacion_reserva, enviar_email_check_in, verificar_token_edicion_resena
+from frontend.utils.tokens import verificar_token_resena, generar_token_resena, generar_token_edicion_resena, verificar_token_edicion_resena
+from frontend.services.mailer import enviar_confirmacion_reserva, enviar_email_check_in, enviar_email_edicion_resena
 import os
 publico_bp = Blueprint("publico", __name__)
 
@@ -83,14 +83,14 @@ def crear_review(token):
     return redirect(url_for("publico.reviews"))
 
 
-@publico_bp.route("/reviews/<token>", methods=["GET"])
+@publico_bp.route("/reviews/editar/<token>", methods=["GET"])
 def modificar_review(token):
 
     id_resena, error = verificar_token_edicion_resena(token)
     if error:
         return render_template("error.html", mensaje=error), 503
 
-    resena, error = get_review(token)
+    resena, error = get_review(id_resena)
     if error:
         return render_template("error.html", mensaje=error), 503
 
@@ -100,7 +100,7 @@ def modificar_review(token):
         token=token
     )
 
-@publico_bp.route("/reviews/<token>", methods=["POST"])
+@publico_bp.route("/reviews/editar/<token>", methods=["POST"])
 def guardar_modificacion_review(token):
 
     id_resena, error = verificar_token_edicion_resena(token)
